@@ -12,7 +12,12 @@
   --chrome:#ffffff; --chrome-line:#d6e0df; --chrome-fg:#1c2226; --chrome-muted:#65727a; --hover:#ecf3f2; --danger:#b42318;
   --font-ui:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   --font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  /* ekstra luft over menylinja når den kjører som app fra Hjem-skjermen */
+  --bar-extra:0px;
+  --float-top:calc(env(safe-area-inset-top,0px) + var(--bar-extra) + 69px);
 }
+@media (display-mode: standalone){ :root{ --bar-extra:14px } }
+:root.standalone{ --bar-extra:14px }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --paper:#0f1c29; --grid-minor:#1a3045; --grid-major:#2b4c69;
   --ink:#e6eef5; --ink-soft:#9db1c3; --measure:#8fc3ff; --angle:#ffb27a; --select:#5ddfbd; --free:#5a9dff;
@@ -36,7 +41,7 @@ button{cursor:pointer}
 :focus-visible{outline:2px solid var(--select);outline-offset:2px}
 
 .topbar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:10px;
-  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:8px;
+  padding-top:calc(env(safe-area-inset-top,0px) + var(--bar-extra) + 8px);padding-bottom:8px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   background:var(--chrome);border-bottom:1px solid var(--chrome-line)}
 .brand{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap}
@@ -52,7 +57,7 @@ select.ctl{padding-right:6px}
 input.name{width:170px}
 .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-muted);white-space:nowrap}
 
-.rail{position:absolute;z-index:4;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));top:76px;
+.rail{position:absolute;z-index:4;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));top:var(--float-top);
   display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;
   box-shadow:0 6px 20px rgb(0 0 0 / .08)}
 .rail button{width:52px;height:52px;border:0;border-radius:10px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500}
@@ -62,7 +67,7 @@ input.name{width:170px}
 .rail hr{border:0;border-top:1px solid var(--chrome-line);margin:4px 2px}
 .rail button:disabled{opacity:.35;cursor:default}
 
-.panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:76px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+.panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:var(--float-top);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   width:330px;display:flex;flex-direction:column;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 6px 20px rgb(0 0 0 / .08);overflow:hidden}
 .panel-scroll{overflow-y:auto;padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-user-select:text;user-select:text}
 .panel h3{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted);font-weight:600}
@@ -122,7 +127,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 .editor input:focus{outline:none}
 .editor span{font-family:var(--font-num);font-size:13px;color:var(--chrome-muted)}
 
-.pickbar{position:absolute;z-index:6;left:50%;transform:translateX(-50%);top:72px;display:flex;align-items:center;gap:12px;
+.pickbar{position:absolute;z-index:6;left:50%;transform:translateX(-50%);top:var(--float-top);display:flex;align-items:center;gap:12px;
   background:var(--select);color:var(--chrome);border-radius:12px;padding:8px 8px 8px 16px;font-size:15px;font-weight:500;box-shadow:0 6px 18px rgb(0 0 0 / .18);max-width:calc(100% - 32px)}
 .pickbar button{height:34px;border:0;border-radius:8px;padding:0 12px;background:var(--chrome);color:var(--chrome-fg)}
 .toast{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
@@ -137,7 +142,6 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 @media (max-width: 760px){
   .brand small{display:none}
   .panel{left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));width:auto;top:auto;max-height:50%}
-  .rail{top:70px}
   .rail button{width:46px;height:46px}
   .badge{display:none}
 }
@@ -202,7 +206,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
       </section>
       <section class="sec">
         <h3>Slik bruker du den</h3>
-        <p class="hint"><b>Pennen tegner, fingeren flytter.</b> Én finger drar arket, to fingre zoomer. Et trykk med fingeren på en strek viser målene.</p>
+        <p class="hint"><b>Pennen tegner, fingeren flytter.</b> Én finger drar arket, to fingre zoomer. Et trykk med fingeren på en strek viser målene. Med <b>Flytt</b> valgt kan du dra punkter, streker og buer med både penn og finger.</p>
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
@@ -1175,7 +1179,7 @@ let gesture = null;
 const spt = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
 
 canvas.addEventListener('pointerdown', e => {
-  canvas.setPointerCapture(e.pointerId);
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   lastPointerType = e.pointerType;
   if (e.pointerType === 'pen') penSeen = true;
   const sp = spt(e);
@@ -1183,7 +1187,9 @@ canvas.addEventListener('pointerdown', e => {
   if (e.pointerType === 'touch') {
     touches.set(e.pointerId, sp);
     if (action && action.pointerType === 'touch') cancelAction();
-    if (penSeen || touches.size > 1 || pick || (settings.tool === 'move' && !hitTest(sp.x, sp.y) && !hitLabel(sp.x, sp.y))) { startGesture(e); return; }
+    // i Flytt kan én finger dra punkter, streker og mål; ellers flytter og zoomer fingrene arket
+    const grab = settings.tool === 'move' && !pick && touches.size === 1 && (hitTest(sp.x, sp.y) || hitLabel(sp.x, sp.y));
+    if (!grab && (penSeen || touches.size > 1 || pick || settings.tool === 'move')) { startGesture(e); return; }
   }
   if (e.button === 1 || e.button === 2 || spaceDown) { action = { type: 'pan', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp, v0: { ...view }, moved: false }; return; }
   if (pick) { action = { type: 'pick', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp }; return; }
@@ -1780,6 +1786,7 @@ $('#imgBtn').addEventListener('click', () => {
 $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true; });
 
 /* ---------- oppstart ---------- */
+if (navigator.standalone) document.documentElement.classList.add('standalone');
 loadStore();
 const startDoc = store.current && store.drawings[store.current] ? JSON.parse(JSON.stringify(store.drawings[store.current])) : sampleDoc();
 if (window.innerWidth <= 760 && !Object.prototype.hasOwnProperty.call(store.settings || {}, 'panel')) settings.panel = false;
