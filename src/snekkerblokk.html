@@ -16,8 +16,8 @@
   --bar-extra:0px;
   --float-top:calc(env(safe-area-inset-top,0px) + var(--bar-extra) + 69px);
 }
-@media (display-mode: standalone){ :root{ --bar-extra:14px } }
-:root.standalone{ --bar-extra:14px }
+@media (display-mode: standalone){ :root{ --bar-extra:26px } }
+:root.standalone{ --bar-extra:26px }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --paper:#0f1c29; --grid-minor:#1a3045; --grid-major:#2b4c69;
   --ink:#e6eef5; --ink-soft:#9db1c3; --measure:#8fc3ff; --angle:#ffb27a; --select:#5ddfbd; --free:#5a9dff;
@@ -44,7 +44,8 @@ button{cursor:pointer}
   padding-top:calc(env(safe-area-inset-top,0px) + var(--bar-extra) + 8px);padding-bottom:8px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   background:var(--chrome);border-bottom:1px solid var(--chrome-line)}
-.brand{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap}
+.brand{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.brand .logo{width:36px;height:36px;flex:none;border-radius:8px;display:block;box-shadow:0 0 0 1px var(--grid-major)}
 .brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted)}
 .bar-scroll{display:flex;align-items:center;gap:8px;overflow-x:auto;min-width:0;flex:1;scrollbar-width:none}
 .bar-scroll::-webkit-scrollbar{display:none}
@@ -161,7 +162,18 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   <canvas id="c" aria-label="Tegneflate med rutenett"></canvas>
 
   <header class="topbar">
-    <div class="brand">Snekkerblokk<small>Rutepapir med mål</small></div>
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+        <defs><clipPath id="logoClip"><rect width="100" height="100" rx="22"/></clipPath></defs>
+        <g clip-path="url(#logoClip)">
+          <rect width="100" height="100" fill="#13212e"/>
+          <path d="M10 0V100M20 0V100M30 0V100M40 0V100M50 0V100M60 0V100M70 0V100M80 0V100M90 0V100M0 10H100M0 20H100M0 30H100M0 40H100M0 50H100M0 60H100M0 70H100M0 80H100M0 90H100" stroke="#213a52" stroke-width="1.2"/>
+          <path d="M50 24 76 48V78H24V48H76" fill="none" stroke="#e6eef5" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 48 50 24" stroke="#5ddfbd" stroke-width="6.4" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <div>Snekkerblokk<small>Rutepapir med mål</small></div>
+    </div>
     <div class="bar-scroll">
       <div class="group">
         <select id="drawSel" class="ctl" aria-label="Velg tegning"></select>
