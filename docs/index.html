@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "b413f70", "label": "21.10.2026 18:12"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "47ad0a3", "label": "21.10.2026 18:19"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -157,7 +157,9 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px))}
 .overlay .box{background:var(--chrome);border-radius:14px;padding:16px;max-width:min(900px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px}
 .overlay img{max-width:100%;max-height:65vh;border:1px solid var(--chrome-line);border-radius:8px;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;background:var(--paper)}
-.overlay .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.overlay .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.overlay img{box-shadow:0 4px 16px rgb(0 0 0 / .25);align-self:center;width:auto;height:auto;object-fit:contain;min-height:0}
+.ctl.primary{background:var(--select);border-color:var(--select);color:var(--chrome);font-weight:600}
 
 @media (max-width: 760px){
   .brand small{display:none}
@@ -199,7 +201,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
       <span class="sep"></span>
       <div class="group">
         <button id="fitBtn" class="ctl" type="button">Vis alt</button>
-        <button id="imgBtn" class="ctl" type="button">Lagre bilde</button>
+        <button id="imgBtn" class="ctl" type="button">Utskrift</button>
         <button id="panelBtn" class="ctl" type="button" aria-pressed="true">Mål</button>
       </div>
     </div>
@@ -207,6 +209,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 
   <nav class="rail" aria-label="Verktøy">
     <button type="button" data-tool="line" title="Strek (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/></svg>Strek</button>
+    <button type="button" data-tool="aux" title="Hjelpelinje (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3.5"><path d="M5 19 19 5"/></svg>Hjelpelinje</button>
     <button type="button" data-tool="rect" title="Rektangel (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rektangel</button>
     <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
     <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
@@ -230,6 +233,8 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <h3>Slik bruker du den</h3>
         <p class="hint"><b>Pennen tegner, fingeren flytter.</b> Én finger drar arket, to fingre zoomer. Et trykk med fingeren på en strek viser målene. Med <b>Flytt</b> valgt kan du dra punkter, streker og buer med både penn og finger.</p>
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
+        <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
+        <p class="hint"><b>Mål i veien?</b> Med Flytt kan du dra et mål eller en vinkel til et annet sted. Drar du det tilbake, havner det på plassen sin igjen.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
         <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
@@ -248,9 +253,12 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 
 <div class="overlay" id="imgOverlay" hidden>
   <div class="box">
-    <div class="row"><strong>Bilde av tegningen</strong><button class="ctl" type="button" id="imgClose">Lukk</button></div>
-    <img id="imgOut" alt="Tegningen som bilde">
-    <p class="hint">Hold fingeren på bildet og velg «Arkiver bilde» eller «Del». På Mac: høyreklikk og velg «Arkiver bilde som».</p>
+    <div class="row"><strong>Utskrift på A4</strong><button class="ctl" type="button" id="imgClose">Lukk</button></div>
+    <img id="imgOut" alt="Forhåndsvisning av A4-arket">
+    <div class="row">
+      <p class="hint">På iPad: trykk Lagre PDF og velg «Skriv ut» eller «Arkiver i Filer».</p>
+      <div class="group"><button class="ctl" type="button" id="savePng">Lagre bilde</button><button class="ctl primary" type="button" id="savePdf">Lagre PDF</button></div>
+    </div>
   </div>
 </div>
 
@@ -293,7 +301,7 @@ function flushSave() {
 }
 
 function sampleDoc() {
-  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [] };
+  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {} };
   const pts = { g0: [0, 0], g1: [240, 0], w0: [0, -200], w1: [240, -200], r: [120, -270] };
   for (const [k, [x, y]] of Object.entries(pts)) d.points[k] = { x, y };
   [['g0', 'g1'], ['g0', 'w0'], ['g1', 'w1'], ['w0', 'w1'], ['w0', 'r'], ['w1', 'r']]
@@ -304,7 +312,7 @@ function sampleDoc() {
   ];
   return d;
 }
-function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [] }; }
+function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {} }; }
 
 /* ---------- hjelpere ---------- */
 function nameFor(i) { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
@@ -378,14 +386,14 @@ let toastTimer;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200); }
 
 /* ---------- angre ---------- */
-const snapshot = () => JSON.stringify({ points: doc.points, lines: doc.lines, strokes: doc.strokes, cons: doc.cons, circles: doc.circles, arcs: doc.arcs });
+const snapshot = () => JSON.stringify({ points: doc.points, lines: doc.lines, strokes: doc.strokes, cons: doc.cons, circles: doc.circles, arcs: doc.arcs, labelOffs: doc.labelOffs });
 function commit(before) {
   if (before === snapshot()) return;
   undoStack.push(before); if (undoStack.length > 200) undoStack.shift();
   redoStack = [];
   changed();
 }
-function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines = o.lines; doc.strokes = o.strokes; doc.cons = o.cons || []; doc.circles = o.circles || []; doc.arcs = o.arcs || []; }
+function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines = o.lines; doc.strokes = o.strokes; doc.cons = o.cons || []; doc.circles = o.circles || []; doc.arcs = o.arcs || []; doc.labelOffs = o.labelOffs || {}; }
 function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); validateSel(); changed(); }
 function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); validateSel(); changed(); }
 function validateSel() {
@@ -726,6 +734,14 @@ function snapPos(w, opt = {}) {
     if (d < bd) { bd = d; best = id; }
   }
   if (best) return { x: P(best).x, y: P(best).y, pid: best, kind: 'point' };
+  // midtpunkt på en strek (gir regelen «midt på» når streken lages)
+  let bm = null, bmd = r * 0.8;
+  for (const l of doc.lines) {
+    if (opt.exclude && (l.a === opt.exclude || l.b === opt.exclude)) continue;
+    const a = P(l.a), b = P(l.b), m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d = Math.hypot(m.x - w.x, m.y - w.y);
+    if (d < bmd) { bmd = d; bm = { x: m.x, y: m.y, kind: 'mid', lid: l.id }; }
+  }
+  if (bm) return bm;
   let bq = null, bl = null, bld = r * 0.7;
   for (const l of doc.lines) {
     if (opt.exclude && (l.a === opt.exclude || l.b === opt.exclude)) continue;
@@ -843,7 +859,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   let W = W0, H = H0, dpr = 1;
   if (target === ctx) { ({ W, H, dpr } = sizeCanvas()); labelHits = []; }
   const g = target;
-  g.setTransform(dpr * (opts.scale || 1), 0, 0, dpr * (opts.scale || 1), 0, 0);
+  g.setTransform(dpr * (opts.scale || 1), 0, 0, dpr * (opts.scale || 1), opts.ox || 0, opts.oy || 0);
   g.fillStyle = C.paper; g.fillRect(0, 0, W, H);
   drawGrid(g, W, H);
   g.lineCap = 'round'; g.lineJoin = 'round';
@@ -856,6 +872,10 @@ function render(target = ctx, W0, H0, opts = {}) {
     const a = toS(P(l.a)), b = toS(P(l.b)), on = (sel && sel.type === 'line' && sel.id === l.id) || pickSrc === l.id;
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; }
     const free = dofInfo && !(dofInfo.det.has(l.a) && dofInfo.det.has(l.b));
+    if (l.aux) {
+      g.setLineDash([8, 6]); g.strokeStyle = on ? C.select : C['ink-soft']; g.lineWidth = on ? 2.4 : 1.6; line(g, a, b); g.setLineDash([]);
+      continue;
+    }
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; line(g, a, b);
   }
   for (const c of doc.circles) {
@@ -871,7 +891,7 @@ function render(target = ctx, W0, H0, opts = {}) {
     g.beginPath(); g.arc(ce.x, ce.y, G.r * k(), -G.t0, -(G.t0 + G.span), true);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
-    if (on || settings.tool === 'move') {
+    if (!opts.export && (on || settings.tool === 'move')) {
       const m = toS(G.mid);
       g.setLineDash([3, 4]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1; line(g, ce, m); g.setLineDash([]);
       if (!opts.export) { g.beginPath(); g.arc(m.x, m.y, 6, 0, Math.PI * 2); g.fillStyle = C.paper; g.fill(); g.strokeStyle = on ? C.select : C.ink; g.lineWidth = 2; g.stroke(); }
@@ -885,11 +905,11 @@ function render(target = ctx, W0, H0, opts = {}) {
   for (const c of doc.circles) {
     const ce = toS(P(c.c)), rr = c.r * k();
     if (rr < 12) continue;
-    drawParts(g, ce.x, ce.y - rr - 13, 0, [{ text: c.name, color: C['ink-soft'] }, { text: 'Ø ' + fmtLen(2 * c.r), color: C.measure, hit: { kind: 'dia', circle: c.id } }]);
+    drawParts(g, ce.x, ce.y - rr - 13, 0, [{ text: c.name, color: C['ink-soft'] }, { text: 'Ø ' + fmtLen(2 * c.r), color: C.measure, hit: { kind: 'dia', circle: c.id } }], 'c:' + c.id);
   }
   for (const A of doc.arcs) {
     const G = arcGeom(A), m = toS(G.mid), locked = doc.cons.some(c => c.type === 'rad' && c.arc === A.id);
-    drawParts(g, m.x + Math.cos(G.tm) * 24, m.y - Math.sin(G.tm) * 24, 0, [{ text: A.name, color: C['ink-soft'] }, { text: 'R ' + fmtLen(G.r), color: C.measure, filled: locked, hit: { kind: 'rad', arc: A.id } }]);
+    drawParts(g, m.x + Math.cos(G.tm) * 24, m.y - Math.sin(G.tm) * 24, 0, [{ text: A.name, color: C['ink-soft'] }, { text: 'R ' + fmtLen(G.r), color: C.measure, filled: locked, hit: { kind: 'rad', arc: A.id } }], 'a:' + A.id);
   }
   const big = settings.tool === 'move' && !opts.export;
   const fx = fixedPts();
@@ -940,8 +960,13 @@ function render(target = ctx, W0, H0, opts = {}) {
 function line(g, a, b) { g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
 function snapRing(g, p) {
   const s = toS(p);
-  g.beginPath(); g.arc(s.x, s.y, p.kind === 'point' ? 9 : 5, 0, Math.PI * 2);
-  g.strokeStyle = C.select; g.lineWidth = 1.5; g.stroke();
+  g.strokeStyle = C.select; g.lineWidth = 1.5;
+  if (p.kind === 'mid') {
+    g.beginPath(); g.moveTo(s.x, s.y - 8); g.lineTo(s.x + 7, s.y + 5); g.lineTo(s.x - 7, s.y + 5); g.closePath(); g.stroke();
+    drawParts(g, s.x, s.y - 20, 0, [{ text: 'midt', color: C.select }]);
+    return;
+  }
+  g.beginPath(); g.arc(s.x, s.y, p.kind === 'point' ? 9 : 5, 0, Math.PI * 2); g.stroke();
 }
 function drawStroke(g, pts) {
   if (pts.length < 2) return;
@@ -963,7 +988,17 @@ function drawGrid(g, W, H) {
   drawSet(major * k() >= 6 ? major : major * 10, C['grid-major']);
 }
 // tegner en rad med små merkelapper; låste mål får fylt bakgrunn
-function drawParts(g, cx, cy, rot, parts) {
+// key: navnet på merkelappen, så den kan dras til et annet sted (lagres i doc.labelOffs)
+function drawParts(g, cx, cy, rot, parts, key) {
+  const off = key && doc.labelOffs[key];
+  if (off) {
+    const ax = cx, ay = cy;
+    cx += off.x * k(); cy += off.y * k();
+    if (Math.hypot(cx - ax, cy - ay) > 18) {
+      g.save(); g.setLineDash([2, 3]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(ax, ay); g.lineTo(cx, cy); g.stroke(); g.restore();
+    }
+  }
   g.save(); g.translate(cx, cy); g.rotate(rot); g.font = FONT;
   const ws = parts.map(p => g.measureText(p.text).width + 10), gap = 3, h = 18;
   const total = ws.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
@@ -977,7 +1012,7 @@ function drawParts(g, cx, cy, rot, parts) {
     g.fillText(p.text, x + 5, 0.5);
     if (p.hit && g === ctx) {
       const mid = x + w / 2;
-      labelHits.push({ cx, cy, rot, x0: x, x1: x + w, h, hit: p.hit, sx: cx + Math.cos(rot) * mid, sy: cy + Math.sin(rot) * mid });
+      labelHits.push({ cx, cy, rot, x0: x, x1: x + w, h, hit: p.hit, key, sx: cx + Math.cos(rot) * mid, sy: cy + Math.sin(rot) * mid });
     }
     x += w + gap;
   });
@@ -997,7 +1032,7 @@ function drawDim(g, c) {
   for (const e of [ps, qs]) { g.moveTo(e.x - uy * 5, e.y + ux * 5); g.lineTo(e.x + uy * 5, e.y - ux * 5); }
   g.stroke();
   let rot = ang; if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
-  drawParts(g, (ps.x + qs.x) / 2, (ps.y + qs.y) / 2, rot, [{ text: fmtLen(c.v), color: C.measure, filled: true, hit: { kind: 'dim', con: c.id } }]);
+  drawParts(g, (ps.x + qs.x) / 2, (ps.y + qs.y) / 2, rot, [{ text: fmtLen(c.v), color: C.measure, filled: true, hit: { kind: 'dim', con: c.id } }], 'd:' + c.id);
 }
 function labelGeom(l, side) {
   const a = toS(P(l.a)), b = toS(P(l.b));
@@ -1012,10 +1047,12 @@ function drawLineLabel(g, l) {
   const t = acuteAng(l);
   const lenLocked = doc.cons.some(c => c.type === 'len' && c.l === l.id);
   const angLocked = doc.cons.some(c => c.type === 'ang' && c.l === l.id);
+  // hjelpelinjer viser bare mål du har låst, som i Fusion
+  if (l.aux && !on && !lenLocked && !angLocked) return;
   const col = on ? C.select : C.measure;
   const parts = [{ text: l.name, color: C['ink-soft'] }, { text: fmtLen(lenOf(l)), color: col, filled: lenLocked, outline: on, hit: { kind: 'len', line: l.id } }];
   if (!isAxis(t) || angLocked) parts.push({ text: fmtAng(t), color: col, filled: angLocked, outline: on, hit: { kind: 'ang', line: l.id } });
-  drawParts(g, G.x, G.y, G.ang, parts);
+  drawParts(g, G.x, G.y, G.ang, parts, 'l:' + l.id);
 }
 function drawGlyphs(g, l, pairNo) {
   const glyphs = [];
@@ -1053,7 +1090,7 @@ function drawJoint(g, pid) {
     drawParts(g, c.x + Math.cos(m) * R, c.y - Math.sin(m) * R, 0, [{
       text: fmtAng(j.deg), color: C.angle, filled: j.locked,
       hit: j.editable ? { kind: 'joint', p: pid, l1: j.u.line.id, l2: j.v.line.id } : null
-    }]);
+    }], 'j:' + pid + ':' + j.u.line.id + ':' + j.v.line.id);
   }
 }
 
@@ -1244,7 +1281,7 @@ function moveGesture() {
   requestRender();
 }
 
-const DRAW_TOOLS = ['line', 'rect', 'circle', 'arc'];
+const DRAW_TOOLS = ['line', 'aux', 'rect', 'circle', 'arc'];
 function startAction(e, sp) {
   const w = toW(sp.x, sp.y), base = { pointerId: e.pointerId, pointerType: e.pointerType, s0: sp };
   const tool = settings.tool;
@@ -1295,6 +1332,12 @@ canvas.addEventListener('pointermove', e => {
       view.ox = action.v0.ox + dx; view.oy = action.v0.oy + dy; requestRender(); break;
     }
     case 'labelTap': {
+      // med Flytt: dra målet til et annet sted
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6 && settings.tool === 'move' && action.label.key) {
+        const o = doc.labelOffs[action.label.key] || { x: 0, y: 0 };
+        action = { ...action, type: 'labelDrag', key: action.label.key, o0: { ...o }, before: snapshot() };
+        break;
+      }
       // dro bort fra merkelappen: tegn en strek i stedet
       if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 10 && DRAW_TOOLS.includes(settings.tool)) {
         const s = snapPos(action.w0);
@@ -1302,6 +1345,12 @@ canvas.addEventListener('pointermove', e => {
         requestRender();
       }
       break;
+    }
+    case 'labelDrag': {
+      const o = { x: action.o0.x + (sp.x - action.s0.x) / k(), y: action.o0.y + (sp.y - action.s0.y) / k() };
+      // dratt tilbake nesten dit den hørte hjemme: tilbake på standardplassen
+      if (Math.hypot(o.x, o.y) * k() < 8) delete doc.labelOffs[action.key]; else doc.labelOffs[action.key] = o;
+      requestRender(); break;
     }
     case 'line': action.end = snapPos(w, { from: [action.start] }); requestRender(); break;
     case 'free': {
@@ -1362,6 +1411,7 @@ function endPointer(e) {
     case 'pick': handlePick(sp); break;
     case 'pan': if (!a.moved) { sel = null; requestRender(true); } scheduleSave(); break;
     case 'labelTap': openEditor(a.label); break;
+    case 'labelDrag': commit(a.before); break;
     case 'line': {
       const dpx = Math.hypot(a.start.x - a.end.x, a.start.y - a.end.y) * k();
       if (dpx < 8) { tapSelect(sp); break; }
@@ -1371,6 +1421,8 @@ function endPointer(e) {
         const r = Math.max(st, Math.round(Math.hypot(a.end.x - a.start.x, a.end.y - a.start.y) / st) * st);
         const c = { id: uid(), c: a.start.pid || addPoint(a.start), r, name: nextName() };
         doc.circles.push(c); sel = { type: 'circle', id: c.id };
+        if (a.start.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: c.c, l: a.start.lid });
+        if (a.start.kind === 'mid') doc.cons.push({ id: uid(), type: 'mid', p: c.c, l: a.start.lid });
         cleanup(); commit(before); break;
       }
       if (a.shape === 'rect') {
@@ -1395,11 +1447,14 @@ function endPointer(e) {
         doc.arcs.push(A);
         if (a.start.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pa, l: a.start.lid });
         if (a.end.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pb, l: a.end.lid });
+        if (a.start.kind === 'mid') doc.cons.push({ id: uid(), type: 'mid', p: pa, l: a.start.lid });
+        if (a.end.kind === 'mid') doc.cons.push({ id: uid(), type: 'mid', p: pb, l: a.end.lid });
         sel = { type: 'arc', id: A.id };
         cleanup(); commit(before); break;
       }
       if (pa !== pb && !doc.lines.some(l => (l.a === pa && l.b === pb) || (l.a === pb && l.b === pa))) {
         const l = { id: uid(), a: pa, b: pb, name: nextName() };
+        if (a.shape === 'aux') l.aux = true;
         doc.lines.push(l);
         if (settings.auto) {
           const A = P(pa), B = P(pb);
@@ -1408,6 +1463,8 @@ function endPointer(e) {
         }
         if (a.start.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pa, l: a.start.lid });
         if (a.end.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pb, l: a.end.lid });
+        if (a.start.kind === 'mid') doc.cons.push({ id: uid(), type: 'mid', p: pa, l: a.start.lid });
+        if (a.end.kind === 'mid') doc.cons.push({ id: uid(), type: 'mid', p: pb, l: a.end.lid });
         sel = { type: 'line', id: l.id };
       }
       cleanup(); commit(before); break;
@@ -1462,7 +1519,8 @@ document.addEventListener('keydown', e => {
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
   if (mod) return;
-  const tools = { l: 'line', r: 'rect', c: 'circle', a: 'arc', v: 'move', f: 'free', e: 'erase' };
+  if (e.key.toLowerCase() === 'x' && sel && sel.type === 'line') { toggleAux(lineById(sel.id)); return; }
+  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', v: 'move', f: 'free', e: 'erase' };
   if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
   else if (e.key === 'Escape') { if (pick) endPick(); sel = null; if (action) cancelAction(); requestRender(true); }
   else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
@@ -1539,7 +1597,7 @@ function selHTML() {
         joints += `<li><b>${endLabel(l, end)}</b> mot ${esc(o.name)}: <span class="num">${fmtAng(j.deg)}</span>${miterTxt}</li>`;
       }
     }
-    return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">Strek</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+    return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">${l.aux ? 'Hjelpelinje' : 'Strek'}</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
       <label class="field"><span>Lengde</span><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em>
         <button type="button" class="lock" data-lock="len" aria-pressed="${has('len')}" aria-label="Lås lengden">${LOCK_SVG}</button></label>
       <label class="field"><span>Vinkel mot vannrett</span><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em>
@@ -1548,7 +1606,7 @@ function selHTML() {
       <h4>Regler</h4>
       <div class="rules">
         ${ruleBtn('h', 'Vannrett', has('h'))}${ruleBtn('v', 'Loddrett', has('v'))}
-        ${ruleBtn('par', 'Parallell med …', false, '∥')}${ruleBtn('perp', 'Vinkelrett på …', false, '⊥')}${ruleBtn('eq', 'Like lang som …', false, '=')}
+        ${ruleBtn('aux', 'Hjelpelinje', !!l.aux, '┄')}${ruleBtn('par', 'Parallell med …', false, '∥')}${ruleBtn('perp', 'Vinkelrett på …', false, '⊥')}${ruleBtn('eq', 'Like lang som …', false, '=')}
       </div>
       ${rulesList(lineCons(l.id), l.id)}
       ${joints ? `<h4>Skjøter</h4><ul class="joints">${joints}</ul>` : ''}`;
@@ -1595,10 +1653,11 @@ function shapesHTML() {
   return rows.length ? `<table class="cut" style="margin-top:12px"><thead><tr><th></th><th>Form</th><th>Mål</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '';
 }
 function cutHTML() {
-  if (!doc.lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Tegn streker med pennen, så kommer lengdene her.</p>';
+  const lines = doc.lines.filter(l => !l.aux);
+  if (!lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Tegn streker med pennen, så kommer lengdene her.</p>';
   const groups = new Map();
   let total = 0;
-  for (const l of doc.lines) {
+  for (const l of lines) {
     const L = lenOf(l), t = acuteAng(l); total += L;
     const key = fmtLen(L) + '|' + (isAxis(t) ? '' : fmtAng(t));
     if (!groups.has(key)) groups.set(key, { L, t, names: [] });
@@ -1607,7 +1666,7 @@ function cutHTML() {
   const rows = [...groups.values()].sort((a, b) => b.L - a.L).map(g =>
     `<tr><td class="n">${g.names.length}×</td><td class="l">${fmtLen(g.L)}</td><td class="a">${isAxis(g.t) ? '' : fmtAng(g.t)}</td><td class="names">${g.names.map(esc).join(' ')}</td></tr>`).join('');
   return `<table class="cut"><thead><tr><th>Ant.</th><th>Lengde</th><th>Vinkel</th><th>Streker</th></tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr><td colspan="4">Sum ${nf1.format(Math.round(total) / 100)} løpemeter, ${doc.lines.length} streker</td></tr></tfoot></table>${shapesHTML()}`;
+    <tfoot><tr><td colspan="4">Sum ${nf1.format(Math.round(total) / 100)} løpemeter, ${lines.length} streker</td></tr></tfoot></table>${shapesHTML()}`;
 }
 function updatePanel() {
   if (panel.hidden) { panelDirty = false; return; }
@@ -1656,6 +1715,12 @@ panel.addEventListener('click', e => {
     else { const j = gaps(p).find(j => j.u.line.id === l1 && j.v.line.id === l2); if (j) addConstraint({ type: 'angle2', p, l: l1, l2, v: j.deg }); }
   } else if (b.dataset.rule) ruleClick(b.dataset.rule);
 });
+function toggleAux(l) {
+  const before = snapshot();
+  if (l.aux) delete l.aux; else l.aux = true;
+  commit(before);
+  toast(l.aux ? `${l.name} er nå en hjelpelinje. Den er ikke med i kapplisten.` : `${l.name} er nå en vanlig strek.`);
+}
 function ruleClick(rule) {
   if (sel.type === 'circle') {
     const ce = circById(sel.id).c;
@@ -1665,6 +1730,7 @@ function ruleClick(rule) {
   }
   if (sel.type === 'line') {
     const l = lineById(sel.id);
+    if (rule === 'aux') { toggleAux(l); return; }
     if (rule === 'h' || rule === 'v') {
       const c = conOf(rule, c => c.l === l.id);
       if (c) { removeCon(c.id); return; }
@@ -1713,7 +1779,7 @@ function syncControls() {
   ds.value = doc.id;
 }
 function openDoc(d) {
-  d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || [];
+  d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || []; d.labelOffs = d.labelOffs || {};
   doc = d; undoStack = []; redoStack = []; sel = null; action = null;
   if (pick) endPick();
   syncControls();
@@ -1740,19 +1806,16 @@ $('#delDraw').addEventListener('click', e => {
 /* ---------- fil ---------- */
 const FILE_EXT = '.snekkerblokk.json';
 const safeName = n => (n || '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 60) || 'tegning';
-$('#saveFile').addEventListener('click', async () => {
-  flushSave();
-  const d = JSON.parse(JSON.stringify(doc)); delete d.view;
-  const name = safeName(doc.name) + FILE_EXT;
-  const file = new File([JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d })], name, { type: 'application/json' });
+async function saveBlob(name, blob, what) {
+  const file = new File([blob], name, { type: blob.type });
   try {
     // inne i Claude: lagring går via Claude sin egen bekreftelse
     if (downloadsApi) {
-      await downloadsApi.save({ filename: name, data: await file.text() });
-      toast('Tegningen er lagret som ' + name + '.');
+      await downloadsApi.save({ filename: name, data: blob });
+      toast(what + ' er lagret som ' + name + '.');
       return;
     }
-    // på iPad: delingsarket, der «Arkiver i Filer» lagrer til Filer eller iCloud
+    // på iPad: delingsarket, med «Arkiver i Filer» og «Skriv ut»
     if (navigator.maxTouchPoints > 0 && navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: doc.name });
       return;
@@ -1760,11 +1823,17 @@ $('#saveFile').addEventListener('click', async () => {
     const url = URL.createObjectURL(file), a = document.createElement('a');
     a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    toast('Tegningen er lagret som ' + name + '.');
+    toast(what + ' er lagret som ' + name + '.');
   } catch (e) {
     if (e && (e.name === 'AbortError' || e.code === 'declined')) return;
     toast('Kunne ikke lagre filen her. Bruk Snekkerblokk-appen på Hjem-skjermen.');
   }
+}
+$('#saveFile').addEventListener('click', () => {
+  flushSave();
+  const d = JSON.parse(JSON.stringify(doc)); delete d.view;
+  const json = JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d });
+  saveBlob(safeName(doc.name) + FILE_EXT, new Blob([json], { type: 'application/json' }), 'Tegningen');
 });
 let downloadsApi = null;
 if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloadsApi = d; }).catch(() => {});
@@ -1786,26 +1855,106 @@ $('#fileIn').addEventListener('change', async e => {
 });
 
 /* ---------- bilde ---------- */
-$('#imgBtn').addEventListener('click', () => {
-  const B = bounds(), saved = { ...view }, pad = 90;
-  let W = 1600, H = 1100;
+// A4-ark: topptekst med logo, navn og dato, og tegningen i en ramme med runde hjørner
+const PRINT_COLORS = { paper: '#ffffff', 'grid-minor': '#e4edeb', 'grid-major': '#c4d8d4', ink: '#1b1f23', 'ink-soft': '#5d676f',
+  measure: '#1d4c9e', angle: '#b8430f', select: '#0b7a62', chrome: '#ffffff', free: '#1b1f23' };
+function drawLogo(g, x, y, s) {
+  g.save(); g.translate(x, y);
+  g.beginPath(); g.roundRect(0, 0, s, s, s * 0.22); g.fillStyle = '#13212e'; g.fill(); g.clip();
+  g.strokeStyle = '#213a52'; g.lineWidth = s * 0.012;
+  g.beginPath(); for (let i = 1; i < 10; i++) { g.moveTo(i * s / 10, 0); g.lineTo(i * s / 10, s); g.moveTo(0, i * s / 10); g.lineTo(s, i * s / 10); } g.stroke();
+  const P2 = (u, v) => [u * s / 100, v * s / 100];
+  g.lineWidth = s * 0.064; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = '#e6eef5'; g.beginPath();
+  g.moveTo(...P2(50, 24)); g.lineTo(...P2(76, 48)); g.lineTo(...P2(76, 78)); g.lineTo(...P2(24, 78)); g.lineTo(...P2(24, 48)); g.lineTo(...P2(76, 48)); g.stroke();
+  g.strokeStyle = '#5ddfbd'; g.beginPath(); g.moveTo(...P2(24, 48)); g.lineTo(...P2(50, 24)); g.stroke();
+  g.restore();
+}
+function makePrintPage() {
+  const B = bounds(), landscape = !B || (B.x1 - B.x0) >= (B.y1 - B.y0);
+  const mm = 200 / 25.4, PW = Math.round((landscape ? 297 : 210) * mm), PH = Math.round((landscape ? 210 : 297) * mm);
+  const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
+  const g = cv.getContext('2d');
+  const savedC = { ...C }, savedView = { ...view }, savedSel = sel;
+  Object.assign(C, PRINT_COLORS); sel = null;
+  g.fillStyle = '#ffffff'; g.fillRect(0, 0, PW, PH);
+  const M = 12 * mm, headH = 20 * mm, logo = 13 * mm;
+  // topptekst
+  drawLogo(g, M, M, logo);
+  const tx = M + logo + 4 * mm;
+  g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+  g.fillStyle = C['ink-soft']; g.font = `600 ${3 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
+  g.fillText('SNEKKERBLOKK', tx, M + 4 * mm);
+  g.fillStyle = C.ink; g.font = `700 ${7 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
+  let title = doc.name || 'Uten navn';
+  const maxW = PW - tx - M - 60 * mm;
+  while (g.measureText(title).width > maxW && title.length > 4) title = title.slice(0, -2);
+  if (title !== (doc.name || 'Uten navn')) title += '…';
+  g.fillText(title, tx, M + 11.5 * mm);
+  // innhold i rammen
+  const fx = M, fy = M + headH, fw = PW - 2 * M, fh = PH - M - fy, rad = 5 * mm, S = 2.4;
+  const cw = fw / S, ch = fh / S, pad = 40;
   if (B) {
-    const z = Math.min((W - pad * 2) / Math.max(1, (B.x1 - B.x0) * PX_PER_CM), (H - pad * 2) / Math.max(1, (B.y1 - B.y0) * PX_PER_CM), 6);
-    view.z = z;
-    W = Math.round((B.x1 - B.x0) * PX_PER_CM * z + pad * 2); H = Math.round((B.y1 - B.y0) * PX_PER_CM * z + pad * 2);
-    view.ox = pad - B.x0 * k(); view.oy = pad - B.y0 * k();
+    view.z = Math.min((cw - pad * 2) / Math.max(1, (B.x1 - B.x0) * PX_PER_CM), (ch - pad * 2) / Math.max(1, (B.y1 - B.y0) * PX_PER_CM), 8);
+    view.ox = cw / 2 - (B.x0 + B.x1) / 2 * k(); view.oy = ch / 2 - (B.y0 + B.y1) / 2 * k();
   }
-  const off = document.createElement('canvas'); off.width = W * 2; off.height = H * 2;
-  const g = off.getContext('2d');
-  const prevSel = sel; sel = null;
-  render(g, W, H, { export: true, scale: 2 });
-  g.setTransform(2, 0, 0, 2, 0, 0);
-  g.font = '600 15px "IBM Plex Sans Condensed", sans-serif'; g.fillStyle = C.ink; g.textBaseline = 'top';
-  g.fillText(doc.name + '   ·   1 rute = ' + fmtLen(doc.rute), 20, 18);
-  sel = prevSel; view = saved;
-  $('#imgOut').src = off.toDataURL('image/png');
+  g.save(); g.beginPath(); g.roundRect(fx, fy, fw, fh, rad); g.clip();
+  render(g, cw, ch, { export: true, scale: S, ox: fx, oy: fy });
+  g.restore();
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.beginPath(); g.roundRect(fx, fy, fw, fh, rad); g.strokeStyle = C.ink; g.lineWidth = 0.5 * mm; g.stroke();
+  // høyre side av topptekst: dato, rute og målestokk
+  const ratio = Math.round(10 / (PX_PER_CM * view.z * S / mm));
+  g.textAlign = 'right'; g.fillStyle = C.ink; g.font = `500 ${3.6 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
+  g.fillText(new Date().toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }), PW - M, M + 5 * mm);
+  g.fillStyle = C['ink-soft']; g.font = `400 ${3.2 * mm}px "IBM Plex Mono", ui-monospace, monospace`;
+  g.fillText(`1 rute = ${fmtLen(doc.rute)}${B ? ' · målestokk ca. 1:' + ratio : ''}`, PW - M, M + 10.5 * mm);
+  g.fillText(`Mål i ${unitName()}`, PW - M, M + 15 * mm);
+  Object.assign(C, savedC); view = savedView; sel = savedSel;
+  return { cv, landscape };
+}
+// en enkel PDF med ett A4-ark der hele siden er ett JPEG-bilde
+function pdfFromJpeg(bytes, iw, ih, landscape) {
+  const pw = landscape ? 841.89 : 595.28, ph = landscape ? 595.28 : 841.89;
+  const enc = new TextEncoder(), parts = [], offs = [];
+  let len = 0;
+  const add = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (n, body) => { offs[n] = len; add(`${n} 0 obj\n${body}\nendobj\n`); };
+  add('%PDF-1.4\n%âãÏÓ\n');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw} ${ph}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
+  offs[4] = len;
+  add(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${iw} /Height ${ih} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`);
+  add(bytes); add('\nendstream\nendobj\n');
+  const content = `q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+  obj(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const xref = len;
+  let x = 'xref\n0 6\n0000000000 65535 f \n';
+  for (let i = 1; i <= 5; i++) x += String(offs[i]).padStart(10, '0') + ' 00000 n \n';
+  add(x + `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  const out = new Uint8Array(len); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+let printPage = null;
+$('#imgBtn').addEventListener('click', () => {
+  flushSave();
+  printPage = makePrintPage();
+  $('#imgOut').src = printPage.cv.toDataURL('image/jpeg', 0.85);
   $('#imgOverlay').hidden = false;
   requestRender();
+});
+$('#savePdf').addEventListener('click', async () => {
+  if (!printPage) return;
+  const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/jpeg', 0.92));
+  const pdf = pdfFromJpeg(new Uint8Array(await blob.arrayBuffer()), printPage.cv.width, printPage.cv.height, printPage.landscape);
+  saveBlob(safeName(doc.name) + '.pdf', new Blob([pdf], { type: 'application/pdf' }), 'Utskriften');
+});
+$('#savePng').addEventListener('click', async () => {
+  if (!printPage) return;
+  const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/png'));
+  saveBlob(safeName(doc.name) + '.png', blob, 'Bildet');
 });
 $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true; });
 
