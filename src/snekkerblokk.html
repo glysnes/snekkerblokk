@@ -1716,6 +1716,12 @@ $('#saveFile').addEventListener('click', async () => {
   const name = safeName(doc.name) + FILE_EXT;
   const file = new File([JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d })], name, { type: 'application/json' });
   try {
+    // inne i Claude: lagring går via Claude sin egen bekreftelse
+    if (downloadsApi) {
+      await downloadsApi.save({ filename: name, data: await file.text() });
+      toast('Tegningen er lagret som ' + name + '.');
+      return;
+    }
     // på iPad: delingsarket, der «Arkiver i Filer» lagrer til Filer eller iCloud
     if (navigator.maxTouchPoints > 0 && navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: doc.name });
@@ -1726,9 +1732,12 @@ $('#saveFile').addEventListener('click', async () => {
     setTimeout(() => URL.revokeObjectURL(url), 10000);
     toast('Tegningen er lagret som ' + name + '.');
   } catch (e) {
-    if (e && e.name !== 'AbortError') toast('Kunne ikke lagre filen her. Bruk Snekkerblokk-appen på Hjem-skjermen.');
+    if (e && (e.name === 'AbortError' || e.code === 'declined')) return;
+    toast('Kunne ikke lagre filen her. Bruk Snekkerblokk-appen på Hjem-skjermen.');
   }
 });
+let downloadsApi = null;
+if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloadsApi = d; }).catch(() => {});
 $('#openFile').addEventListener('click', () => $('#fileIn').click());
 $('#fileIn').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';

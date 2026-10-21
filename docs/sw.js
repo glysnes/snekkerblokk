@@ -1,5 +1,5 @@
 // Snekkerblokk offline: viser lagret versjon med en gang, henter ny i bakgrunnen
-const CACHE = 'snekkerblokk-652f778c02';
+const CACHE = 'snekkerblokk-af6998150b';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
