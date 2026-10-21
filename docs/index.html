@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "47ad0a3", "label": "21.10.2026 18:19"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "49d946b", "label": "21.10.2026 18:27"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -196,6 +196,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         </select>
         <button id="snapBtn" class="ctl" type="button" aria-pressed="true">Fest til ruter</button>
         <button id="autoBtn" class="ctl" type="button" aria-pressed="true" title="Vannrette og loddrette streker får regelen automatisk">Auto-regler</button>
+        <button id="penBtn" class="ctl" type="button" aria-pressed="false" title="Pennen tegner, fingeren flytter. Slås på av seg selv første gang du bruker Apple Pencil.">Penn-modus</button>
         <select id="unitSel" class="ctl" aria-label="Enhet for mål"><option value="cm">cm</option><option value="mm">mm</option></select>
       </div>
       <span class="sep"></span>
@@ -231,7 +232,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
       </section>
       <section class="sec">
         <h3>Slik bruker du den</h3>
-        <p class="hint"><b>Pennen tegner, fingeren flytter.</b> Én finger drar arket, to fingre zoomer. Et trykk med fingeren på en strek viser målene. Med <b>Flytt</b> valgt kan du dra punkter, streker og buer med både penn og finger.</p>
+        <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
         <p class="hint"><b>Mål i veien?</b> Med Flytt kan du dra et mål eller en vinkel til et annet sted. Drar du det tilbake, havner det på plassen sin igjen.</p>
@@ -891,7 +892,7 @@ function render(target = ctx, W0, H0, opts = {}) {
     g.beginPath(); g.arc(ce.x, ce.y, G.r * k(), -G.t0, -(G.t0 + G.span), true);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
-    if (!opts.export && (on || settings.tool === 'move')) {
+    if (!opts.export && (on || settings.tool === 'move' || settings.penMode)) {
       const m = toS(G.mid);
       g.setLineDash([3, 4]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1; line(g, ce, m); g.setLineDash([]);
       if (!opts.export) { g.beginPath(); g.arc(m.x, m.y, 6, 0, Math.PI * 2); g.fillStyle = C.paper; g.fill(); g.strokeStyle = on ? C.select : C.ink; g.lineWidth = 2; g.stroke(); }
@@ -1242,15 +1243,30 @@ const spt = e => { const r = canvas.getBoundingClientRect(); return { x: e.clien
 canvas.addEventListener('pointerdown', e => {
   try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   lastPointerType = e.pointerType;
-  if (e.pointerType === 'pen') penSeen = true;
+  if (e.pointerType === 'pen') {
+    penSeen = true;
+    // første gang vi ser en Apple Pencil: slå på penn-modus (med mindre du har slått den av selv)
+    if (settings.penMode === undefined) {
+      settings.penMode = true; syncControls(); scheduleSave();
+      toast('Apple Pencil oppdaget: pennen tegner, fingeren flytter. Du kan slå av Penn-modus i menylinja.');
+    }
+  }
   const sp = spt(e);
   if (editing) closeEditor(true);
   if (e.pointerType === 'touch') {
     touches.set(e.pointerId, sp);
     if (action && action.pointerType === 'touch') cancelAction();
-    // i Flytt kan én finger dra punkter, streker og mål; ellers flytter og zoomer fingrene arket
-    const grab = settings.tool === 'move' && !pick && touches.size === 1 && (hitTest(sp.x, sp.y) || hitLabel(sp.x, sp.y));
-    if (!grab && (penSeen || touches.size > 1 || pick || settings.tool === 'move')) { startGesture(e); return; }
+    if (touches.size > 1 || pick) { startGesture(e); return; }
+    const onSomething = hitTest(sp.x, sp.y) || hitLabel(sp.x, sp.y);
+    if (settings.penMode) {
+      // penn-modus: fingeren flytter. Punkter, mål og bueknotter i alle verktøy; i Flytt også hele streker og sirkler
+      if (settings.tool !== 'move') {
+        const t = fingerTarget(sp);
+        if (t) startFingerMove(e, sp, t); else startGesture(e);
+        return;
+      }
+      if (!onSomething) { startGesture(e); return; }
+    } else if (settings.tool === 'move' && !onSomething) { startGesture(e); return; }
   }
   if (e.button === 1 || e.button === 2 || spaceDown) { action = { type: 'pan', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp, v0: { ...view }, moved: false }; return; }
   if (pick) { action = { type: 'pick', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp }; return; }
@@ -1282,6 +1298,22 @@ function moveGesture() {
 }
 
 const DRAW_TOOLS = ['line', 'aux', 'rect', 'circle', 'arc'];
+// det en finger kan ta tak i uten å bytte til Flytt: små ting, så du ikke flytter en strek når du ville flytte arket
+function fingerTarget(sp) {
+  const h = hitTest(sp.x, sp.y);
+  if (h && h.type === 'point') return h;
+  const lab = hitLabel(sp.x, sp.y);
+  if (lab) return { type: 'label', label: lab };
+  for (const A of doc.arcs) { const m = toS(arcGeom(A).mid); if (Math.hypot(m.x - sp.x, m.y - sp.y) < hitR()) return { type: 'arc', id: A.id }; }
+  return null;
+}
+function startFingerMove(e, sp, t) {
+  const w = toW(sp.x, sp.y), base = { pointerId: e.pointerId, pointerType: e.pointerType, s0: sp, moveMode: true };
+  if (t.type === 'point') { sel = t; action = { ...base, type: 'dragPoint', pid: t.id, before: snapshot(), target: null, w0: w }; }
+  else if (t.type === 'label') action = { ...base, type: 'labelTap', label: t.label, w0: w };
+  else { sel = t; action = { ...base, type: 'dragArc', arc: t.id, before: snapshot() }; }
+  requestRender(true);
+}
 function startAction(e, sp) {
   const w = toW(sp.x, sp.y), base = { pointerId: e.pointerId, pointerType: e.pointerType, s0: sp };
   const tool = settings.tool;
@@ -1333,13 +1365,13 @@ canvas.addEventListener('pointermove', e => {
     }
     case 'labelTap': {
       // med Flytt: dra målet til et annet sted
-      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6 && settings.tool === 'move' && action.label.key) {
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6 && (settings.tool === 'move' || action.moveMode) && action.label.key) {
         const o = doc.labelOffs[action.label.key] || { x: 0, y: 0 };
         action = { ...action, type: 'labelDrag', key: action.label.key, o0: { ...o }, before: snapshot() };
         break;
       }
       // dro bort fra merkelappen: tegn en strek i stedet
-      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 10 && DRAW_TOOLS.includes(settings.tool)) {
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 10 && !action.moveMode && DRAW_TOOLS.includes(settings.tool)) {
         const s = snapPos(action.w0);
         action = { ...action, type: 'line', shape: settings.tool, start: s, end: snapPos(w, { from: [s] }) };
         requestRender();
@@ -1759,6 +1791,11 @@ function updateRail() {
   $('#badge').textContent = `1 rute = ${fmtLen(doc.rute)} · ${Math.round(view.z * 100)} %`;
 }
 $('#snapBtn').addEventListener('click', () => { settings.snap = !settings.snap; syncControls(); scheduleSave(); });
+$('#penBtn').addEventListener('click', () => {
+  settings.penMode = !settings.penMode; syncControls(); scheduleSave();
+  toast(settings.penMode ? 'Penn-modus på: pennen tegner, fingeren flytter.' : 'Penn-modus av: fingeren tegner også.');
+  requestRender();
+});
 $('#autoBtn').addEventListener('click', () => { settings.auto = !settings.auto; syncControls(); scheduleSave(); });
 $('#unitSel').addEventListener('change', e => { settings.unit = e.target.value; scheduleSave(); requestRender(true); });
 $('#ruteSel').addEventListener('change', e => { doc.rute = +e.target.value; scheduleSave(); requestRender(true); });
@@ -1769,6 +1806,7 @@ $('#panelBtn').addEventListener('click', () => setPanel(!settings.panel));
 function syncControls() {
   $('#snapBtn').setAttribute('aria-pressed', String(settings.snap));
   $('#autoBtn').setAttribute('aria-pressed', String(settings.auto));
+  $('#penBtn').setAttribute('aria-pressed', String(!!settings.penMode));
   $('#unitSel').value = settings.unit;
   $('#ruteSel').value = String(doc.rute);
   $('#nameIn').value = doc.name;
