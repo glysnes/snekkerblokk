@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "2167cf6", "label": "21.10.2026 18:47"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "f408efe", "label": "21.10.2026 18:52"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -218,6 +218,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <button type="button" data-tool="rect" title="Rektangel (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rektangel</button>
     <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
     <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
+    <button type="button" data-tool="trim" title="Klipp bort biten du trykker på (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Klipp</button>
     <button type="button" data-tool="move" title="Flytt punkter og streker (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Flytt</button>
     <button type="button" data-tool="free" title="Frihånd (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Frihånd</button>
     <button type="button" data-tool="erase" title="Viskelær (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Visk</button>
@@ -239,6 +240,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
+        <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
         <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
@@ -281,6 +283,7 @@ const LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 let store = { current: null, drawings: {}, settings: {} };
 let settings = { unit: 'cm', snap: true, auto: true, tool: 'line', panel: true };
 let doc, view = { ox: 0, oy: 0, z: 1 };
+let trimHover = null;
 let sel = null, hover = null, action = null, pick = null, editing = null;
 let undoStack = [], redoStack = [];
 let lastPointerType = 'mouse', penSeen = false, spaceDown = false;
@@ -961,6 +964,7 @@ function render(target = ctx, W0, H0, opts = {}) {
     drawParts(g, b.x + 16 + w / 2, b.y - 22, 0, [{ text: txt, color: C.select }]);
     snapRing(g, action.end);
   } else if (hover && DRAW_TOOLS.includes(settings.tool)) snapRing(g, hover);
+  else if (trimHover && settings.tool === 'trim' && !action) drawTrimPreview(g, trimHover);
 }
 function line(g, a, b) { g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
 function snapRing(g, p) {
@@ -1239,6 +1243,149 @@ function handlePick(sp) {
   endPick();
 }
 
+
+/* ---------- klipp (trim) ---------- */
+function lineCircleTs(a, d, c, r) {
+  const fx = a.x - c.x, fy = a.y - c.y, A = d.x * d.x + d.y * d.y, B = 2 * (fx * d.x + fy * d.y), Cc = fx * fx + fy * fy - r * r;
+  const disc = B * B - 4 * A * Cc;
+  if (A < 1e-12 || disc < 0) return [];
+  if (disc < 1e-12) return [-B / (2 * A)];
+  const q = Math.sqrt(disc);
+  return [(-B - q) / (2 * A), (-B + q) / (2 * A)];
+}
+function circleCircle(c1, r1, c2, r2) {
+  const dx = c2.x - c1.x, dy = c2.y - c1.y, d = Math.hypot(dx, dy);
+  if (d < 1e-9 || d > r1 + r2 + 1e-9 || d < Math.abs(r1 - r2) - 1e-9) return [];
+  const a = (r1 * r1 - r2 * r2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, r1 * r1 - a * a));
+  const mx = c1.x + a * dx / d, my = c1.y + a * dy / d;
+  if (h < 1e-9) return [{ x: mx, y: my }];
+  return [{ x: mx + h * dy / d, y: my - h * dx / d }, { x: mx - h * dy / d, y: my + h * dx / d }];
+}
+const onArc = (A, p) => { const g = arcGeom(A); return norm2pi(angUp(g.c, p) - g.t0) <= g.span + 1e-6; };
+const radiusOf = x => x.type === 'circle' ? x.o.r : arcGeom(x.o).r;
+// alle steder der formen krysser en annen strek, sirkel eller bue
+function crossings(type, id) {
+  const others = [...doc.lines.map(o => ({ type: 'line', o })), ...doc.circles.map(o => ({ type: 'circle', o })), ...doc.arcs.map(o => ({ type: 'arc', o }))]
+    .filter(x => !(x.type === type && x.o.id === id));
+  const out = [];
+  if (type === 'line') {
+    const l = lineById(id), a = P(l.a), b = P(l.b), d = { x: b.x - a.x, y: b.y - a.y };
+    for (const x of others) {
+      if (x.type === 'line') {
+        const p = P(x.o.a), q = P(x.o.b), e = { x: q.x - p.x, y: q.y - p.y }, den = d.x * e.y - d.y * e.x;
+        if (Math.abs(den) < 1e-12) continue;
+        const t = ((p.x - a.x) * e.y - (p.y - a.y) * e.x) / den, u = ((p.x - a.x) * d.y - (p.y - a.y) * d.x) / den;
+        if (u >= -1e-6 && u <= 1 + 1e-6) out.push({ t, with: x });
+      } else {
+        for (const t of lineCircleTs(a, d, P(x.o.c), radiusOf(x))) {
+          const pt = { x: a.x + d.x * t, y: a.y + d.y * t };
+          if (x.type === 'arc' && !onArc(x.o, pt)) continue;
+          out.push({ t, with: x });
+        }
+      }
+    }
+    return out.filter(c => c.t > 1e-6 && c.t < 1 - 1e-6).map(c => ({ ...c, x: a.x + d.x * c.t, y: a.y + d.y * c.t }));
+  }
+  const ent = type === 'circle' ? circById(id) : arcById(id), ce = P(ent.c), r = type === 'circle' ? ent.r : arcGeom(ent).r;
+  for (const x of others) {
+    if (x.type === 'line') {
+      const p = P(x.o.a), q = P(x.o.b), e = { x: q.x - p.x, y: q.y - p.y };
+      for (const u of lineCircleTs(p, e, ce, r)) if (u >= -1e-6 && u <= 1 + 1e-6) out.push({ x: p.x + e.x * u, y: p.y + e.y * u, with: x });
+    } else {
+      for (const pt of circleCircle(ce, r, P(x.o.c), radiusOf(x))) { if (x.type === 'arc' && !onArc(x.o, pt)) continue; out.push({ ...pt, with: x }); }
+    }
+  }
+  return out;
+}
+// hva blir klippet bort hvis du trykker her? (brukes både til forhåndsvisning og til selve klippet)
+function planTrim(sp) {
+  const h = hitLine(sp.x, sp.y) || hitShape(sp.x, sp.y);
+  if (!h) return null;
+  const w = toW(sp.x, sp.y);
+  if (h.type === 'line') {
+    const l = lineById(h.id), a = P(l.a), b = P(l.b), d = { x: b.x - a.x, y: b.y - a.y };
+    const tc = projSeg(w, a, b).t;
+    let lo = { t: 0 }, hi = { t: 1 };
+    for (const c of crossings('line', l.id)) { if (c.t < tc && c.t > lo.t) lo = c; if (c.t > tc && c.t < hi.t) hi = c; }
+    const at = t => ({ x: a.x + d.x * t, y: a.y + d.y * t });
+    return { type: 'line', id: l.id, lo, hi, from: at(lo.t), to: at(hi.t), whole: lo.t === 0 && hi.t === 1 };
+  }
+  const ent = h.type === 'circle' ? circById(h.id) : arcById(h.id), ce = P(ent.c);
+  const g = h.type === 'arc' ? arcGeom(ent) : null, r = g ? g.r : ent.r, base = g ? g.t0 : 0, span = g ? g.span : 2 * Math.PI;
+  const sc = norm2pi(angUp(ce, w) - base);
+  const ss = crossings(h.type, h.id).map(c => ({ ...c, s: norm2pi(angUp(ce, c) - base) })).filter(c => c.s > 1e-6 && c.s < span - 1e-6);
+  let lo = null, hi = null;
+  for (const c of ss) { if (c.s < sc && (!lo || c.s > lo.s)) lo = c; if (c.s > sc && (!hi || c.s < hi.s)) hi = c; }
+  if (h.type === 'circle') {
+    if (ss.length < 2) return { type: 'circle', id: h.id, whole: true, ce, r, base, lo: { s: 0 }, hi: { s: 2 * Math.PI } };
+    // på en sirkel går det rundt: mangler et kryss på den ene siden, brukes det siste på den andre
+    if (!lo) lo = ss.reduce((m, c) => c.s > m.s ? c : m, ss[0]), lo = { ...lo, s: lo.s - 2 * Math.PI };
+    if (!hi) hi = ss.reduce((m, c) => c.s < m.s ? c : m, ss[0]), hi = { ...hi, s: hi.s + 2 * Math.PI };
+    return { type: 'circle', id: h.id, whole: false, ce, r, base, lo, hi };
+  }
+  lo = lo || { s: 0 }; hi = hi || { s: span };
+  return { type: 'arc', id: h.id, ce, r, base, span, lo, hi, whole: lo.s === 0 && hi.s === span };
+}
+function drawTrimPreview(g, pl) {
+  g.save(); g.strokeStyle = C.angle; g.lineWidth = 5; g.globalAlpha = .75; g.lineCap = 'round';
+  if (pl.type === 'line') line(g, toS(pl.from), toS(pl.to));
+  else { const c = toS(pl.ce); g.beginPath(); g.arc(c.x, c.y, pl.r * k(), -(pl.base + pl.lo.s), -(pl.base + pl.hi.s), true); g.stroke(); }
+  g.restore();
+}
+function pointNear(p) {
+  for (const id in doc.points) { const q = P(id); if (Math.hypot(q.x - p.x, q.y - p.y) < 0.05) return id; }
+  return addPoint(p);
+}
+// det nye endepunktet festes til streken det krysset, så det følger med om den flyttes
+function attachTo(pid, cross) {
+  if (!cross || !cross.with || cross.with.type !== 'line') return;
+  const L = cross.with.o;
+  if (L.a === pid || L.b === pid || doc.cons.some(c => c.type === 'online' && c.p === pid && c.l === L.id)) return;
+  doc.cons.push({ id: uid(), type: 'online', p: pid, l: L.id });
+}
+const angPoint = (ce, r, a) => ({ x: ce.x + r * Math.cos(a), y: ce.y - r * Math.sin(a) });
+function applyTrim(pl) {
+  if (pl.type === 'line') {
+    const l = lineById(pl.id);
+    if (pl.whole) { doc.lines = doc.lines.filter(x => x.id !== l.id); return; }
+    // lengden endres: låst lengde, lik lengde og midtpunkt gjelder ikke lenger
+    doc.cons = doc.cons.filter(c => !((c.l === l.id || c.l2 === l.id) && ['len', 'eq', 'mid'].includes(c.type)));
+    if (pl.lo.t === 0) { const np = pointNear(pl.to); l.a = np; attachTo(np, pl.hi); }
+    else if (pl.hi.t === 1) { const np = pointNear(pl.from); l.b = np; attachTo(np, pl.lo); }
+    else {
+      const p1 = pointNear(pl.from), p2 = pointNear(pl.to);
+      const nl = { id: uid(), a: p2, b: l.b, name: nextName() };
+      if (l.aux) nl.aux = true;
+      l.b = p1; doc.lines.push(nl);
+      for (const c of doc.cons.filter(c => c.l === l.id && ['h', 'v', 'ang'].includes(c.type))) doc.cons.push({ ...c, id: uid(), l: nl.id });
+      attachTo(p1, pl.lo); attachTo(p2, pl.hi);
+    }
+    return;
+  }
+  if (pl.type === 'circle') {
+    const c = circById(pl.id);
+    doc.circles = doc.circles.filter(x => x.id !== c.id);
+    if (pl.whole) return;
+    // resten av sirkelen blir en bue, mot klokka fra krysset etter til krysset før
+    doc.arcs.push({ id: uid(), c: c.c, a: pointNear(angPoint(pl.ce, pl.r, pl.base + pl.hi.s)), b: pointNear(angPoint(pl.ce, pl.r, pl.base + pl.lo.s)), name: c.name });
+    return;
+  }
+  const A = arcById(pl.id);
+  if (pl.whole) { doc.arcs = doc.arcs.filter(x => x.id !== A.id); return; }
+  if (pl.lo.s === 0) A.a = pointNear(angPoint(pl.ce, pl.r, pl.base + pl.hi.s));
+  else if (pl.hi.s === pl.span) A.b = pointNear(angPoint(pl.ce, pl.r, pl.base + pl.lo.s));
+  else {
+    const p1 = pointNear(angPoint(pl.ce, pl.r, pl.base + pl.lo.s)), p2 = pointNear(angPoint(pl.ce, pl.r, pl.base + pl.hi.s));
+    doc.arcs.push({ id: uid(), c: A.c, a: p2, b: A.b, name: nextName() });
+    A.b = p1;
+  }
+}
+function trimAt(sp) {
+  const pl = planTrim(sp);
+  if (!pl) return;
+  applyTrim(pl); cleanup(); validateSel(); requestRender(true);
+}
+
 /* ---------- peker ---------- */
 const touches = new Map();
 let gesture = null;
@@ -1346,6 +1493,9 @@ function startAction(e, sp) {
   } else if (tool === 'erase') {
     action = { ...base, type: 'erase', before: snapshot() };
     eraseAt(sp);
+  } else if (tool === 'trim') {
+    action = { ...base, type: 'trim', before: snapshot() };
+    trimHover = null; trimAt(sp);
   }
 }
 function cancelAction() {
@@ -1358,6 +1508,7 @@ canvas.addEventListener('pointermove', e => {
   if (touches.has(e.pointerId)) { touches.set(e.pointerId, sp); if (gesture) { moveGesture(); return; } }
   if (!action || action.pointerId !== e.pointerId) {
     if (e.pointerType !== 'touch' && DRAW_TOOLS.includes(settings.tool) && !pick) { lastPointerType = e.pointerType; hover = snapPos(toW(sp.x, sp.y)); requestRender(); }
+    else if (e.pointerType !== 'touch' && settings.tool === 'trim' && !pick) { lastPointerType = e.pointerType; trimHover = planTrim(sp); requestRender(); }
     return;
   }
   const w = toW(sp.x, sp.y);
@@ -1388,6 +1539,7 @@ canvas.addEventListener('pointermove', e => {
       requestRender(); break;
     }
     case 'erase': eraseAt(sp); break;
+    case 'trim': trimAt(sp); break;
     case 'dragPoint': {
       if (isFixed(action.pid)) break;
       const from = doc.lines.filter(l => l.a === action.pid || l.b === action.pid).map(l => otherEnd(l, action.pid));
@@ -1502,7 +1654,7 @@ function endPointer(e) {
       if (a.pts.length > 1) { const before = snapshot(); doc.strokes.push({ id: uid(), pts: a.pts.map(p => ({ x: Math.round(p.x * 10) / 10, y: Math.round(p.y * 10) / 10 })) }); commit(before); }
       requestRender(); break;
     }
-    case 'erase': cleanup(); commit(a.before); validateSel(); break;
+    case 'erase': case 'trim': cleanup(); commit(a.before); validateSel(); break;
     case 'dragPoint':
       if (isFixed(a.pid) && Math.hypot(sp.x - a.s0.x, sp.y - a.s0.y) > 6) toast('Punktet er låst. Lås det opp i panelet for å flytte det.');
       if (a.target && a.target !== a.pid) { mergePoint(a.pid, a.target); sel = { type: 'point', id: a.target }; solve(); }
@@ -1512,7 +1664,7 @@ function endPointer(e) {
 }
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
-canvas.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && !action) { hover = null; requestRender(); } });
+canvas.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && !action) { hover = null; trimHover = null; requestRender(); } });
 
 function tapSelect(sp) {
   if (pick) { handlePick(sp); return; }
@@ -1549,7 +1701,7 @@ document.addEventListener('keydown', e => {
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
   if (mod) return;
   if (e.key.toLowerCase() === 'x' && sel && sel.type === 'line') { toggleAux(lineById(sel.id)); return; }
-  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', v: 'move', f: 'free', e: 'erase' };
+  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', v: 'move', f: 'free', e: 'erase' };
   if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
   else if (e.key === 'Escape') { if (pick) endPick(); sel = null; if (action) cancelAction(); requestRender(true); }
   else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
@@ -1619,9 +1771,13 @@ function selHTML() {
       </dl>`;
     }
     let joints = '';
+    const seenJ = new Set();
     for (const end of ['a', 'b']) {
       for (const j of gaps(l[end]).filter(j => j.u.line === l || j.v.line === l)) {
         const o = j.u.line === l ? j.v.line : j.u.line;
+        // en T-skjøt gir samme vinkel på begge sider; vis den bare én gang
+        const jk = end + o.id + j.deg.toFixed(1);
+        if (seenJ.has(jk)) continue; seenJ.add(jk);
         const miterTxt = j.deg >= 89.95 ? `<br>Gjæring: sag på <span class="num">${fmtAng(90 - j.deg / 2)}</span> på begge` : '';
         joints += `<li><b>${endLabel(l, end)}</b> mot ${esc(o.name)}: <span class="num">${fmtAng(j.deg)}</span>${miterTxt}</li>`;
       }
@@ -1777,7 +1933,7 @@ function ruleClick(rule) {
 }
 
 /* ---------- verktøylinje ---------- */
-function setTool(t) { settings.tool = t; hover = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
+function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
 document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#undoBtn').addEventListener('click', undo);
 $('#redoBtn').addEventListener('click', redo);
