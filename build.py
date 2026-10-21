@@ -9,6 +9,7 @@ Kjør:  python3 build.py
 """
 import hashlib
 import json
+from datetime import datetime
 import math
 import struct
 import zlib
@@ -35,8 +36,18 @@ HEAD = """<!doctype html>
 <style>body{margin:0}</style>
 """
 
+# Når en ny service worker tar over en side som allerede kjører, er en ny versjon lastet ned.
 SW_REGISTER = """<script>
-if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+if ('serviceWorker' in navigator) addEventListener('load', () => {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController && window.snekkerblokkUpdateReady) window.snekkerblokkUpdateReady();
+  });
+  navigator.serviceWorker.register('sw.js').then(reg => reg.update()).catch(() => {});
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});
+  });
+});
 </script>
 """
 
@@ -44,7 +55,7 @@ SW = """// Snekkerblokk offline: viser lagret versjon med en gang, henter ny i b
 const CACHE = 'snekkerblokk-%s';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
@@ -122,17 +133,19 @@ def main():
     src = SRC.read_text(encoding='utf-8')
     split = src.index('<div id="app">')
     head, body = src[:split], src[split:]
-    html = HEAD + head + '</head>\n<body>\n' + body + SW_REGISTER + '</body>\n</html>\n'
+    version = hashlib.sha1(src.encode()).hexdigest()[:7]
+    label = datetime.now().strftime('%d.%m.%Y %H:%M')
+    stamp = '<script>window.SNEKKERBLOKK_VERSION = %s;</script>\n' % json.dumps({'id': version, 'label': label})
+    html = HEAD + stamp + head + '</head>\n<body>\n' + body + SW_REGISTER + '</body>\n</html>\n'
     OUT.mkdir(exist_ok=True)
     (OUT / 'index.html').write_text(html, encoding='utf-8')
-    version = hashlib.sha1(html.encode()).hexdigest()[:10]
     (OUT / 'sw.js').write_text(SW % version, encoding='utf-8')
     (OUT / 'manifest.webmanifest').write_text(json.dumps(MANIFEST, ensure_ascii=False, indent=2), encoding='utf-8')
     for n in (180, 192, 512):
         f = OUT / f'icon-{n}.png'
         if not f.exists():
             png(f, n, n, icon(n))
-    print(f'Bygget docs/ (versjon {version})')
+    print(f'Bygget docs/ (versjon {label}, {version})')
 
 
 if __name__ == '__main__':
