@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "49d946b", "label": "21.10.2026 18:27"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "83f09fe", "label": "21.10.2026 18:35"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -71,6 +71,9 @@ button{cursor:pointer}
 .ctl[aria-pressed="true"]{background:var(--hover);border-color:var(--select);color:var(--select)}
 select.ctl{padding-right:6px}
 input.name{width:170px}
+.version-tag{flex:none;font-family:var(--font-num);font-size:11px;line-height:1.3;color:var(--chrome-muted);text-align:right;white-space:nowrap}
+.version-tag b{display:block;font-weight:500;color:var(--chrome-fg)}
+@media (max-width: 760px){ .version-tag{display:none} }
 .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-muted);white-space:nowrap}
 
 .rail{position:absolute;z-index:4;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));top:var(--float-top);
@@ -176,7 +179,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   <canvas id="c" aria-label="Tegneflate med rutenett"></canvas>
 
   <header class="topbar">
-    <div class="brand">Snekkerblokk<small id="brandSub">Rutepapir med mål</small></div>
+    <div class="brand">Snekkerblokk<small>Rutepapir med mål</small></div>
     <div class="bar-scroll">
       <div class="group">
         <select id="drawSel" class="ctl" aria-label="Velg tegning"></select>
@@ -206,6 +209,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <button id="panelBtn" class="ctl" type="button" aria-pressed="true">Mål</button>
       </div>
     </div>
+    <div class="version-tag" id="versionTag" hidden></div>
   </header>
 
   <nav class="rail" aria-label="Verktøy">
@@ -235,7 +239,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
-        <p class="hint"><b>Mål i veien?</b> Med Flytt kan du dra et mål eller en vinkel til et annet sted. Drar du det tilbake, havner det på plassen sin igjen.</p>
+        <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
         <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
@@ -1364,17 +1368,10 @@ canvas.addEventListener('pointermove', e => {
       view.ox = action.v0.ox + dx; view.oy = action.v0.oy + dy; requestRender(); break;
     }
     case 'labelTap': {
-      // med Flytt: dra målet til et annet sted
-      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6 && (settings.tool === 'move' || action.moveMode) && action.label.key) {
+      // drar du i et mål eller en vinkel, flyttes merkelappen (med penn, finger eller mus, i alle verktøy)
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6 && action.label.key) {
         const o = doc.labelOffs[action.label.key] || { x: 0, y: 0 };
         action = { ...action, type: 'labelDrag', key: action.label.key, o0: { ...o }, before: snapshot() };
-        break;
-      }
-      // dro bort fra merkelappen: tegn en strek i stedet
-      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 10 && !action.moveMode && DRAW_TOOLS.includes(settings.tool)) {
-        const s = snapPos(action.w0);
-        action = { ...action, type: 'line', shape: settings.tool, start: s, end: snapPos(w, { from: [s] }) };
-        requestRender();
       }
       break;
     }
@@ -1999,7 +1996,9 @@ $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true;
 /* ---------- versjon og oppdatering (settes av build.py i app-versjonen) ---------- */
 const APP_VERSION = window.SNEKKERBLOKK_VERSION || null;
 if (APP_VERSION) {
-  $('#brandSub').textContent = 'Versjon ' + APP_VERSION.label;
+  const vt = $('#versionTag');
+  vt.innerHTML = `<b>Versjon ${esc(APP_VERSION.id)}</b>${esc(APP_VERSION.label)}`;
+  vt.hidden = false;
   $('#versionLine').textContent = `Versjon ${APP_VERSION.label} (${APP_VERSION.id})`;
 } else $('#versionLine').textContent = 'Versjon i Claude';
 // kalles fra service worker-koden når en ny versjon er lastet ned i bakgrunnen
