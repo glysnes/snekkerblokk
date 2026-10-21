@@ -1,0 +1,1787 @@
+<meta charset="utf-8">
+<title>Snekkerblokk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: full-bleed graph-paper canvas; slim settings bar on top, tool rail floating left, measurement panel right (bottom sheet on phones) */
+:root{
+  --paper:#f5f8f7; --grid-minor:#d5e7e4; --grid-major:#a8ccc7;
+  --ink:#21262b; --ink-soft:#5d676f; --measure:#1d4c9e; --angle:#b8430f; --select:#0b7a62; --free:#3d78e0;
+  --chrome:#ffffff; --chrome-line:#d6e0df; --chrome-fg:#1c2226; --chrome-muted:#65727a; --hover:#ecf3f2; --danger:#b42318;
+  --font-ui:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1c29; --grid-minor:#1a3045; --grid-major:#2b4c69;
+  --ink:#e6eef5; --ink-soft:#9db1c3; --measure:#8fc3ff; --angle:#ffb27a; --select:#5ddfbd; --free:#5a9dff;
+  --chrome:#13212e; --chrome-line:#253a4d; --chrome-fg:#e2eaf1; --chrome-muted:#8da1b4; --hover:#1b2c3d; --danger:#ff8a80;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0f1c29; --grid-minor:#1a3045; --grid-major:#2b4c69;
+  --ink:#e6eef5; --ink-soft:#9db1c3; --measure:#8fc3ff; --angle:#ffb27a; --select:#5ddfbd; --free:#5a9dff;
+  --chrome:#13212e; --chrome-line:#253a4d; --chrome-fg:#e2eaf1; --chrome-muted:#8da1b4; --hover:#1b2c3d; --danger:#ff8a80;
+  color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--chrome-fg);font-family:var(--font-ui);font-size:15px;overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#app{position:fixed;inset:0}
+#c{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block;cursor:crosshair}
+button,select,input{font:inherit;color:inherit;touch-action:manipulation}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--select);outline-offset:2px}
+
+.topbar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:10px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:var(--chrome);border-bottom:1px solid var(--chrome-line)}
+.brand{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted)}
+.bar-scroll{display:flex;align-items:center;gap:8px;overflow-x:auto;min-width:0;flex:1;scrollbar-width:none}
+.bar-scroll::-webkit-scrollbar{display:none}
+.group{display:flex;align-items:center;gap:6px;flex:none}
+.sep{width:1px;height:28px;background:var(--chrome-line);flex:none}
+.ctl{height:38px;border:1px solid var(--chrome-line);background:var(--chrome);border-radius:8px;padding:0 10px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.ctl:hover{background:var(--hover)}
+.ctl[aria-pressed="true"]{background:var(--hover);border-color:var(--select);color:var(--select)}
+select.ctl{padding-right:6px}
+input.name{width:170px}
+.lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-muted);white-space:nowrap}
+
+.rail{position:absolute;z-index:4;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));top:76px;
+  display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;
+  box-shadow:0 6px 20px rgb(0 0 0 / .08)}
+.rail button{width:52px;height:52px;border:0;border-radius:10px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500}
+.rail button svg{width:24px;height:24px}
+.rail button:hover{background:var(--hover)}
+.rail button[aria-pressed="true"]{background:var(--select);color:var(--chrome)}
+.rail hr{border:0;border-top:1px solid var(--chrome-line);margin:4px 2px}
+.rail button:disabled{opacity:.35;cursor:default}
+
+.panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:76px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  width:330px;display:flex;flex-direction:column;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 6px 20px rgb(0 0 0 / .08);overflow:hidden}
+.panel-scroll{overflow-y:auto;padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-user-select:text;user-select:text}
+.panel h3{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted);font-weight:600}
+.panel h4{margin:6px 0 0;font-size:13px;font-weight:600}
+.sec{display:flex;flex-direction:column;gap:10px}
+.sel-head{display:flex;align-items:center;gap:10px}
+.sel-head .title{font-size:18px;font-weight:600;flex:1}
+.tag{font-family:var(--font-num);font-weight:600;font-size:13px;min-width:26px;height:26px;padding:0 6px;border-radius:6px;display:inline-grid;place-items:center;background:var(--hover);color:var(--measure)}
+.field{display:grid;grid-template-columns:1fr 96px 22px 38px;align-items:center;gap:6px}
+.field span{font-size:14px}
+.field input{height:40px;border:1px solid var(--chrome-line);border-radius:8px;background:var(--paper);padding:0 10px;font-family:var(--font-num);font-size:16px;text-align:right;width:100%;min-width:0;-webkit-user-select:text;user-select:text}
+.field em{font-style:normal;color:var(--chrome-muted);font-size:13px}
+.lock{width:38px;height:38px;border:1px solid var(--chrome-line);border-radius:8px;background:transparent;display:grid;place-items:center;color:var(--chrome-muted)}
+.lock svg{width:18px;height:18px}
+.lock[aria-pressed="true"]{background:var(--measure);border-color:var(--measure);color:var(--chrome)}
+.field.joint{grid-template-columns:1fr 96px 22px 38px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0}
+.facts dt{color:var(--chrome-muted);font-size:14px}
+.facts dd{margin:0;font-family:var(--font-num);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.facts dd.saw{color:var(--angle);font-weight:600}
+.joints{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.joints li{font-size:14px;line-height:1.35;padding:8px 10px;border-radius:8px;background:var(--hover)}
+.joints .num{font-family:var(--font-num);color:var(--angle);font-weight:600}
+.rules{display:flex;flex-wrap:wrap;gap:6px}
+.rule{height:36px;border:1px solid var(--chrome-line);background:var(--chrome);border-radius:18px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.rule b{font-family:var(--font-num);font-weight:600;color:var(--measure)}
+.rule:hover{background:var(--hover)}
+.rule[aria-pressed="true"]{background:var(--measure);border-color:var(--measure);color:var(--chrome)}
+.rule[aria-pressed="true"] b{color:var(--chrome)}
+.active-rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.active-rules li{display:flex;align-items:center;gap:8px;font-size:14px;padding:4px 4px 4px 10px;border-radius:8px;background:var(--hover)}
+.active-rules li span{flex:1}
+.active-rules .dim-in{width:76px;height:32px;border:1px solid var(--chrome-line);border-radius:6px;background:var(--paper);padding:0 8px;font-family:var(--font-num);font-size:16px;text-align:right;-webkit-user-select:text;user-select:text}
+.active-rules .dim-unit{font-style:normal;font-size:12px;color:var(--chrome-muted)}
+.active-rules button{width:30px;height:30px;border:0;background:transparent;border-radius:6px;color:var(--chrome-muted);font-size:18px;line-height:1}
+.active-rules button:hover{color:var(--danger)}
+.hint{font-size:14px;line-height:1.45;color:var(--chrome-muted);margin:0}
+.hint b{color:var(--chrome-fg);font-weight:600}
+.status{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4;padding:10px 12px;border-radius:10px;background:var(--hover)}
+.status i{flex:none;width:12px;height:12px;border-radius:3px;margin-top:4px;background:var(--free)}
+.status.done i{background:var(--ink)}
+.btn-danger{border:1px solid var(--chrome-line);background:transparent;border-radius:8px;height:34px;padding:0 10px;color:var(--danger)}
+table.cut{width:100%;border-collapse:collapse;font-size:14px}
+table.cut th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-muted);font-weight:600;text-align:left;padding:0 6px 6px 0;border-bottom:1px solid var(--chrome-line)}
+table.cut td{padding:7px 6px 7px 0;border-bottom:1px solid var(--chrome-line);font-variant-numeric:tabular-nums;vertical-align:top}
+table.cut td.n,table.cut td.l,table.cut td.a{font-family:var(--font-num)}
+table.cut td.a{color:var(--angle)}
+table.cut td.names{color:var(--chrome-muted);font-family:var(--font-num);font-size:12px}
+table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
+
+.badge{position:absolute;z-index:3;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  font-family:var(--font-num);font-size:12px;color:var(--ink-soft);background:var(--chrome);border:1px solid var(--chrome-line);border-radius:8px;padding:6px 10px;pointer-events:none}
+
+.editor{position:absolute;z-index:7;transform:translate(-50%,-50%);display:flex;align-items:center;gap:4px;background:var(--chrome);
+  border:2px solid var(--select);border-radius:9px;padding:2px 8px 2px 2px;box-shadow:0 6px 18px rgb(0 0 0 / .18)}
+.editor input{width:92px;height:36px;border:0;background:transparent;font-family:var(--font-num);font-size:17px;text-align:right;padding:0 6px;-webkit-user-select:text;user-select:text}
+.editor input:focus{outline:none}
+.editor span{font-family:var(--font-num);font-size:13px;color:var(--chrome-muted)}
+
+.pickbar{position:absolute;z-index:6;left:50%;transform:translateX(-50%);top:72px;display:flex;align-items:center;gap:12px;
+  background:var(--select);color:var(--chrome);border-radius:12px;padding:8px 8px 8px 16px;font-size:15px;font-weight:500;box-shadow:0 6px 18px rgb(0 0 0 / .18);max-width:calc(100% - 32px)}
+.pickbar button{height:34px;border:0;border-radius:8px;padding:0 12px;background:var(--chrome);color:var(--chrome-fg)}
+.toast{position:absolute;z-index:8;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  background:var(--chrome-fg);color:var(--chrome);border-radius:10px;padding:10px 16px;font-size:15px;max-width:calc(100% - 32px);box-shadow:0 6px 18px rgb(0 0 0 / .2)}
+
+.overlay{position:fixed;inset:0;z-index:20;background:rgb(0 0 0 / .55);display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px))}
+.overlay .box{background:var(--chrome);border-radius:14px;padding:16px;max-width:min(900px,100%);max-height:100%;display:flex;flex-direction:column;gap:12px}
+.overlay img{max-width:100%;max-height:65vh;border:1px solid var(--chrome-line);border-radius:8px;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;background:var(--paper)}
+.overlay .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+@media (max-width: 760px){
+  .brand small{display:none}
+  .panel{left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));width:auto;top:auto;max-height:50%}
+  .rail{top:70px}
+  .rail button{width:46px;height:46px}
+  .badge{display:none}
+}
+@media (prefers-reduced-motion: no-preference){ .ctl,.rail button,.rule{transition:background-color .12s,color .12s} }
+</style>
+
+<div id="app">
+  <canvas id="c" aria-label="Tegneflate med rutenett"></canvas>
+
+  <header class="topbar">
+    <div class="brand">Snekkerblokk<small>Rutepapir med mål</small></div>
+    <div class="bar-scroll">
+      <div class="group">
+        <select id="drawSel" class="ctl" aria-label="Velg tegning"></select>
+        <input id="nameIn" class="ctl name" aria-label="Navn på tegningen" spellcheck="false">
+        <button id="delDraw" class="ctl" type="button">Slett</button>
+        <button id="saveFile" class="ctl" type="button" title="Lagre tegningen som fil, for eksempel i Filer eller iCloud">Lagre fil</button>
+        <button id="openFile" class="ctl" type="button" title="Åpne en tegning fra fil">Åpne fil</button>
+        <input type="file" id="fileIn" accept=".json,application/json" hidden>
+      </div>
+      <span class="sep"></span>
+      <div class="group">
+        <span class="lbl">1 rute =</span>
+        <select id="ruteSel" class="ctl" aria-label="Størrelse på en rute">
+          <option value="1">1 cm</option><option value="2">2 cm</option><option value="5">5 cm</option>
+          <option value="10">10 cm</option><option value="20">20 cm</option><option value="25">25 cm</option>
+          <option value="50">50 cm</option><option value="100">1 m</option>
+        </select>
+        <button id="snapBtn" class="ctl" type="button" aria-pressed="true">Fest til ruter</button>
+        <button id="autoBtn" class="ctl" type="button" aria-pressed="true" title="Vannrette og loddrette streker får regelen automatisk">Auto-regler</button>
+        <select id="unitSel" class="ctl" aria-label="Enhet for mål"><option value="cm">cm</option><option value="mm">mm</option></select>
+      </div>
+      <span class="sep"></span>
+      <div class="group">
+        <button id="fitBtn" class="ctl" type="button">Vis alt</button>
+        <button id="imgBtn" class="ctl" type="button">Lagre bilde</button>
+        <button id="panelBtn" class="ctl" type="button" aria-pressed="true">Mål</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="Verktøy">
+    <button type="button" data-tool="line" title="Strek (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/></svg>Strek</button>
+    <button type="button" data-tool="rect" title="Rektangel (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rektangel</button>
+    <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
+    <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
+    <button type="button" data-tool="move" title="Flytt punkter og streker (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Flytt</button>
+    <button type="button" data-tool="free" title="Frihånd (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Frihånd</button>
+    <button type="button" data-tool="erase" title="Viskelær (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Visk</button>
+    <hr>
+    <button type="button" id="undoBtn" title="Angre (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Angre</button>
+    <button type="button" id="redoBtn" title="Gjør om (⇧⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg>Gjør om</button>
+  </nav>
+
+  <aside class="panel" id="panel" aria-label="Mål og vinkler">
+    <div class="panel-scroll">
+      <section class="sec" id="statusBox"></section>
+      <section class="sec" id="selBox"></section>
+      <section class="sec">
+        <h3>Kappliste</h3>
+        <div id="cutBox"></div>
+      </section>
+      <section class="sec">
+        <h3>Slik bruker du den</h3>
+        <p class="hint"><b>Pennen tegner, fingeren flytter.</b> Én finger drar arket, to fingre zoomer. Et trykk med fingeren på en strek viser målene.</p>
+        <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
+        <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
+        <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
+        <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
+        <p class="hint">Lengdene måles fra punkt til punkt langs streken. Ta hensyn til materialtykkelsen selv. Sagvinkler er regnet fra rett kapp (0°).</p>
+      </section>
+    </div>
+  </aside>
+
+  <div class="editor" id="editor" hidden><input id="edIn" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Nytt mål"><span id="edUnit"></span></div>
+  <div class="pickbar" id="pickbar" hidden><span id="pickText"></span><button type="button" id="pickCancel">Avbryt</button></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div class="badge" id="badge"></div>
+</div>
+
+<div class="overlay" id="imgOverlay" hidden>
+  <div class="box">
+    <div class="row"><strong>Bilde av tegningen</strong><button class="ctl" type="button" id="imgClose">Lukk</button></div>
+    <img id="imgOut" alt="Tegningen som bilde">
+    <p class="hint">Hold fingeren på bildet og velg «Arkiver bilde» eller «Del». På Mac: høyreklikk og velg «Arkiver bilde som».</p>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const canvas = $('#c'), ctx = canvas.getContext('2d');
+const PX_PER_CM = 2;
+const STORE = 'snekkerblokk.v1';
+const DEG = 180 / Math.PI;
+const FONT = '500 12px "IBM Plex Mono", ui-monospace, monospace';
+const LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+let store = { current: null, drawings: {}, settings: {} };
+let settings = { unit: 'cm', snap: true, auto: true, tool: 'line', panel: true };
+let doc, view = { ox: 0, oy: 0, z: 1 };
+let sel = null, hover = null, action = null, pick = null, editing = null;
+let undoStack = [], redoStack = [];
+let lastPointerType = 'mouse', penSeen = false, spaceDown = false;
+let labelHits = [];
+let C = {};
+let seq = 0;
+const uid = () => Date.now().toString(36) + (seq++).toString(36) + Math.random().toString(36).slice(2, 5);
+
+/* ---------- lagring ---------- */
+function loadStore() {
+  try { const s = JSON.parse(localStorage.getItem(STORE)); if (s && s.drawings) store = s; } catch (e) {}
+  Object.assign(settings, store.settings || {});
+}
+function saveStore() { try { localStorage.setItem(STORE, JSON.stringify(store)); } catch (e) {} }
+let saveTimer;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(flushSave, 300); }
+function flushSave() {
+  clearTimeout(saveTimer);
+  doc.updated = Date.now(); doc.view = { ...view };
+  store.drawings[doc.id] = JSON.parse(JSON.stringify(doc));
+  store.current = doc.id; store.settings = { ...settings };
+  saveStore();
+}
+
+function sampleDoc() {
+  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [] };
+  const pts = { g0: [0, 0], g1: [240, 0], w0: [0, -200], w1: [240, -200], r: [120, -270] };
+  for (const [k, [x, y]] of Object.entries(pts)) d.points[k] = { x, y };
+  [['g0', 'g1'], ['g0', 'w0'], ['g1', 'w1'], ['w0', 'w1'], ['w0', 'r'], ['w1', 'r']]
+    .forEach(([a, b], i) => d.lines.push({ id: 'l' + i, a, b, name: nameFor(i) }));
+  d.cons = [
+    { id: 'c0', type: 'fix', p: 'g0' }, { id: 'c1', type: 'h', l: 'l0' }, { id: 'c2', type: 'h', l: 'l3' },
+    { id: 'c3', type: 'v', l: 'l1' }, { id: 'c4', type: 'v', l: 'l2' }, { id: 'c5', type: 'eq', l: 'l4', l2: 'l5' }
+  ];
+  return d;
+}
+function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [] }; }
+
+/* ---------- hjelpere ---------- */
+function nameFor(i) { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+function nextName() { const used = new Set([...doc.lines, ...doc.arcs, ...doc.circles].map(l => l.name)); for (let i = 0; ; i++) { const n = nameFor(i); if (!used.has(n)) return n; } }
+const P = id => doc.points[id];
+const k = () => PX_PER_CM * view.z;
+const toS = p => ({ x: p.x * k() + view.ox, y: p.y * k() + view.oy });
+const toW = (sx, sy) => ({ x: (sx - view.ox) / k(), y: (sy - view.oy) / k() });
+const lineById = id => doc.lines.find(l => l.id === id);
+const arcById = id => doc.arcs.find(a => a.id === id);
+const circById = id => doc.circles.find(c => c.id === id);
+const angUp = (c, p) => Math.atan2(-(p.y - c.y), p.x - c.x);
+const norm2pi = x => { x %= 2 * Math.PI; return x < 0 ? x + 2 * Math.PI : x; };
+// en bue går alltid mot klokka (sett ovenfra på arket) fra a til b rundt sentrum c
+function arcGeom(A) {
+  const c = P(A.c), a = P(A.a), b = P(A.b), r = Math.hypot(a.x - c.x, a.y - c.y);
+  const t0 = angUp(c, a); let span = norm2pi(angUp(c, b) - t0); if (span < 1e-9) span = 2 * Math.PI;
+  const tm = t0 + span / 2, chord = Math.hypot(b.x - a.x, b.y - a.y);
+  return { c, a, b, r, t0, span, tm, chord, mid: { x: c.x + r * Math.cos(tm), y: c.y - r * Math.sin(tm) }, sag: r * (1 - Math.cos(span / 2)), len: r * span };
+}
+function circumcenter(a, b, m) {
+  const d = 2 * (a.x * (b.y - m.y) + b.x * (m.y - a.y) + m.x * (a.y - b.y));
+  if (Math.abs(d) < 1e-9) return null;
+  const A2 = a.x * a.x + a.y * a.y, B2 = b.x * b.x + b.y * b.y, M2 = m.x * m.x + m.y * m.y;
+  return { x: (A2 * (b.y - m.y) + B2 * (m.y - a.y) + M2 * (a.y - b.y)) / d, y: (A2 * (m.x - b.x) + B2 * (a.x - m.x) + M2 * (b.x - a.x)) / d };
+}
+// sentrum for buen gjennom a, b og m; swap = a og b må bytte plass for at buen skal gå gjennom m
+function arcThrough(a, b, m) {
+  const c = circumcenter(a, b, m); if (!c) return null;
+  const ta = angUp(c, a);
+  return { c, swap: !(norm2pi(angUp(c, m) - ta) < norm2pi(angUp(c, b) - ta)) };
+}
+// standard bue: pilhøyde en firedel av spennet, buet oppover (eller mot venstre)
+function defaultBulge(a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+  let nx = dy / L, ny = -dx / L;
+  if (ny > 1e-9 || (Math.abs(ny) <= 1e-9 && nx > 0)) { nx = -nx; ny = -ny; }
+  return { x: (a.x + b.x) / 2 + nx * L * 0.25, y: (a.y + b.y) / 2 + ny * L * 0.25 };
+}
+const isCenter = pid => doc.circles.some(c => c.c === pid) || doc.arcs.some(a => a.c === pid);
+const lenOf = l => { const a = P(l.a), b = P(l.b); return Math.hypot(b.x - a.x, b.y - a.y); };
+const vec = l => { const a = P(l.a), b = P(l.b); return { x: b.x - a.x, y: b.y - a.y }; };
+const otherEnd = (l, pid) => P(l.a === pid ? l.b : l.a);
+// avstand fra punkt til (den forlengede) streken, med fortegn for hvilken side
+function sdist(p, l) { const a = P(l.a), b = P(l.b), n = Math.hypot(b.x - a.x, b.y - a.y) || 1; return ((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) / n; }
+// vinkel i grader med y oppover, -180..180
+const rawAng = (a, b) => Math.atan2(-(b.y - a.y), b.x - a.x) * DEG;
+function acuteAng(l) { let t = Math.abs(rawAng(P(l.a), P(l.b))); if (t > 90) t = 180 - t; return t; }
+function projSeg(p, a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy || 1e-9;
+  const t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / L2;
+  const tc = Math.max(0, Math.min(1, t));
+  const x = a.x + tc * dx, y = a.y + tc * dy;
+  return { t, x, y, d: Math.hypot(p.x - x, p.y - y) };
+}
+const nf1 = new Intl.NumberFormat('nb-NO', { maximumFractionDigits: 1 });
+const nfA = new Intl.NumberFormat('nb-NO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const unitName = () => settings.unit;
+function lenNum(cm) { return settings.unit === 'mm' ? Math.round(cm * 10).toLocaleString('nb-NO') : nf1.format(Math.round(cm * 10) / 10); }
+const fmtLen = cm => lenNum(cm) + ' ' + unitName();
+const fmtAng = d => nfA.format(Math.round(d * 10) / 10) + '°';
+const parseNum = s => parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
+const isAxis = t => t < 0.05 || Math.abs(t - 90) < 0.05;
+const hitR = () => lastPointerType === 'touch' ? 22 : 12;
+const degree = pid => doc.lines.filter(l => l.a === pid || l.b === pid).length;
+function inputLen(cm) { return settings.unit === 'mm' ? String(Math.round(cm * 10)) : nf1.format(Math.round(cm * 10) / 10).replace(/\s/g, ''); }
+const inputAng = d => nfA.format(Math.round(d * 10) / 10);
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+let toastTimer;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200); }
+
+/* ---------- angre ---------- */
+const snapshot = () => JSON.stringify({ points: doc.points, lines: doc.lines, strokes: doc.strokes, cons: doc.cons, circles: doc.circles, arcs: doc.arcs });
+function commit(before) {
+  if (before === snapshot()) return;
+  undoStack.push(before); if (undoStack.length > 200) undoStack.shift();
+  redoStack = [];
+  changed();
+}
+function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines = o.lines; doc.strokes = o.strokes; doc.cons = o.cons || []; doc.circles = o.circles || []; doc.arcs = o.arcs || []; }
+function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); validateSel(); changed(); }
+function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); validateSel(); changed(); }
+function validateSel() {
+  if (!sel) return;
+  const ok = { line: lineById, point: P, arc: arcById, circle: circById }[sel.type](sel.id);
+  if (!ok) sel = null;
+}
+function changed() { scheduleSave(); requestRender(true); }
+
+/* ---------- regler (constraints) ---------- */
+const conOf = (type, f) => doc.cons.find(c => c.type === type && f(c));
+const lineCons = id => doc.cons.filter(c => c.l === id || c.l2 === id);
+const isFixed = pid => doc.cons.some(c => c.type === 'fix' && c.p === pid);
+const fixedPts = () => new Set(doc.cons.filter(c => c.type === 'fix').map(c => c.p));
+const wrapPi = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; };
+
+function consRes(c, out) {
+  const L = c.l && lineById(c.l), L2 = c.l2 && lineById(c.l2);
+  switch (c.type) {
+    case 'h': out.push(P(L.a).y - P(L.b).y); break;
+    case 'v': out.push(P(L.a).x - P(L.b).x); break;
+    case 'len': out.push(lenOf(L) - c.v); break;
+    case 'ang': { const d = vec(L), t = c.v / DEG; out.push(-d.x * Math.sin(t) - d.y * Math.cos(t)); break; }
+    case 'par': { const d1 = vec(L), d2 = vec(L2), n = Math.hypot(d1.x, d1.y) || 1; out.push((d1.x * d2.y - d1.y * d2.x) / n); break; }
+    case 'perp': { const d1 = vec(L), d2 = vec(L2), n = Math.hypot(d1.x, d1.y) || 1; out.push((d1.x * d2.x + d1.y * d2.y) / n); break; }
+    case 'eq': out.push(lenOf(L) - lenOf(L2)); break;
+    case 'angle2': {
+      const p = P(c.p), o1 = otherEnd(L, c.p), o2 = otherEnd(L2, c.p);
+      const u = { x: o1.x - p.x, y: p.y - o1.y }, w = { x: o2.x - p.x, y: p.y - o2.y };
+      const a = Math.atan2(u.x * w.y - u.y * w.x, u.x * w.x + u.y * w.y);
+      out.push(wrapPi(a - c.v / DEG) * Math.min(Math.hypot(u.x, u.y), Math.hypot(w.x, w.y)));
+      break;
+    }
+    case 'online': { const a = P(L.a), b = P(L.b), p = P(c.p), n = Math.hypot(b.x - a.x, b.y - a.y) || 1; out.push(((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) / n); break; }
+    case 'mid': { const a = P(L.a), b = P(L.b), p = P(c.p); out.push(p.x - (a.x + b.x) / 2, p.y - (a.y + b.y) / 2); break; }
+    case 'rad': { const A = arcById(c.arc), ce = P(A.c), a = P(A.a); out.push(Math.hypot(a.x - ce.x, a.y - ce.y) - c.v); break; }
+    case 'pdist': out.push(sdist(P(c.p), L) * c.side - c.v); break;
+    case 'ppdist': { const p = P(c.p), q = P(c.p2); out.push(Math.hypot(q.x - p.x, q.y - p.y) - c.v); break; }
+    case 'tan': { const ci = circById(c.circle); out.push(sdist(P(ci.c), L) * c.side - ci.r); break; }
+  }
+}
+function consPoints(c) {
+  const s = [];
+  if (c.l) { const l = lineById(c.l); s.push(l.a, l.b); }
+  if (c.l2) { const l = lineById(c.l2); s.push(l.a, l.b); }
+  if (c.p) s.push(c.p);
+  if (c.arc) { const A = arcById(c.arc); s.push(A.a, A.b, A.c); }
+  if (c.p2) s.push(c.p2);
+  if (c.circle) s.push(circById(c.circle).c);
+  return s;
+}
+// hver bue har en innebygd regel: begge endene like langt fra sentrum
+const conRes = () => {
+  const r = []; for (const c of doc.cons) consRes(c, r);
+  for (const A of doc.arcs) { const c = P(A.c), a = P(A.a), b = P(A.b); r.push(Math.hypot(a.x - c.x, a.y - c.y) - Math.hypot(b.x - c.x, b.y - c.y)); }
+  return r;
+};
+const hasRules = () => doc.cons.length > 0 || doc.arcs.length > 0;
+const maxAbs = r => r.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+const savePos = () => { const o = {}; for (const id in doc.points) o[id] = { ...doc.points[id] }; return o; };
+const loadPos = o => { for (const id in o) if (doc.points[id]) Object.assign(doc.points[id], o[id]); };
+
+function gaussSolve(A, b, n) {
+  for (let i = 0; i < n; i++) {
+    let piv = i, mv = Math.abs(A[i * n + i]);
+    for (let r = i + 1; r < n; r++) { const v = Math.abs(A[r * n + i]); if (v > mv) { mv = v; piv = r; } }
+    if (mv < 1e-14) return null;
+    if (piv !== i) { for (let c = 0; c < n; c++) { const t = A[i * n + c]; A[i * n + c] = A[piv * n + c]; A[piv * n + c] = t; } const t = b[i]; b[i] = b[piv]; b[piv] = t; }
+    for (let r = i + 1; r < n; r++) {
+      const f = A[r * n + i] / A[i * n + i]; if (!f) continue;
+      for (let c = i; c < n; c++) A[r * n + c] -= f * A[i * n + c];
+      b[r] -= f * b[i];
+    }
+  }
+  const x = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) { let s = b[i]; for (let c = i + 1; c < n; c++) s -= A[i * n + c] * x[c]; x[i] = s / A[i * n + i]; }
+  return x;
+}
+// Levenberg–Marquardt: flytter punktene så lite som mulig til alle regler stemmer
+function solve(hold = new Set(), soft = [], prefer = null) {
+  if (!hasRules()) return true;
+  const fx = fixedPts(), vset = new Set();
+  for (const c of doc.cons) if (c.type !== 'fix') for (const id of consPoints(c)) if (!fx.has(id) && !hold.has(id)) vset.add(id);
+  for (const A of doc.arcs) for (const id of [A.a, A.b, A.c]) if (!fx.has(id) && !hold.has(id)) vset.add(id);
+  for (const s of soft) if (!fx.has(s.id)) vset.add(s.id);
+  const vars = []; for (const id of vset) vars.push([id, 'x'], [id, 'y']);
+  const n = vars.length;
+  // punkter utenfor «prefer» koster mer å flytte, så endringen holder seg nær det du rørte
+  const S = vars.map(([id]) => !prefer || prefer.has(id) ? 1 : 0.15);
+  const res = () => { const r = conRes(); for (const s of soft) { const p = P(s.id); r.push(s.w * (p.x - s.x), s.w * (p.y - s.y)); } return r; };
+  if (n) {
+    let r = res(), err = r.reduce((s, v) => s + v * v, 0), lambda = 1e-4;
+    for (let it = 0; it < 80 && maxAbs(r) > 1e-9; it++) {
+      const m = r.length, J = new Float64Array(m * n), h = 1e-6;
+      for (let j = 0; j < n; j++) {
+        const [id, ax] = vars[j], p = P(id), v0 = p[ax];
+        p[ax] = v0 + h; const rj = res(); p[ax] = v0;
+        for (let i = 0; i < m; i++) J[i * n + j] = (rj[i] - r[i]) / h * S[j];
+      }
+      const A = new Float64Array(n * n), g = new Float64Array(n);
+      for (let i = 0; i < m; i++) {
+        const ri = r[i], row = i * n;
+        for (let j = 0; j < n; j++) {
+          const Jij = J[row + j]; if (!Jij) continue;
+          g[j] += Jij * ri;
+          for (let q = j; q < n; q++) A[j * n + q] += Jij * J[row + q];
+        }
+      }
+      for (let j = 0; j < n; j++) for (let q = 0; q < j; q++) A[j * n + q] = A[q * n + j];
+      let improved = false;
+      for (let tries = 0; tries < 10; tries++) {
+        const M = A.slice(); for (let j = 0; j < n; j++) M[j * n + j] += lambda;
+        const dx = gaussSolve(M, Array.from(g, v => -v), n);
+        if (!dx) { lambda *= 10; continue; }
+        const save = vars.map(([id, ax]) => P(id)[ax]);
+        vars.forEach(([id, ax], j) => P(id)[ax] += dx[j] * S[j]);
+        const r2 = res(), e2 = r2.reduce((s, v) => s + v * v, 0);
+        if (e2 < err) { r = r2; err = e2; lambda = Math.max(1e-10, lambda * 0.3); improved = true; break; }
+        vars.forEach(([id, ax], j) => P(id)[ax] = save[j]);
+        lambda *= 10;
+      }
+      if (!improved) break;
+    }
+  }
+  return maxAbs(conRes()) < 1e-3;
+}
+function solveWithHold(hold, prefer, exempt = []) {
+  const prev = savePos(), ok = () => noFlip(prev, [], exempt);
+  if (hold && hold.size && solve(hold, [], prefer) && ok()) return true;
+  loadPos(prev);
+  if (prefer && solve(new Set(), [], prefer) && ok()) return true;
+  loadPos(prev);
+  return solve() && ok();
+}
+const linePts = (...ids) => { const s = new Set(); for (const id of ids) { const l = lineById(id); if (l) { s.add(l.a); s.add(l.b); } } return s; };
+function nearPts(pids) {
+  const s = new Set(pids);
+  for (const l of doc.lines) if (pids.includes(l.a) || pids.includes(l.b)) { s.add(l.a); s.add(l.b); }
+  for (const A of doc.arcs) if ([A.a, A.b, A.c].some(id => pids.includes(id))) [A.a, A.b, A.c].forEach(id => s.add(id));
+  return s;
+}
+function setRad(A, r) {
+  const g = arcGeom(A);
+  if (!(r > g.chord / 2 + 1e-6)) { toast(`Radien må være større enn halve spennet (${fmtLen(g.chord / 2)}).`); return; }
+  const before = snapshot();
+  const c = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
+  if (c) c.v = r; else doc.cons.push({ id: uid(), type: 'rad', arc: A.id, v: r });
+  // flytt sentrum langs midtnormalen, på samme side som før
+  const M = { x: (g.a.x + g.b.x) / 2, y: (g.a.y + g.b.y) / 2 }, ux = (g.b.x - g.a.x) / g.chord, uy = (g.b.y - g.a.y) / g.chord;
+  const nx = -uy, ny = ux, side = Math.sign((g.c.x - M.x) * nx + (g.c.y - M.y) * ny) || 1, d = Math.sqrt(r * r - g.chord * g.chord / 4);
+  Object.assign(P(A.c), { x: M.x + nx * d * side, y: M.y + ny * d * side });
+  if (!solveWithHold(new Set([A.a, A.b]), new Set([A.c]))) { restore(before); toast('Det går ikke: radien strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+// dra punkter: prøv å holde dem der fingeren er; går ikke det, kommer de så nær som reglene tillater
+// Prøver i rekkefølge, og bruker det første som går:
+// 1) bare punktet du drar flytter seg (det glir langs reglene, f.eks. mønet langs midtlinjen)
+// 2) punktet blir under pennen, og bare nabopunktene følger etter
+// 3) alt kan flytte seg, men nabopunktene først
+function dragPoints(targets) {
+  const fx = fixedPts(), prev = savePos();
+  const ids = targets.map(t => t.id).filter(id => !fx.has(id));
+  const place = () => { for (const t of targets) if (!fx.has(t.id)) Object.assign(P(t.id), { x: t.x, y: t.y }); };
+  place();
+  if (!hasRules()) return;
+  const all = Object.keys(doc.points), nb = nearPts(ids);
+  const tol = Math.max(10 / k(), settings.snap ? doc.rute * 0.75 : 0);
+  const closeEnough = () => targets.every(t => fx.has(t.id) || Math.hypot(P(t.id).x - t.x, P(t.id).y - t.y) < tol);
+  if (solve(new Set(all.filter(id => !ids.includes(id)))) && closeEnough() && noFlip(prev, ids)) return;
+  loadPos(prev); place();
+  if (solve(new Set(all.filter(id => !nb.has(id) || ids.includes(id)))) && noFlip(prev, ids)) return;
+  loadPos(prev); place();
+  if (solve(new Set(ids), [], nb) && noFlip(prev, ids)) return;
+  loadPos(prev);
+  solve(new Set(), targets.map(t => ({ ...t, w: 0.1 })), nb);
+  solve(new Set(), [], nb);
+  if (!noFlip(prev, ids)) loadPos(prev);
+}
+// en strek du ikke drar direkte i skal aldri snu seg eller krympe til null
+function noFlip(prev, ids, exempt = []) {
+  for (const l of doc.lines) {
+    if (ids.includes(l.a) || ids.includes(l.b) || exempt.includes(l.id)) continue;
+    const a0 = prev[l.a], b0 = prev[l.b]; if (!a0 || !b0) continue;
+    const ox = b0.x - a0.x, oy = b0.y - a0.y, v = vec(l);
+    if (Math.hypot(ox, oy) < 0.5) continue;
+    if (ox * v.x + oy * v.y <= 0 || Math.hypot(v.x, v.y) < 0.5) return false;
+  }
+  return true;
+}
+// Hvilke punkter er fullt bestemt av mål og regler? (som svart/blått i Fusion)
+let dofKey = '', dofCache = { dof: 0, det: new Set(), n: 0 };
+function computeDof() {
+  const key = snapshot();
+  if (key === dofKey) return dofCache;
+  dofKey = key;
+  const fx = fixedPts(), pids = Object.keys(doc.points).filter(id => !fx.has(id));
+  const vars = []; pids.forEach(id => vars.push([id, 'x'], [id, 'y']));
+  const n = vars.length, r0 = conRes(), m = r0.length, h = 1e-6;
+  const rows = Array.from({ length: m }, () => new Float64Array(n));
+  for (let j = 0; j < n; j++) {
+    const [id, ax] = vars[j], p = P(id), v0 = p[ax];
+    p[ax] = v0 + h; const rj = conRes(); p[ax] = v0;
+    for (let i = 0; i < m; i++) rows[i][j] = (rj[i] - r0[i]) / h;
+  }
+  const basis = [];
+  for (const row of rows) {
+    const v = Float64Array.from(row), n0 = Math.hypot(...v);
+    if (n0 < 1e-9) continue;
+    for (let pass = 0; pass < 2; pass++) for (const b of basis) { let d = 0; for (let j = 0; j < n; j++) d += v[j] * b[j]; for (let j = 0; j < n; j++) v[j] -= d * b[j]; }
+    const nv = Math.hypot(...v);
+    if (nv > 1e-6 * n0) basis.push(v.map(x => x / nv));
+  }
+  const det = new Set(fx);
+  for (let j = 0; j < n; j += 2) {
+    let sx = 0, sy = 0; for (const b of basis) { sx += b[j] * b[j]; sy += b[j + 1] * b[j + 1]; }
+    if (sx > 1 - 1e-6 && sy > 1 - 1e-6) det.add(vars[j][0]);
+  }
+  dofCache = { dof: n - basis.length, det, n };
+  return dofCache;
+}
+function addConstraint(c, hold, quiet) {
+  const before = snapshot();
+  c.id = uid(); doc.cons.push(c);
+  if (!solveWithHold(hold, new Set(consPoints(c)), [c.l, c.l2].filter(Boolean))) {
+    restore(before);
+    if (!quiet) toast('Det går ikke: regelen strider mot regler som allerede finnes.');
+    requestRender(true); return false;
+  }
+  commit(before); return true;
+}
+function removeCon(id) { const before = snapshot(); doc.cons = doc.cons.filter(c => c.id !== id); commit(before); }
+
+function setCircleR(c, r) {
+  if (!(r > 0)) { toast('Skriv inn et mål større enn null.'); return; }
+  const before = snapshot(); c.r = r;
+  if (!solveWithHold(new Set(), new Set([c.c]))) { restore(before); toast('Det går ikke: størrelsen strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+function setDim(c, v) {
+  if (!(v >= 0)) { toast('Skriv inn et mål på null eller mer.'); return; }
+  const before = snapshot(), cc = doc.cons.find(x => x.id === c.id);
+  cc.v = v;
+  const hold = cc.type === 'pdist' ? linePts(cc.l) : new Set([cc.p2]);
+  if (!solveWithHold(hold, new Set([cc.p]))) { restore(before); toast('Det går ikke: målet strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+function fixedEnd(l) { return degree(l.a) >= degree(l.b) ? ['a', 'b'] : ['b', 'a']; }
+function setLen(l, L) {
+  if (!(L > 0)) { toast('Skriv inn en lengde større enn null.'); return; }
+  const before = snapshot();
+  const c = conOf('len', c => c.l === l.id);
+  if (c) c.v = L; else doc.cons.push({ id: uid(), type: 'len', l: l.id, v: L });
+  const [fk, mk] = fixedEnd(l);
+  if (doc.cons.length === 1 || !lineCons(l.id).some(c => c.type !== 'len')) {
+    // ingen andre regler: bare flytt den løse enden langs streken
+    const f = P(l[fk]), m = P(l[mk]), d = Math.hypot(m.x - f.x, m.y - f.y) || 1;
+    m.x = f.x + (m.x - f.x) / d * L; m.y = f.y + (m.y - f.y) / d * L;
+  }
+  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: lengden strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+function setAng(l, v) {
+  if (!(v >= 0 && v <= 90)) { toast('Vinkelen må være mellom 0 og 90°.'); return; }
+  const before = snapshot();
+  doc.cons = doc.cons.filter(c => !(c.l === l.id && (c.type === 'h' || c.type === 'v' || c.type === 'ang')));
+  const phi = rawAng(P(l.a), P(l.b));
+  let np;
+  if (phi >= 0 && phi <= 90) np = v; else if (phi > 90) np = 180 - v; else if (phi >= -90) np = -v; else np = -(180 - v);
+  doc.cons.push({ id: uid(), type: 'ang', l: l.id, v: np });
+  const [fk, mk] = fixedEnd(l), f = P(l[fk]), m = P(l[mk]);
+  if (!lineCons(l.id).some(c => c.type !== 'ang')) {
+    const L = Math.hypot(m.x - f.x, m.y - f.y), dir = fk === 'a' ? np : np + 180;
+    m.x = f.x + L * Math.cos(dir / DEG); m.y = f.y - L * Math.sin(dir / DEG);
+  }
+  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: vinkelen strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+function setJoint(pid, l1, l2, v) {
+  if (!(v > 0 && v < 180)) { toast('Vinkelen må være mellom 0 og 180°.'); return; }
+  const before = snapshot();
+  let c = doc.cons.find(c => c.type === 'angle2' && c.p === pid && ((c.l === l1 && c.l2 === l2) || (c.l === l2 && c.l2 === l1)));
+  if (c) { c.l = l1; c.l2 = l2; c.v = v; } else doc.cons.push({ id: uid(), type: 'angle2', p: pid, l: l1, l2, v });
+  // hold streken med flest forbindelser i den andre enden, la den andre svinge
+  const A = lineById(l1), B = lineById(l2), oa = A.a === pid ? A.b : A.a, ob = B.a === pid ? B.b : B.a;
+  const hold = new Set([pid, degree(oa) >= degree(ob) ? oa : ob]);
+  if (!lineCons(l1).concat(lineCons(l2)).some(c => c.type !== 'angle2')) {
+    const swing = degree(oa) >= degree(ob) ? ob : oa, keep = swing === ob ? oa : ob, p = P(pid), s = P(swing), kp = P(keep);
+    const base = Math.atan2(p.y - kp.y, kp.x - p.x), Ls = Math.hypot(s.x - p.x, s.y - p.y);
+    const dir = swing === ob ? base + v / DEG : base - v / DEG;
+    s.x = p.x + Ls * Math.cos(dir); s.y = p.y - Ls * Math.sin(dir);
+  }
+  if (!solveWithHold(hold, linePts(l1, l2), [l1, l2])) { restore(before); toast('Det går ikke: vinkelen strider mot andre regler.'); requestRender(true); return; }
+  commit(before);
+}
+
+/* ---------- geometri: skjøter ---------- */
+function incident(pid) {
+  const p = P(pid), out = [];
+  for (const l of doc.lines) {
+    if (l.a === pid || l.b === pid) {
+      const o = otherEnd(l, pid);
+      out.push({ line: l, ang: Math.atan2(-(o.y - p.y), o.x - p.x) });
+    } else {
+      const a = P(l.a), b = P(l.b), q = projSeg(p, a, b);
+      if (q.t > 0.001 && q.t < 0.999 && q.d < 0.3) {
+        out.push({ line: l, ang: Math.atan2(-(a.y - p.y), a.x - p.x), through: true });
+        out.push({ line: l, ang: Math.atan2(-(b.y - p.y), b.x - p.x), through: true });
+      }
+    }
+  }
+  return out;
+}
+function gaps(pid) {
+  const inc = incident(pid);
+  if (inc.length < 2) return [];
+  inc.sort((u, v) => u.ang - v.ang);
+  const res = [];
+  for (let i = 0; i < inc.length; i++) {
+    const u = inc[i], v = inc[(i + 1) % inc.length];
+    let g = v.ang - u.ang; if (i === inc.length - 1) g += 2 * Math.PI;
+    const deg = g * DEG;
+    if (deg > 0.05 && deg < 179.9 && u.line !== v.line) {
+      const editable = !u.through && !v.through;
+      const locked = editable && doc.cons.some(c => c.type === 'angle2' && c.p === pid && ((c.l === u.line.id && c.l2 === v.line.id) || (c.l === v.line.id && c.l2 === u.line.id)));
+      res.push({ u, v, start: u.ang, g, deg, editable, locked });
+    }
+  }
+  return res;
+}
+
+/* ---------- fest/snap ---------- */
+function snapPos(w, opt = {}) {
+  const r = hitR() / k();
+  let best = null, bd = r;
+  for (const id in doc.points) {
+    if (id === opt.exclude) continue;
+    const p = doc.points[id], d = Math.hypot(p.x - w.x, p.y - w.y);
+    if (d < bd) { bd = d; best = id; }
+  }
+  if (best) return { x: P(best).x, y: P(best).y, pid: best, kind: 'point' };
+  let bq = null, bl = null, bld = r * 0.7;
+  for (const l of doc.lines) {
+    if (opt.exclude && (l.a === opt.exclude || l.b === opt.exclude)) continue;
+    const q = projSeg(w, P(l.a), P(l.b));
+    if (q.t > 0.02 && q.t < 0.98 && q.d < bld) { bld = q.d; bq = q; bl = l; }
+  }
+  if (bq) return { x: bq.x, y: bq.y, kind: 'line', lid: bl.id };
+  let res;
+  if (settings.snap) { const g = doc.rute; res = { x: Math.round(w.x / g) * g, y: Math.round(w.y / g) * g, kind: 'grid' }; }
+  else {
+    res = { x: Math.round(w.x * 2) / 2, y: Math.round(w.y * 2) / 2, kind: 'free' };
+    for (const f of (opt.from || [])) {
+      const t = Math.abs(rawAng(f, res));
+      if (Math.min(t, 180 - t) < 2) res.y = f.y; else if (Math.abs(t - 90) < 2) res.x = f.x;
+    }
+  }
+  return res;
+}
+function hitTest(sx, sy) {
+  const r = hitR();
+  let best = null, bd = r;
+  for (const id in doc.points) { const s = toS(P(id)), d = Math.hypot(s.x - sx, s.y - sy); if (d < bd) { bd = d; best = { type: 'point', id }; } }
+  if (best) return best;
+  return hitLine(sx, sy) || hitShape(sx, sy);
+}
+function hitShape(sx, sy) {
+  const r = hitR() * 0.9, w = toW(sx, sy);
+  let best = null, bd = r;
+  for (const c of doc.circles) { const ce = P(c.c), d = Math.abs(Math.hypot(w.x - ce.x, w.y - ce.y) - c.r) * k(); if (d < bd) { bd = d; best = { type: 'circle', id: c.id }; } }
+  for (const A of doc.arcs) {
+    const g = arcGeom(A), d = Math.abs(Math.hypot(w.x - g.c.x, w.y - g.c.y) - g.r) * k();
+    if (d < bd && norm2pi(angUp(g.c, w) - g.t0) <= g.span + 0.02) { bd = d; best = { type: 'arc', id: A.id }; }
+  }
+  return best;
+}
+function hitLine(sx, sy) {
+  let best = null, bd = hitR() * 0.9;
+  for (const l of doc.lines) { const q = projSeg({ x: sx, y: sy }, toS(P(l.a)), toS(P(l.b))); if (q.d < bd) { bd = q.d; best = { type: 'line', id: l.id }; } }
+  return best;
+}
+function hitLabel(sx, sy) {
+  const pad = lastPointerType === 'touch' ? 8 : 3;
+  for (let i = labelHits.length - 1; i >= 0; i--) {
+    const h = labelHits[i], dx = sx - h.cx, dy = sy - h.cy, c = Math.cos(-h.rot), s = Math.sin(-h.rot);
+    const lx = dx * c - dy * s, ly = dx * s + dy * c;
+    if (lx > h.x0 - pad && lx < h.x1 + pad && Math.abs(ly) < h.h / 2 + pad) return h;
+  }
+  return null;
+}
+
+/* ---------- endringer ---------- */
+function addPoint(p) { const id = uid(); doc.points[id] = { x: p.x, y: p.y }; return id; }
+function cleanup() {
+  doc.lines = doc.lines.filter(l => l.a !== l.b && P(l.a) && P(l.b));
+  const seen = new Set();
+  doc.lines = doc.lines.filter(l => { const key = [l.a, l.b].sort().join('|'); if (seen.has(key)) return false; seen.add(key); return true; });
+  doc.circles = doc.circles.filter(c => P(c.c) && c.r > 0);
+  doc.arcs = doc.arcs.filter(A => P(A.a) && P(A.b) && P(A.c) && A.a !== A.b && A.c !== A.a && A.c !== A.b);
+  const used = new Set(); doc.lines.forEach(l => { used.add(l.a); used.add(l.b); });
+  doc.circles.forEach(c => used.add(c.c)); doc.arcs.forEach(A => { used.add(A.a); used.add(A.b); used.add(A.c); });
+  for (const id in doc.points) if (!used.has(id)) delete doc.points[id];
+  doc.cons = doc.cons.filter(c => {
+    const L = c.l && lineById(c.l), L2 = c.l2 && lineById(c.l2);
+    if (c.l && !L) return false;
+    if (c.arc && !arcById(c.arc)) return false;
+    if (c.p2 && (!P(c.p2) || c.p2 === c.p)) return false;
+    if (c.circle && !circById(c.circle)) return false;
+    if (c.type === 'pdist' && (L.a === c.p || L.b === c.p)) return false;
+    if (c.l2 && (!L2 || c.l2 === c.l)) return false;
+    if (c.p && !P(c.p)) return false;
+    if ((c.type === 'online' || c.type === 'mid') && (L.a === c.p || L.b === c.p)) return false;
+    if (c.type === 'angle2' && !([L.a, L.b].includes(c.p) && [L2.a, L2.b].includes(c.p))) return false;
+    return true;
+  });
+}
+function mergePoint(from, to) {
+  doc.lines.forEach(l => { if (l.a === from) l.a = to; if (l.b === from) l.b = to; });
+  doc.cons.forEach(c => { if (c.p === from) c.p = to; if (c.p2 === from) c.p2 = to; });
+  doc.circles.forEach(c => { if (c.c === from) c.c = to; });
+  doc.arcs.forEach(A => { for (const k2 of ['a', 'b', 'c']) if (A[k2] === from) A[k2] = to; });
+  delete doc.points[from];
+  cleanup();
+}
+function deleteSel() {
+  if (!sel) return;
+  const before = snapshot();
+  if (sel.type === 'line') doc.lines = doc.lines.filter(l => l.id !== sel.id);
+  else if (sel.type === 'arc') doc.arcs = doc.arcs.filter(A => A.id !== sel.id);
+  else if (sel.type === 'circle') doc.circles = doc.circles.filter(c => c.id !== sel.id);
+  else {
+    doc.lines = doc.lines.filter(l => l.a !== sel.id && l.b !== sel.id);
+    doc.arcs = doc.arcs.filter(A => ![A.a, A.b, A.c].includes(sel.id));
+    doc.circles = doc.circles.filter(c => c.c !== sel.id);
+  }
+  cleanup(); sel = null; commit(before);
+}
+
+/* ---------- tegning ---------- */
+let renderQueued = false, panelDirty = true;
+function requestRender(panel) { if (panel) panelDirty = true; if (!renderQueued) { renderQueued = true; requestAnimationFrame(frame); } }
+function frame() { renderQueued = false; render(); if (panelDirty) updatePanel(); updateRail(); }
+
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  ['paper', 'grid-minor', 'grid-major', 'ink', 'ink-soft', 'measure', 'angle', 'select', 'chrome', 'free'].forEach(n => C[n] = cs.getPropertyValue('--' + n).trim());
+  requestRender();
+}
+function sizeCanvas() {
+  const dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
+  if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+  return { W, H, dpr };
+}
+
+function render(target = ctx, W0, H0, opts = {}) {
+  let W = W0, H = H0, dpr = 1;
+  if (target === ctx) { ({ W, H, dpr } = sizeCanvas()); labelHits = []; }
+  const g = target;
+  g.setTransform(dpr * (opts.scale || 1), 0, 0, dpr * (opts.scale || 1), 0, 0);
+  g.fillStyle = C.paper; g.fillRect(0, 0, W, H);
+  drawGrid(g, W, H);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = C['ink-soft']; g.lineWidth = 1.8;
+  for (const s of doc.strokes) drawStroke(g, s.pts);
+  if (action && action.type === 'free') drawStroke(g, action.pts);
+  const pickSrc = pick && pick.l;
+  const dofInfo = (doc.lines.length || doc.arcs.length || doc.circles.length) && !opts.export ? computeDof() : null;
+  for (const l of doc.lines) {
+    const a = toS(P(l.a)), b = toS(P(l.b)), on = (sel && sel.type === 'line' && sel.id === l.id) || pickSrc === l.id;
+    if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; }
+    const free = dofInfo && !(dofInfo.det.has(l.a) && dofInfo.det.has(l.b));
+    g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; line(g, a, b);
+  }
+  for (const c of doc.circles) {
+    const ce = toS(P(c.c)), on = sel && sel.type === 'circle' && sel.id === c.id;
+    const free = dofInfo && !dofInfo.det.has(c.c);
+    g.beginPath(); g.arc(ce.x, ce.y, c.r * k(), 0, Math.PI * 2);
+    if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
+    g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
+  }
+  for (const A of doc.arcs) {
+    const G = arcGeom(A), ce = toS(G.c), on = sel && sel.type === 'arc' && sel.id === A.id;
+    const free = dofInfo && ![A.a, A.b, A.c].every(id => dofInfo.det.has(id));
+    g.beginPath(); g.arc(ce.x, ce.y, G.r * k(), -G.t0, -(G.t0 + G.span), true);
+    if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
+    g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
+    if (on || settings.tool === 'move') {
+      const m = toS(G.mid);
+      g.setLineDash([3, 4]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1; line(g, ce, m); g.setLineDash([]);
+      if (!opts.export) { g.beginPath(); g.arc(m.x, m.y, 6, 0, Math.PI * 2); g.fillStyle = C.paper; g.fill(); g.strokeStyle = on ? C.select : C.ink; g.lineWidth = 2; g.stroke(); }
+    }
+  }
+  for (const id in doc.points) drawJoint(g, id);
+  const pairNo = new Map(); let pn = 0;
+  for (const c of doc.cons) if (c.type === 'par' || c.type === 'perp' || c.type === 'eq') pairNo.set(c.id, ++pn);
+  for (const l of doc.lines) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
+  for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
+  for (const c of doc.circles) {
+    const ce = toS(P(c.c)), rr = c.r * k();
+    if (rr < 12) continue;
+    drawParts(g, ce.x, ce.y - rr - 13, 0, [{ text: c.name, color: C['ink-soft'] }, { text: 'Ø ' + fmtLen(2 * c.r), color: C.measure, hit: { kind: 'dia', circle: c.id } }]);
+  }
+  for (const A of doc.arcs) {
+    const G = arcGeom(A), m = toS(G.mid), locked = doc.cons.some(c => c.type === 'rad' && c.arc === A.id);
+    drawParts(g, m.x + Math.cos(G.tm) * 24, m.y - Math.sin(G.tm) * 24, 0, [{ text: A.name, color: C['ink-soft'] }, { text: 'R ' + fmtLen(G.r), color: C.measure, filled: locked, hit: { kind: 'rad', arc: A.id } }]);
+  }
+  const big = settings.tool === 'move' && !opts.export;
+  const fx = fixedPts();
+  for (const id in doc.points) {
+    const s = toS(P(id)), on = sel && sel.type === 'point' && sel.id === id;
+    if (fx.has(id)) {
+      g.strokeStyle = C.ink; g.lineWidth = 1.4; g.beginPath();
+      g.moveTo(s.x - 9, s.y + 9); g.lineTo(s.x + 9, s.y + 9);
+      for (let i = -9; i <= 6; i += 5) { g.moveTo(s.x + i, s.y + 9); g.lineTo(s.x + i + 4, s.y + 14); }
+      g.moveTo(s.x - 6, s.y + 9); g.lineTo(s.x, s.y); g.lineTo(s.x + 6, s.y + 9); g.stroke();
+    }
+    if (isCenter(id) && !on && !doc.lines.some(l => l.a === id || l.b === id)) {
+      g.strokeStyle = C['ink-soft']; g.lineWidth = 1.5; g.beginPath();
+      g.moveTo(s.x - 6, s.y); g.lineTo(s.x + 6, s.y); g.moveTo(s.x, s.y - 6); g.lineTo(s.x, s.y + 6); g.stroke();
+      continue;
+    }
+    g.beginPath(); g.arc(s.x, s.y, on ? 7 : big ? 6 : 3, 0, Math.PI * 2);
+    if (big || on) { g.fillStyle = on ? C.select : C.paper; g.fill(); g.strokeStyle = on ? C.select : C.ink; g.lineWidth = 2; g.stroke(); }
+    else { g.fillStyle = C.ink; g.fill(); }
+  }
+  if (opts.export) return;
+  if (action && action.type === 'line') {
+    const a = toS(action.start), b = toS(action.end), S0 = action.start, S1 = action.end;
+    g.setLineDash([6, 5]); g.strokeStyle = C.select; g.lineWidth = 2.2;
+    const L = Math.hypot(S1.x - S0.x, S1.y - S0.y);
+    let t = Math.abs(rawAng(S0, S1)); if (t > 90) t = 180 - t;
+    let txt = fmtLen(L) + '  ' + fmtAng(t);
+    if (action.shape === 'circle') {
+      g.beginPath(); g.arc(a.x, a.y, L * k(), 0, Math.PI * 2); g.stroke(); line(g, a, b);
+      txt = 'Ø ' + fmtLen(2 * L);
+    } else if (action.shape === 'rect') {
+      g.strokeRect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+      txt = fmtLen(Math.abs(S1.x - S0.x)) + ' × ' + fmtLen(Math.abs(S1.y - S0.y));
+    } else if (action.shape === 'arc' && L > 0.1) {
+      const at = arcThrough(S0, S1, defaultBulge(S0, S1));
+      if (at) {
+        const [p, q] = at.swap ? [S1, S0] : [S0, S1], c = toS(at.c), r = Math.hypot(p.x - at.c.x, p.y - at.c.y) * k();
+        g.beginPath(); g.arc(c.x, c.y, r, -angUp(at.c, p), -angUp(at.c, q), true); g.stroke();
+        txt = 'spenn ' + fmtLen(L);
+      }
+    } else line(g, a, b);
+    g.setLineDash([]);
+    g.font = FONT; const w = g.measureText(txt).width + 10;
+    drawParts(g, b.x + 16 + w / 2, b.y - 22, 0, [{ text: txt, color: C.select }]);
+    snapRing(g, action.end);
+  } else if (hover && DRAW_TOOLS.includes(settings.tool)) snapRing(g, hover);
+}
+function line(g, a, b) { g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
+function snapRing(g, p) {
+  const s = toS(p);
+  g.beginPath(); g.arc(s.x, s.y, p.kind === 'point' ? 9 : 5, 0, Math.PI * 2);
+  g.strokeStyle = C.select; g.lineWidth = 1.5; g.stroke();
+}
+function drawStroke(g, pts) {
+  if (pts.length < 2) return;
+  g.beginPath(); let s = toS(pts[0]); g.moveTo(s.x, s.y);
+  for (let i = 1; i < pts.length - 1; i++) { const a = toS(pts[i]), b = toS(pts[i + 1]); g.quadraticCurveTo(a.x, a.y, (a.x + b.x) / 2, (a.y + b.y) / 2); }
+  s = toS(pts[pts.length - 1]); g.lineTo(s.x, s.y); g.stroke();
+}
+function drawGrid(g, W, H) {
+  const step = doc.rute, px = step * k();
+  const tl = toW(0, 0), br = toW(W, H);
+  const drawSet = (st, color, skipEvery) => {
+    g.strokeStyle = color; g.lineWidth = 1; g.beginPath();
+    for (let i = Math.floor(tl.x / st); i * st <= br.x; i++) { if (skipEvery && i % skipEvery === 0) continue; const x = Math.round(i * st * k() + view.ox) + .5; g.moveTo(x, 0); g.lineTo(x, H); }
+    for (let i = Math.floor(tl.y / st); i * st <= br.y; i++) { if (skipEvery && i % skipEvery === 0) continue; const y = Math.round(i * st * k() + view.oy) + .5; g.moveTo(0, y); g.lineTo(W, y); }
+    g.stroke();
+  };
+  if (px >= 6) drawSet(step, C['grid-minor'], 10);
+  const major = step * 10;
+  drawSet(major * k() >= 6 ? major : major * 10, C['grid-major']);
+}
+// tegner en rad med små merkelapper; låste mål får fylt bakgrunn
+function drawParts(g, cx, cy, rot, parts) {
+  g.save(); g.translate(cx, cy); g.rotate(rot); g.font = FONT;
+  const ws = parts.map(p => g.measureText(p.text).width + 10), gap = 3, h = 18;
+  const total = ws.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+  let x = -total / 2;
+  parts.forEach((p, i) => {
+    const w = ws[i];
+    g.beginPath(); g.roundRect ? g.roundRect(x, -h / 2, w, h, 4) : g.rect(x, -h / 2, w, h);
+    if (p.filled) { g.fillStyle = p.color; g.fill(); }
+    else { g.fillStyle = C.paper; g.globalAlpha = .9; g.fill(); g.globalAlpha = 1; if (p.outline) { g.strokeStyle = p.color; g.lineWidth = 1; g.stroke(); } }
+    g.fillStyle = p.filled ? C.paper : p.color; g.textBaseline = 'middle'; g.textAlign = 'left';
+    g.fillText(p.text, x + 5, 0.5);
+    if (p.hit && g === ctx) {
+      const mid = x + w / 2;
+      labelHits.push({ cx, cy, rot, x0: x, x1: x + w, h, hit: p.hit, sx: cx + Math.cos(rot) * mid, sy: cy + Math.sin(rot) * mid });
+    }
+    x += w + gap;
+  });
+  g.restore();
+}
+// målsetting: stiplet linje fra punktet til streken (eller punktet) med låst mål på midten
+function drawDim(g, c) {
+  const p = P(c.p);
+  let q;
+  if (c.type === 'pdist') { const l = lineById(c.l), a = P(l.a), b = P(l.b), pr = projSeg(p, a, b), t = pr.t; q = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    if (t < 0 || t > 1) { const e = toS(t < 0 ? a : b), qs = toS(q); g.setLineDash([2, 4]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1; line(g, e, qs); g.setLineDash([]); } }
+  else q = P(c.p2);
+  const ps = toS(p), qs = toS(q);
+  g.setLineDash([5, 4]); g.strokeStyle = C.measure; g.lineWidth = 1.2; line(g, ps, qs); g.setLineDash([]);
+  const ang = Math.atan2(qs.y - ps.y, qs.x - ps.x), ux = Math.cos(ang), uy = Math.sin(ang);
+  g.beginPath();
+  for (const e of [ps, qs]) { g.moveTo(e.x - uy * 5, e.y + ux * 5); g.lineTo(e.x + uy * 5, e.y - ux * 5); }
+  g.stroke();
+  let rot = ang; if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
+  drawParts(g, (ps.x + qs.x) / 2, (ps.y + qs.y) / 2, rot, [{ text: fmtLen(c.v), color: C.measure, filled: true, hit: { kind: 'dim', con: c.id } }]);
+}
+function labelGeom(l, side) {
+  const a = toS(P(l.a)), b = toS(P(l.b));
+  let ang = Math.atan2(b.y - a.y, b.x - a.x);
+  if (ang > Math.PI / 2) ang -= Math.PI; if (ang <= -Math.PI / 2) ang += Math.PI;
+  const nx = Math.sin(ang), ny = -Math.cos(ang);
+  return { x: (a.x + b.x) / 2 + nx * 13 * side, y: (a.y + b.y) / 2 + ny * 13 * side, ang, len: Math.hypot(b.x - a.x, b.y - a.y) };
+}
+function drawLineLabel(g, l) {
+  const G = labelGeom(l, 1), on = sel && sel.type === 'line' && sel.id === l.id;
+  if (G.len < 36 && !on) return;
+  const t = acuteAng(l);
+  const lenLocked = doc.cons.some(c => c.type === 'len' && c.l === l.id);
+  const angLocked = doc.cons.some(c => c.type === 'ang' && c.l === l.id);
+  const col = on ? C.select : C.measure;
+  const parts = [{ text: l.name, color: C['ink-soft'] }, { text: fmtLen(lenOf(l)), color: col, filled: lenLocked, outline: on, hit: { kind: 'len', line: l.id } }];
+  if (!isAxis(t) || angLocked) parts.push({ text: fmtAng(t), color: col, filled: angLocked, outline: on, hit: { kind: 'ang', line: l.id } });
+  drawParts(g, G.x, G.y, G.ang, parts);
+}
+function drawGlyphs(g, l, pairNo) {
+  const glyphs = [];
+  for (const c of doc.cons) {
+    if (c.l !== l.id && c.l2 !== l.id) continue;
+    if (c.type === 'h') glyphs.push('vannrett');
+    else if (c.type === 'v') glyphs.push('loddrett');
+    else if (c.type === 'par') glyphs.push('∥' + pairNo.get(c.id));
+    else if (c.type === 'perp') glyphs.push('⊥' + pairNo.get(c.id));
+    else if (c.type === 'eq') glyphs.push('=' + pairNo.get(c.id));
+  }
+  if (!glyphs.length) return;
+  const G = labelGeom(l, -1);
+  if (G.len < 50) return;
+  drawParts(g, G.x, G.y, G.ang, glyphs.map(t => ({ text: t, color: C['ink-soft'], outline: true })));
+}
+function drawJoint(g, pid) {
+  const gs = gaps(pid); if (!gs.length) return;
+  const c = toS(P(pid));
+  for (const j of gs) {
+    if (Math.abs(j.deg - 90) < 0.05 && !j.locked) {
+      const s = 10, u = { x: Math.cos(j.u.ang), y: -Math.sin(j.u.ang) }, v = { x: Math.cos(j.v.ang), y: -Math.sin(j.v.ang) };
+      g.beginPath(); g.moveTo(c.x + u.x * s, c.y + u.y * s); g.lineTo(c.x + (u.x + v.x) * s, c.y + (u.y + v.y) * s); g.lineTo(c.x + v.x * s, c.y + v.y * s);
+      g.strokeStyle = C['ink-soft']; g.lineWidth = 1; g.stroke();
+      if (j.editable && g === ctx) {
+        const m = j.start + j.g / 2, cx = c.x + Math.cos(m) * 14, cy = c.y - Math.sin(m) * 14;
+        labelHits.push({ cx, cy, rot: 0, x0: -10, x1: 10, h: 20, sx: cx, sy: cy, hit: { kind: 'joint', p: pid, l1: j.u.line.id, l2: j.v.line.id } });
+      }
+      continue;
+    }
+    const r = j.deg < 25 ? 34 : 22;
+    g.beginPath(); g.arc(c.x, c.y, r, -j.start, -(j.start + j.g), true);
+    g.strokeStyle = C.angle; g.lineWidth = 1.5; g.stroke();
+    const m = j.start + j.g / 2, R = r + 20;
+    drawParts(g, c.x + Math.cos(m) * R, c.y - Math.sin(m) * R, 0, [{
+      text: fmtAng(j.deg), color: C.angle, filled: j.locked,
+      hit: j.editable ? { kind: 'joint', p: pid, l1: j.u.line.id, l2: j.v.line.id } : null
+    }]);
+  }
+}
+
+/* ---------- visning ---------- */
+function clampZ(z) { return Math.max(0.05, Math.min(40, z)); }
+function zoomAt(sx, sy, factor) {
+  const w = toW(sx, sy); view.z = clampZ(view.z * factor);
+  view.ox = sx - w.x * k(); view.oy = sy - w.y * k();
+  closeEditor(false); requestRender(); scheduleSave();
+}
+function freeArea() {
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  const top = $('.topbar').getBoundingClientRect().bottom + 12;
+  const left = $('.rail').getBoundingClientRect().right + 12;
+  let right = W - 16, bottom = H - 16;
+  const pr = $('#panel').hidden ? null : $('#panel').getBoundingClientRect();
+  if (pr) { if (W <= 760) bottom = pr.top - 12; else right = pr.left - 12; }
+  return { left, top, right, bottom };
+}
+function bounds() {
+  const xs = [], ys = [];
+  for (const id in doc.points) { xs.push(P(id).x); ys.push(P(id).y); }
+  doc.strokes.forEach(s => s.pts.forEach(p => { xs.push(p.x); ys.push(p.y); }));
+  doc.circles.forEach(c => { const ce = P(c.c); xs.push(ce.x - c.r, ce.x + c.r); ys.push(ce.y - c.r, ce.y + c.r); });
+  doc.arcs.forEach(A => { const m = arcGeom(A).mid; xs.push(m.x); ys.push(m.y); });
+  if (!xs.length) return null;
+  return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+}
+function fitView() {
+  const B = bounds(), A = freeArea();
+  if (!B) { view.z = 1; view.ox = (A.left + A.right) / 2; view.oy = (A.top + A.bottom) / 2; requestRender(); return; }
+  const pad = 60, aw = Math.max(80, A.right - A.left - pad * 2), ah = Math.max(80, A.bottom - A.top - pad * 2);
+  view.z = clampZ(Math.min(aw / Math.max(1, (B.x1 - B.x0) * PX_PER_CM), ah / Math.max(1, (B.y1 - B.y0) * PX_PER_CM)));
+  view.ox = (A.left + A.right) / 2 - (B.x0 + B.x1) / 2 * k();
+  view.oy = (A.top + A.bottom) / 2 - (B.y0 + B.y1) / 2 * k();
+  requestRender(); scheduleSave();
+}
+
+/* ---------- redigere mål direkte i tegningen ---------- */
+const editor = $('#editor'), edIn = $('#edIn');
+function openEditor(h) {
+  const hit = h.hit;
+  let value, unit;
+  if (hit.kind === 'len') { const l = lineById(hit.line); value = inputLen(lenOf(l)); unit = unitName(); sel = { type: 'line', id: l.id }; }
+  else if (hit.kind === 'ang') { const l = lineById(hit.line); value = inputAng(acuteAng(l)); unit = '°'; sel = { type: 'line', id: l.id }; }
+  else if (hit.kind === 'rad') { const A = arcById(hit.arc); value = inputLen(arcGeom(A).r); unit = unitName(); sel = { type: 'arc', id: A.id }; }
+  else if (hit.kind === 'dia') { const c = circById(hit.circle); value = inputLen(2 * c.r); unit = unitName(); sel = { type: 'circle', id: c.id }; }
+  else if (hit.kind === 'dim') { const c = doc.cons.find(c => c.id === hit.con); if (!c) return; value = inputLen(c.v); unit = unitName(); }
+  else { const j = gaps(hit.p).find(j => j.u.line.id === hit.l1 && j.v.line.id === hit.l2); if (!j) return; value = inputAng(j.deg); unit = '°'; sel = { type: 'point', id: hit.p }; }
+  editing = hit;
+  editor.style.left = h.sx + 'px'; editor.style.top = h.sy + 'px';
+  edIn.value = value; $('#edUnit').textContent = unit;
+  editor.hidden = false;
+  edIn.focus(); edIn.select();
+  requestRender(true);
+}
+function closeEditor(apply) {
+  if (!editing) return;
+  const hit = editing; editing = null; editor.hidden = true;
+  if (!apply) { requestRender(true); return; }
+  const v = parseNum(edIn.value);
+  if (!isFinite(v)) { requestRender(true); return; }
+  if (hit.kind === 'len') { const l = lineById(hit.line); if (l) setLen(l, settings.unit === 'mm' ? v / 10 : v); }
+  else if (hit.kind === 'ang') { const l = lineById(hit.line); if (l) setAng(l, v); }
+  else if (hit.kind === 'rad') { const A = arcById(hit.arc); if (A) setRad(A, settings.unit === 'mm' ? v / 10 : v); }
+  else if (hit.kind === 'dia') { const c = circById(hit.circle); if (c) setCircleR(c, (settings.unit === 'mm' ? v / 10 : v) / 2); }
+  else if (hit.kind === 'dim') { const c = doc.cons.find(c => c.id === hit.con); if (c) setDim(c, settings.unit === 'mm' ? v / 10 : v); }
+  else if (P(hit.p)) setJoint(hit.p, hit.l1, hit.l2, v);
+  requestRender(true);
+}
+edIn.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); closeEditor(true); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeEditor(false); }
+  e.stopPropagation();
+});
+edIn.addEventListener('blur', () => closeEditor(true));
+
+/* ---------- velg strek nr. 2 for en regel ---------- */
+const PICK_TEXT = {
+  par: n => `Trykk på streken som skal være parallell med ${n}`,
+  perp: n => `Trykk på streken som skal stå vinkelrett på ${n}`,
+  eq: n => `Trykk på streken som skal være like lang som ${n}`,
+  mid: () => 'Trykk på streken punktet skal ligge midt på',
+  pdist: () => 'Trykk på streken du vil måle avstanden til',
+  ppdist: () => 'Trykk på punktet du vil måle avstanden til',
+  tan: n => `Trykk på streken sirkelen ${n} skal ligge inntil`,
+  online: () => 'Trykk på streken punktet skal ligge på'
+};
+function startPick(type) {
+  if (!sel) return;
+  const circle = sel.type === 'circle' ? sel.id : null;
+  pick = { type, circle, l: sel.type === 'line' ? sel.id : null, p: sel.type === 'point' ? sel.id : circle ? circById(circle).c : null };
+  $('#pickText').textContent = PICK_TEXT[type](pick.l ? lineById(pick.l).name : circle ? circById(circle).name : '');
+  $('#pickbar').hidden = false;
+  requestRender();
+}
+function endPick() { pick = null; $('#pickbar').hidden = true; requestRender(); }
+$('#pickCancel').addEventListener('click', endPick);
+function openDimEditor(id) {
+  render();
+  const h = labelHits.find(h => h.hit.kind === 'dim' && h.hit.con === id);
+  if (h) openEditor(h);
+}
+const DUP_MSG = 'Den regelen finnes allerede.';
+function handlePick(sp) {
+  if (pick.type === 'ppdist') {
+    const h = hitTest(sp.x, sp.y);
+    if (!h || h.type !== 'point') { toast('Trykk på et punkt, eller Avbryt.'); return; }
+    if (h.id === pick.p) { toast('Velg et annet punkt.'); return; }
+    if (doc.cons.some(c => c.type === 'ppdist' && ((c.p === pick.p && c.p2 === h.id) || (c.p === h.id && c.p2 === pick.p)))) { toast(DUP_MSG); endPick(); return; }
+    const p = P(pick.p), q = P(h.id), c = { type: 'ppdist', p: pick.p, p2: h.id, v: Math.hypot(q.x - p.x, q.y - p.y) };
+    endPick();
+    if (addConstraint(c, new Set([h.id]))) openDimEditor(c.id);
+    return;
+  }
+  const h = hitLine(sp.x, sp.y);
+  if (!h) { toast('Trykk på en strek, eller Avbryt.'); return; }
+  const target = lineById(h.id);
+  if (doc.cons.some(c => c.type === pick.type && c.l === h.id && (pick.type === 'tan' ? c.circle === pick.circle : c.p === pick.p))) { toast(DUP_MSG); endPick(); return; }
+  if (pick.type === 'tan') {
+    const ci = circById(pick.circle), sd = sdist(P(ci.c), target);
+    endPick();
+    addConstraint({ type: 'tan', circle: ci.id, l: h.id, side: Math.sign(sd) || 1 }, new Set([target.a, target.b]));
+    return;
+  }
+  if (pick.type === 'pdist') {
+    if (target.a === pick.p || target.b === pick.p) { toast('Punktet er et endepunkt på den streken. Velg en annen.'); return; }
+    const sd = sdist(P(pick.p), target), c = { type: 'pdist', p: pick.p, l: h.id, v: Math.abs(sd), side: Math.sign(sd) || 1 };
+    endPick();
+    if (addConstraint(c, new Set([target.a, target.b]))) openDimEditor(c.id);
+    return;
+  }
+  if (pick.l) {
+    if (h.id === pick.l) { toast('Velg en annen strek.'); return; }
+    const src = lineById(pick.l);
+    addConstraint({ type: pick.type, l: pick.l, l2: h.id }, new Set([src.a, src.b]));
+  } else {
+    if (target.a === pick.p || target.b === pick.p) { toast('Punktet er et endepunkt på den streken. Velg en annen.'); return; }
+    addConstraint({ type: pick.type, p: pick.p, l: h.id }, new Set([target.a, target.b]));
+  }
+  endPick();
+}
+
+/* ---------- peker ---------- */
+const touches = new Map();
+let gesture = null;
+const spt = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId);
+  lastPointerType = e.pointerType;
+  if (e.pointerType === 'pen') penSeen = true;
+  const sp = spt(e);
+  if (editing) closeEditor(true);
+  if (e.pointerType === 'touch') {
+    touches.set(e.pointerId, sp);
+    if (action && action.pointerType === 'touch') cancelAction();
+    if (penSeen || touches.size > 1 || pick || (settings.tool === 'move' && !hitTest(sp.x, sp.y) && !hitLabel(sp.x, sp.y))) { startGesture(e); return; }
+  }
+  if (e.button === 1 || e.button === 2 || spaceDown) { action = { type: 'pan', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp, v0: { ...view }, moved: false }; return; }
+  if (pick) { action = { type: 'pick', pointerId: e.pointerId, pointerType: e.pointerType, s0: sp }; return; }
+  startAction(e, sp);
+});
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+function startGesture(e) {
+  const pts = [...touches.values()];
+  if (pts.length === 1) gesture = { mode: 'pan', s0: pts[0], v0: { ...view }, t0: performance.now(), tap: true, id: e.pointerId };
+  else {
+    const [p, q] = pts, mid = { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+    gesture = { mode: 'pinch', d0: Math.hypot(p.x - q.x, p.y - q.y) || 1, z0: view.z, w: toW(mid.x, mid.y), tap: false };
+  }
+}
+function moveGesture() {
+  const pts = [...touches.values()];
+  if (!gesture) return;
+  if (gesture.mode === 'pan' && pts.length === 1) {
+    const p = pts[0], dx = p.x - gesture.s0.x, dy = p.y - gesture.s0.y;
+    if (Math.hypot(dx, dy) > 8) gesture.tap = false;
+    view.ox = gesture.v0.ox + dx; view.oy = gesture.v0.oy + dy;
+  } else if (gesture.mode === 'pinch' && pts.length >= 2) {
+    const [p, q] = pts, mid = { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+    view.z = clampZ(gesture.z0 * Math.hypot(p.x - q.x, p.y - q.y) / gesture.d0);
+    view.ox = mid.x - gesture.w.x * k(); view.oy = mid.y - gesture.w.y * k();
+  }
+  requestRender();
+}
+
+const DRAW_TOOLS = ['line', 'rect', 'circle', 'arc'];
+function startAction(e, sp) {
+  const w = toW(sp.x, sp.y), base = { pointerId: e.pointerId, pointerType: e.pointerType, s0: sp };
+  const tool = settings.tool;
+  const label = (DRAW_TOOLS.includes(tool) || tool === 'move') ? hitLabel(sp.x, sp.y) : null;
+  if (DRAW_TOOLS.includes(tool)) {
+    const s = snapPos(w);
+    if (label && s.kind !== 'point') { action = { ...base, type: 'labelTap', label, w0: w }; return; }
+    action = { ...base, type: 'line', shape: tool, start: s, end: s };
+  } else if (tool === 'move') {
+    const h = hitTest(sp.x, sp.y);
+    if (h && h.type === 'arc') {
+      sel = h; action = { ...base, type: 'dragArc', arc: h.id, before: snapshot() };
+    } else if (h && h.type === 'circle' && !label) {
+      sel = h; action = { ...base, type: 'dragCircle', circle: h.id, before: snapshot() };
+    } else if (h && h.type === 'point') {
+      sel = h; action = { ...base, type: 'dragPoint', pid: h.id, before: snapshot(), target: null, w0: w };
+    } else if (label) {
+      action = { ...base, type: 'labelTap', label, w0: w };
+    } else if (h && h.type === 'line') {
+      const l = lineById(h.id); sel = h;
+      action = { ...base, type: 'dragLine', line: l, w0: w, a0: { ...P(l.a) }, b0: { ...P(l.b) }, before: snapshot() };
+    } else action = { ...base, type: 'pan', v0: { ...view }, moved: false };
+    requestRender(true);
+  } else if (tool === 'free') {
+    action = { ...base, type: 'free', pts: [w] };
+  } else if (tool === 'erase') {
+    action = { ...base, type: 'erase', before: snapshot() };
+    eraseAt(sp);
+  }
+}
+function cancelAction() {
+  if (action && action.before) { restore(action.before); cleanup(); }
+  action = null; requestRender(true);
+}
+
+canvas.addEventListener('pointermove', e => {
+  const sp = spt(e);
+  if (touches.has(e.pointerId)) { touches.set(e.pointerId, sp); if (gesture) { moveGesture(); return; } }
+  if (!action || action.pointerId !== e.pointerId) {
+    if (e.pointerType !== 'touch' && DRAW_TOOLS.includes(settings.tool) && !pick) { lastPointerType = e.pointerType; hover = snapPos(toW(sp.x, sp.y)); requestRender(); }
+    return;
+  }
+  const w = toW(sp.x, sp.y);
+  switch (action.type) {
+    case 'pan': {
+      const dx = sp.x - action.s0.x, dy = sp.y - action.s0.y;
+      if (Math.hypot(dx, dy) > 4) action.moved = true;
+      view.ox = action.v0.ox + dx; view.oy = action.v0.oy + dy; requestRender(); break;
+    }
+    case 'labelTap': {
+      // dro bort fra merkelappen: tegn en strek i stedet
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 10 && DRAW_TOOLS.includes(settings.tool)) {
+        const s = snapPos(action.w0);
+        action = { ...action, type: 'line', shape: settings.tool, start: s, end: snapPos(w, { from: [s] }) };
+        requestRender();
+      }
+      break;
+    }
+    case 'line': action.end = snapPos(w, { from: [action.start] }); requestRender(); break;
+    case 'free': {
+      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      for (const ev of evs) { const p = spt(ev); action.pts.push(toW(p.x, p.y)); }
+      requestRender(); break;
+    }
+    case 'erase': eraseAt(sp); break;
+    case 'dragPoint': {
+      if (isFixed(action.pid)) break;
+      const from = doc.lines.filter(l => l.a === action.pid || l.b === action.pid).map(l => otherEnd(l, action.pid));
+      const s = snapPos(w, { exclude: action.pid, from });
+      action.target = s.pid || null;
+      dragPoints([{ id: action.pid, x: s.x, y: s.y }]);
+      requestRender(true); break;
+    }
+    case 'dragArc': {
+      // dra i buen: den går alltid gjennom pennen, endepunktene står
+      const A = arcById(action.arc), m = { x: Math.round(w.x * 2) / 2, y: Math.round(w.y * 2) / 2 };
+      const at = arcThrough(P(A.a), P(A.b), m);
+      if (!at || Math.hypot(at.c.x - m.x, at.c.y - m.y) > 1e5) break;
+      if (at.swap) { const t = A.a; A.a = A.b; A.b = t; }
+      dragPoints([{ id: A.c, x: at.c.x, y: at.c.y }]);
+      requestRender(true); break;
+    }
+    case 'dragCircle': {
+      const c = circById(action.circle), ce = P(c.c), st = settings.snap ? doc.rute / 2 : 0.5;
+      c.r = Math.max(st, Math.round(Math.hypot(w.x - ce.x, w.y - ce.y) / st) * st);
+      if (doc.cons.some(x => x.circle === c.id)) solve(new Set(), [], new Set([c.c]));
+      requestRender(true); break;
+    }
+    case 'dragLine': {
+      let dx = w.x - action.w0.x, dy = w.y - action.w0.y;
+      const st = settings.snap ? doc.rute : 0.5;
+      dx = Math.round(dx / st) * st; dy = Math.round(dy / st) * st;
+      const l = action.line;
+      dragPoints([{ id: l.a, x: action.a0.x + dx, y: action.a0.y + dy }, { id: l.b, x: action.b0.x + dx, y: action.b0.y + dy }]);
+      requestRender(true); break;
+    }
+  }
+});
+
+function endPointer(e) {
+  const sp = spt(e);
+  if (touches.has(e.pointerId)) {
+    touches.delete(e.pointerId);
+    if (gesture) {
+      if (gesture.mode === 'pan' && gesture.tap && performance.now() - gesture.t0 < 400 && e.type === 'pointerup') tapSelect(sp);
+      if (touches.size === 1) { const [id] = touches.keys(); startGesture({ pointerId: id }); gesture.tap = false; }
+      else if (touches.size === 0) { gesture = null; scheduleSave(); }
+      return;
+    }
+  }
+  if (!action || action.pointerId !== e.pointerId) return;
+  const a = action; action = null;
+  if (e.type === 'pointercancel') { if (a.before) { restore(a.before); cleanup(); } requestRender(true); return; }
+  switch (a.type) {
+    case 'pick': handlePick(sp); break;
+    case 'pan': if (!a.moved) { sel = null; requestRender(true); } scheduleSave(); break;
+    case 'labelTap': openEditor(a.label); break;
+    case 'line': {
+      const dpx = Math.hypot(a.start.x - a.end.x, a.start.y - a.end.y) * k();
+      if (dpx < 8) { tapSelect(sp); break; }
+      const before = snapshot();
+      if (a.shape === 'circle') {
+        const st = settings.snap ? doc.rute / 2 : 0.5;
+        const r = Math.max(st, Math.round(Math.hypot(a.end.x - a.start.x, a.end.y - a.start.y) / st) * st);
+        const c = { id: uid(), c: a.start.pid || addPoint(a.start), r, name: nextName() };
+        doc.circles.push(c); sel = { type: 'circle', id: c.id };
+        cleanup(); commit(before); break;
+      }
+      if (a.shape === 'rect') {
+        const x0 = a.start.x, y0 = a.start.y, x1 = a.end.x, y1 = a.end.y;
+        if (Math.abs(x1 - x0) < 0.1 || Math.abs(y1 - y0) < 0.1) { toast('Dra på skrå for å lage et rektangel.'); break; }
+        const p0 = a.start.pid || addPoint(a.start), p2 = a.end.pid || addPoint(a.end);
+        const p1 = addPoint({ x: x1, y: y0 }), p3 = addPoint({ x: x0, y: y1 });
+        const ids = [];
+        for (const [u, v, t] of [[p0, p1, 'h'], [p1, p2, 'v'], [p2, p3, 'h'], [p3, p0, 'v']]) {
+          const l = { id: uid(), a: u, b: v, name: nextName() }; doc.lines.push(l); ids.push(l.id);
+          if (settings.auto) doc.cons.push({ id: uid(), type: t, l: l.id });
+        }
+        sel = { type: 'line', id: ids[0] };
+        cleanup(); commit(before); break;
+      }
+      const pa = a.start.pid || addPoint(a.start), pb = a.end.pid || addPoint(a.end);
+      if (a.shape === 'arc') {
+        if (pa === pb) break;
+        const at = arcThrough(P(pa), P(pb), defaultBulge(P(pa), P(pb)));
+        const A = { id: uid(), a: pa, b: pb, c: addPoint(at.c), name: nextName() };
+        if (at.swap) { A.a = pb; A.b = pa; }
+        doc.arcs.push(A);
+        if (a.start.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pa, l: a.start.lid });
+        if (a.end.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pb, l: a.end.lid });
+        sel = { type: 'arc', id: A.id };
+        cleanup(); commit(before); break;
+      }
+      if (pa !== pb && !doc.lines.some(l => (l.a === pa && l.b === pb) || (l.a === pb && l.b === pa))) {
+        const l = { id: uid(), a: pa, b: pb, name: nextName() };
+        doc.lines.push(l);
+        if (settings.auto) {
+          const A = P(pa), B = P(pb);
+          if (Math.abs(A.y - B.y) < 1e-6) doc.cons.push({ id: uid(), type: 'h', l: l.id });
+          else if (Math.abs(A.x - B.x) < 1e-6) doc.cons.push({ id: uid(), type: 'v', l: l.id });
+        }
+        if (a.start.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pa, l: a.start.lid });
+        if (a.end.kind === 'line') doc.cons.push({ id: uid(), type: 'online', p: pb, l: a.end.lid });
+        sel = { type: 'line', id: l.id };
+      }
+      cleanup(); commit(before); break;
+    }
+    case 'free': {
+      if (a.pts.length > 1) { const before = snapshot(); doc.strokes.push({ id: uid(), pts: a.pts.map(p => ({ x: Math.round(p.x * 10) / 10, y: Math.round(p.y * 10) / 10 })) }); commit(before); }
+      requestRender(); break;
+    }
+    case 'erase': cleanup(); commit(a.before); validateSel(); break;
+    case 'dragPoint':
+      if (isFixed(a.pid) && Math.hypot(sp.x - a.s0.x, sp.y - a.s0.y) > 6) toast('Punktet er låst. Lås det opp i panelet for å flytte det.');
+      if (a.target && a.target !== a.pid) { mergePoint(a.pid, a.target); sel = { type: 'point', id: a.target }; solve(); }
+      validateSel(); commit(a.before); requestRender(true); break;
+    case 'dragLine': case 'dragArc': case 'dragCircle': commit(a.before); requestRender(true); break;
+  }
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && !action) { hover = null; requestRender(); } });
+
+function tapSelect(sp) {
+  if (pick) { handlePick(sp); return; }
+  const lab = hitLabel(sp.x, sp.y);
+  if (lab) { openEditor(lab); setPanel(true); return; }
+  sel = hitTest(sp.x, sp.y); if (sel) setPanel(true); requestRender(true);
+}
+function eraseAt(sp) {
+  const r = hitR(), w = toW(sp.x, sp.y), rw = r / k();
+  const n0 = doc.lines.length + doc.strokes.length;
+  doc.lines = doc.lines.filter(l => projSeg(sp, toS(P(l.a)), toS(P(l.b))).d > r * 0.8);
+  doc.strokes = doc.strokes.filter(s => !s.pts.some(p => Math.hypot(p.x - w.x, p.y - w.y) < rw));
+  const h = hitShape(sp.x, sp.y);
+  if (h && h.type === 'circle') doc.circles = doc.circles.filter(c => c.id !== h.id);
+  if (h && h.type === 'arc') doc.arcs = doc.arcs.filter(A => A.id !== h.id);
+  if (doc.lines.length + doc.strokes.length !== n0 || h) requestRender(true);
+}
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const sp = spt(e);
+  if (e.ctrlKey || e.deltaMode === 1) zoomAt(sp.x, sp.y, Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.01)));
+  else { view.ox -= e.deltaX; view.oy -= e.deltaY; closeEditor(false); requestRender(); scheduleSave(); }
+}, { passive: false });
+let gz = 1;
+canvas.addEventListener('gesturestart', e => { e.preventDefault(); gz = 1; });
+canvas.addEventListener('gesturechange', e => { e.preventDefault(); if (penSeen || touches.size) return; const sp = spt(e); zoomAt(sp.x, sp.y, e.scale / gz); gz = e.scale; });
+
+/* ---------- tastatur ---------- */
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, select')) { if (e.key === 'Enter') e.target.blur(); return; }
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
+  if (mod) return;
+  const tools = { l: 'line', r: 'rect', c: 'circle', a: 'arc', v: 'move', f: 'free', e: 'erase' };
+  if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
+  else if (e.key === 'Escape') { if (pick) endPick(); sel = null; if (action) cancelAction(); requestRender(true); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
+  else if (e.key === ' ') { spaceDown = true; canvas.style.cursor = 'grab'; }
+  else if (e.key === '+' || e.key === '=') zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.25);
+  else if (e.key === '-') zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 0.8);
+  else if (e.key === '0') fitView();
+});
+document.addEventListener('keyup', e => { if (e.key === ' ') { spaceDown = false; canvas.style.cursor = ''; } });
+
+/* ---------- panel ---------- */
+const panel = $('#panel'), selBox = $('#selBox'), cutBox = $('#cutBox'), statusBox = $('#statusBox');
+function statusHTML() {
+  if (!doc.lines.length && !doc.arcs.length && !doc.circles.length) return '';
+  const d = computeDof();
+  if (d.dof === 0) return '<div class="status done"><i></i><span><b>Fullt bestemt.</b> Mål og regler låser hele tegningen.</span></div>';
+  if (!doc.cons.length) return '<div class="status"><i></i><span><b>Ingenting er låst ennå.</b> Blå streker kan flytte seg. Legg til mål og regler for å låse dem.</span></div>';
+  const tip = !fixedPts().size ? ' Lås posisjonen til ett punkt, ellers kan hele tegningen flytte seg.' : ' Lås flere mål for å låse dem.';
+  return `<div class="status"><i></i><span><b>${d.dof} ${d.dof === 1 ? 'frihetsgrad' : 'frihetsgrader'} igjen.</b> Blå streker kan fortsatt flytte seg.${tip}</span></div>`;
+}
+function endLabel(l, end) {
+  const a = P(l.a), b = P(l.b), me = end === 'a' ? a : b, other = end === 'a' ? b : a;
+  if (Math.abs(b.x - a.x) >= Math.abs(b.y - a.y)) return me.x <= other.x ? 'Venstre ende' : 'Høyre ende';
+  return me.y >= other.y ? 'Nedre ende' : 'Øvre ende';
+}
+function describe(c, fromLine) {
+  const nm = id => esc(lineById(id).name);
+  const other = c.l === fromLine ? c.l2 : c.l;
+  switch (c.type) {
+    case 'h': return 'Vannrett';
+    case 'v': return 'Loddrett';
+    case 'len': return 'Lengden er låst: ' + fmtLen(c.v);
+    case 'ang': { let t = Math.abs(c.v); if (t > 90) t = 180 - t; return 'Vinkelen er låst: ' + fmtAng(t); }
+    case 'par': return 'Parallell med ' + nm(other);
+    case 'perp': return 'Vinkelrett på ' + nm(other);
+    case 'eq': return 'Like lang som ' + nm(other);
+    case 'angle2': return `${nm(c.l)} og ${nm(c.l2)} er låst til ${fmtAng(c.v)}`;
+    case 'fix': return 'Posisjonen er låst';
+    case 'online': return 'Ligger på ' + nm(c.l);
+    case 'mid': return 'Ligger midt på ' + nm(c.l);
+    case 'rad': return 'Radius låst: ' + fmtLen(c.v);
+    case 'pdist': return 'Avstand til ' + nm(c.l);
+    case 'ppdist': return 'Avstand mellom punkter';
+    case 'tan': return 'Ligger inntil ' + nm(c.l);
+  }
+}
+function rulesList(cons, fromLine) {
+  if (!cons.length) return '<p class="hint">Ingen regler ennå.</p>';
+  return '<ul class="active-rules">' + cons.map(c => `<li><span>${describe(c, fromLine)}</span>${c.type === 'pdist' || c.type === 'ppdist'
+    ? `<input class="dim-in" inputmode="decimal" data-dim="${esc(c.id)}" value="${inputLen(c.v)}" aria-label="Avstand"><em class="dim-unit">${unitName()}</em>` : ''}<button type="button" data-del-con="${esc(c.id)}" aria-label="Fjern regelen">×</button></li>`).join('') + '</ul>';
+}
+const ruleBtn = (rule, label, on, glyph) => `<button type="button" class="rule" data-rule="${rule}" aria-pressed="${!!on}">${glyph ? `<b>${glyph}</b>` : ''}${label}</button>`;
+
+function selHTML() {
+  if (!sel) return `<h3>Valgt</h3><p class="hint">Trykk på en strek eller et punkt for å se og endre mål, vinkler og regler.</p>`;
+  if (sel.type === 'line') {
+    const l = lineById(sel.id), L = lenOf(l), t = acuteAng(l), a = P(l.a), b = P(l.b);
+    const dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
+    const has = type => doc.cons.some(c => c.type === type && c.l === l.id);
+    let facts = '';
+    if (!isAxis(t)) {
+      facts = `<dl class="facts">
+        <dt>Høyde × bredde</dt><dd>${lenNum(dy)} × ${lenNum(dx)} ${unitName()}</dd>
+        <dt>Stigning</dt><dd>${lenNum(Math.tan(t / DEG) * 100)} ${unitName()} per meter</dd>
+        <dt>Loddrett kapp</dt><dd class="saw">sag på ${fmtAng(t)}</dd>
+        <dt>Vannrett kapp</dt><dd class="saw">sag på ${fmtAng(90 - t)}</dd>
+      </dl>`;
+    }
+    let joints = '';
+    for (const end of ['a', 'b']) {
+      for (const j of gaps(l[end]).filter(j => j.u.line === l || j.v.line === l)) {
+        const o = j.u.line === l ? j.v.line : j.u.line;
+        const miterTxt = j.deg >= 89.95 ? `<br>Gjæring: sag på <span class="num">${fmtAng(90 - j.deg / 2)}</span> på begge` : '';
+        joints += `<li><b>${endLabel(l, end)}</b> mot ${esc(o.name)}: <span class="num">${fmtAng(j.deg)}</span>${miterTxt}</li>`;
+      }
+    }
+    return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">Strek</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+      <label class="field"><span>Lengde</span><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em>
+        <button type="button" class="lock" data-lock="len" aria-pressed="${has('len')}" aria-label="Lås lengden">${LOCK_SVG}</button></label>
+      <label class="field"><span>Vinkel mot vannrett</span><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em>
+        <button type="button" class="lock" data-lock="ang" aria-pressed="${has('ang')}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>
+      ${facts}
+      <h4>Regler</h4>
+      <div class="rules">
+        ${ruleBtn('h', 'Vannrett', has('h'))}${ruleBtn('v', 'Loddrett', has('v'))}
+        ${ruleBtn('par', 'Parallell med …', false, '∥')}${ruleBtn('perp', 'Vinkelrett på …', false, '⊥')}${ruleBtn('eq', 'Like lang som …', false, '=')}
+      </div>
+      ${rulesList(lineCons(l.id), l.id)}
+      ${joints ? `<h4>Skjøter</h4><ul class="joints">${joints}</ul>` : ''}`;
+  }
+  if (sel.type === 'arc') {
+    const A = arcById(sel.id), G = arcGeom(A), locked = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
+    return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">Bue</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+      <label class="field"><span>Radius</span><input id="inRad" inputmode="decimal" value="${inputLen(G.r)}"><em>${unitName()}</em>
+        <button type="button" class="lock" data-lock-rad="1" aria-pressed="${!!locked}" aria-label="Lås radien">${LOCK_SVG}</button></label>
+      <dl class="facts">
+        <dt>Spenn</dt><dd>${fmtLen(G.chord)}</dd>
+        <dt>Pilhøyde</dt><dd>${fmtLen(G.sag)}</dd>
+        <dt>Buelengde</dt><dd>${fmtLen(G.len)}</dd>
+        <dt>Vinkel</dt><dd>${fmtAng(G.span * DEG)}</dd>
+      </dl>
+      <p class="hint">Med Flytt kan du dra i den runde knotten midt på buen for å gjøre den flatere eller rundere. Endepunktene står stille.</p>
+      <p class="hint">Merke opp: sett en spiker i sentrum og bruk en snor eller lekt på ${fmtLen(G.r)}.</p>`;
+  }
+  if (sel.type === 'circle') {
+    const c = circById(sel.id);
+    return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">Sirkel</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+      <label class="field"><span>Diameter</span><input id="inDia" inputmode="decimal" value="${inputLen(2 * c.r)}"><em>${unitName()}</em><span></span></label>
+      <dl class="facts"><dt>Radius</dt><dd>${fmtLen(c.r)}</dd><dt>Omkrets</dt><dd>${fmtLen(2 * Math.PI * c.r)}</dd></dl>
+      <h4>Regler</h4>
+      <div class="rules">${ruleBtn('pdist', 'Avstand fra sentrum til strek …', false, '↔')}${ruleBtn('ppdist', 'Avstand til punkt …', false, '↔')}${ruleBtn('tan', 'Ligger inntil strek …')}${ruleBtn('fix', 'Lås sentrum', isFixed(c.c))}</div>
+      ${rulesList(doc.cons.filter(x => x.circle === c.id || x.p === c.c || x.p2 === c.c))}
+      <p class="hint">Med Flytt: dra i kanten for å endre størrelsen, eller i krysset i midten for å flytte sirkelen.</p>`;
+  }
+  const pid = sel.id, gs = gaps(pid);
+  const angleFields = gs.map(j => j.editable
+    ? `<label class="field joint"><span>Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}</span><input inputmode="decimal" data-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" value="${inputAng(j.deg)}"><em>°</em>
+        <button type="button" class="lock" data-lock-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" aria-pressed="${j.locked}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>`
+    : `<p class="hint">Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}: ${fmtAng(j.deg)}</p>`).join('');
+  const pc = doc.cons.filter(c => c.p === pid || c.p2 === pid);
+  return `<div class="sel-head"><span class="tag">•</span><span class="title">Punkt</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+    ${angleFields || '<p class="hint">Ingen vinkler her ennå. Tegn en strek til fra dette punktet.</p>'}
+    <h4>Regler</h4>
+    <div class="rules">${ruleBtn('fix', 'Lås posisjon', isFixed(pid))}${ruleBtn('mid', 'Midt på …')}${ruleBtn('online', 'På streken …')}${ruleBtn('pdist', 'Avstand til strek …', false, '↔')}${ruleBtn('ppdist', 'Avstand til punkt …', false, '↔')}</div>
+    ${rulesList(pc)}`;
+}
+function shapesHTML() {
+  const rows = doc.arcs.map(A => { const G = arcGeom(A); return `<tr><td class="n">${esc(A.name)}</td><td>Bue</td><td class="l">R ${fmtLen(G.r)}</td><td class="l">spenn ${fmtLen(G.chord)}<br>pil ${fmtLen(G.sag)}</td></tr>`; })
+    .concat(doc.circles.map(c => `<tr><td class="n">${esc(c.name)}</td><td>Sirkel</td><td class="l">Ø ${fmtLen(2 * c.r)}</td><td></td></tr>`));
+  return rows.length ? `<table class="cut" style="margin-top:12px"><thead><tr><th></th><th>Form</th><th>Mål</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '';
+}
+function cutHTML() {
+  if (!doc.lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Tegn streker med pennen, så kommer lengdene her.</p>';
+  const groups = new Map();
+  let total = 0;
+  for (const l of doc.lines) {
+    const L = lenOf(l), t = acuteAng(l); total += L;
+    const key = fmtLen(L) + '|' + (isAxis(t) ? '' : fmtAng(t));
+    if (!groups.has(key)) groups.set(key, { L, t, names: [] });
+    groups.get(key).names.push(l.name);
+  }
+  const rows = [...groups.values()].sort((a, b) => b.L - a.L).map(g =>
+    `<tr><td class="n">${g.names.length}×</td><td class="l">${fmtLen(g.L)}</td><td class="a">${isAxis(g.t) ? '' : fmtAng(g.t)}</td><td class="names">${g.names.map(esc).join(' ')}</td></tr>`).join('');
+  return `<table class="cut"><thead><tr><th>Ant.</th><th>Lengde</th><th>Vinkel</th><th>Streker</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="4">Sum ${nf1.format(Math.round(total) / 100)} løpemeter, ${doc.lines.length} streker</td></tr></tfoot></table>${shapesHTML()}`;
+}
+function updatePanel() {
+  if (panel.hidden) { panelDirty = false; return; }
+  const ae = document.activeElement;
+  if (ae && ae.tagName === 'INPUT' && panel.contains(ae)) return;
+  panelDirty = false;
+  statusBox.innerHTML = statusHTML();
+  selBox.innerHTML = selHTML();
+  cutBox.innerHTML = cutHTML();
+}
+panel.addEventListener('change', e => {
+  const t = e.target, v = parseNum(t.value);
+  if (!isFinite(v)) { panelDirty = true; return; }
+  if (t.id === 'inLen' && sel && sel.type === 'line') setLen(lineById(sel.id), settings.unit === 'mm' ? v / 10 : v);
+  else if (t.id === 'inAng' && sel && sel.type === 'line') setAng(lineById(sel.id), v);
+  else if (t.id === 'inRad' && sel && sel.type === 'arc') setRad(arcById(sel.id), settings.unit === 'mm' ? v / 10 : v);
+  else if (t.id === 'inDia' && sel && sel.type === 'circle') setCircleR(circById(sel.id), (settings.unit === 'mm' ? v / 10 : v) / 2);
+  else if (t.dataset.dim) { const c = doc.cons.find(c => c.id === t.dataset.dim); if (c) setDim(c, settings.unit === 'mm' ? v / 10 : v); }
+  else if (t.dataset.joint) { const [p, l1, l2] = t.dataset.joint.split('|'); setJoint(p, l1, l2, v); }
+  panelDirty = true;
+});
+panel.addEventListener('focusout', () => setTimeout(() => requestRender(true), 0));
+panel.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !sel) return;
+  e.preventDefault();
+  if (b.dataset.act === 'del') deleteSel();
+  else if (b.dataset.delCon) removeCon(b.dataset.delCon);
+  else if (b.dataset.lockRad) {
+    const A = arcById(sel.id), c = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
+    if (c) removeCon(c.id); else addConstraint({ type: 'rad', arc: A.id, v: arcGeom(A).r });
+  }
+  else if (b.dataset.lock) {
+    const l = lineById(sel.id), c = conOf(b.dataset.lock, c => c.l === l.id);
+    if (c) removeCon(c.id);
+    else if (b.dataset.lock === 'len') addConstraint({ type: 'len', l: l.id, v: lenOf(l) });
+    else {
+      const before = snapshot();
+      doc.cons = doc.cons.filter(c => !(c.l === l.id && (c.type === 'h' || c.type === 'v')));
+      doc.cons.push({ id: uid(), type: 'ang', l: l.id, v: rawAng(P(l.a), P(l.b)) });
+      commit(before);
+    }
+  } else if (b.dataset.lockJoint) {
+    const [p, l1, l2] = b.dataset.lockJoint.split('|');
+    const c = doc.cons.find(c => c.type === 'angle2' && c.p === p && ((c.l === l1 && c.l2 === l2) || (c.l === l2 && c.l2 === l1)));
+    if (c) removeCon(c.id);
+    else { const j = gaps(p).find(j => j.u.line.id === l1 && j.v.line.id === l2); if (j) addConstraint({ type: 'angle2', p, l: l1, l2, v: j.deg }); }
+  } else if (b.dataset.rule) ruleClick(b.dataset.rule);
+});
+function ruleClick(rule) {
+  if (sel.type === 'circle') {
+    const ce = circById(sel.id).c;
+    if (rule === 'fix') { const c = conOf('fix', c => c.p === ce); if (c) removeCon(c.id); else addConstraint({ type: 'fix', p: ce }); }
+    else startPick(rule);
+    return;
+  }
+  if (sel.type === 'line') {
+    const l = lineById(sel.id);
+    if (rule === 'h' || rule === 'v') {
+      const c = conOf(rule, c => c.l === l.id);
+      if (c) { removeCon(c.id); return; }
+      const before = snapshot();
+      doc.cons = doc.cons.filter(c => !(c.l === l.id && (c.type === 'h' || c.type === 'v' || c.type === 'ang')));
+      const [fk] = fixedEnd(l);
+      doc.cons.push({ id: uid(), type: rule, l: l.id });
+      if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: regelen strider mot regler som allerede finnes.'); requestRender(true); return; }
+      commit(before);
+    } else startPick(rule);
+  } else {
+    if (rule === 'fix') { const c = conOf('fix', c => c.p === sel.id); if (c) removeCon(c.id); else addConstraint({ type: 'fix', p: sel.id }); }
+    else startPick(rule);
+  }
+}
+
+/* ---------- verktøylinje ---------- */
+function setTool(t) { settings.tool = t; hover = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
+document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
+$('#undoBtn').addEventListener('click', undo);
+$('#redoBtn').addEventListener('click', redo);
+function updateRail() {
+  document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === settings.tool)));
+  $('#undoBtn').disabled = !undoStack.length; $('#redoBtn').disabled = !redoStack.length;
+  canvas.style.cursor = spaceDown ? 'grab' : pick ? 'pointer' : settings.tool === 'move' ? 'default' : 'crosshair';
+  $('#badge').textContent = `1 rute = ${fmtLen(doc.rute)} · ${Math.round(view.z * 100)} %`;
+}
+$('#snapBtn').addEventListener('click', () => { settings.snap = !settings.snap; syncControls(); scheduleSave(); });
+$('#autoBtn').addEventListener('click', () => { settings.auto = !settings.auto; syncControls(); scheduleSave(); });
+$('#unitSel').addEventListener('change', e => { settings.unit = e.target.value; scheduleSave(); requestRender(true); });
+$('#ruteSel').addEventListener('change', e => { doc.rute = +e.target.value; scheduleSave(); requestRender(true); });
+$('#fitBtn').addEventListener('click', fitView);
+function setPanel(on) { settings.panel = on; panel.hidden = !on; $('#panelBtn').setAttribute('aria-pressed', String(on)); scheduleSave(); requestRender(true); }
+$('#panelBtn').addEventListener('click', () => setPanel(!settings.panel));
+
+function syncControls() {
+  $('#snapBtn').setAttribute('aria-pressed', String(settings.snap));
+  $('#autoBtn').setAttribute('aria-pressed', String(settings.auto));
+  $('#unitSel').value = settings.unit;
+  $('#ruteSel').value = String(doc.rute);
+  $('#nameIn').value = doc.name;
+  const ds = $('#drawSel');
+  const list = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  if (!store.drawings[doc.id]) list.unshift(doc);
+  ds.innerHTML = list.map(d => `<option value="${esc(d.id)}">${esc(d.name || 'Uten navn')}</option>`).join('') + '<option value="__new">+ Ny tegning</option>';
+  ds.value = doc.id;
+}
+function openDoc(d) {
+  d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || [];
+  doc = d; undoStack = []; redoStack = []; sel = null; action = null;
+  if (pick) endPick();
+  syncControls();
+  if (d.view) { view = { ...d.view }; requestRender(true); } else fitView();
+}
+$('#drawSel').addEventListener('change', e => {
+  flushSave();
+  if (e.target.value === '__new') { openDoc(blankDoc()); flushSave(); syncControls(); }
+  else openDoc(JSON.parse(JSON.stringify(store.drawings[e.target.value])));
+});
+$('#nameIn').addEventListener('input', e => { doc.name = e.target.value; scheduleSave(); });
+$('#nameIn').addEventListener('change', () => { flushSave(); syncControls(); });
+let delArm = null;
+$('#delDraw').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!delArm) { b.textContent = 'Trykk igjen for å slette'; b.style.color = 'var(--danger)'; delArm = setTimeout(() => { delArm = null; b.textContent = 'Slett'; b.style.color = ''; }, 3000); return; }
+  clearTimeout(delArm); delArm = null; b.textContent = 'Slett'; b.style.color = '';
+  delete store.drawings[doc.id];
+  const rest = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  openDoc(rest.length ? JSON.parse(JSON.stringify(rest[0])) : blankDoc());
+  flushSave(); syncControls();
+});
+
+/* ---------- fil ---------- */
+const FILE_EXT = '.snekkerblokk.json';
+const safeName = n => (n || '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 60) || 'tegning';
+$('#saveFile').addEventListener('click', async () => {
+  flushSave();
+  const d = JSON.parse(JSON.stringify(doc)); delete d.view;
+  const name = safeName(doc.name) + FILE_EXT;
+  const file = new File([JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d })], name, { type: 'application/json' });
+  try {
+    // på iPad: delingsarket, der «Arkiver i Filer» lagrer til Filer eller iCloud
+    if (navigator.maxTouchPoints > 0 && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: doc.name });
+      return;
+    }
+    const url = URL.createObjectURL(file), a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast('Tegningen er lagret som ' + name + '.');
+  } catch (e) {
+    if (e && e.name !== 'AbortError') toast('Kunne ikke lagre filen her. Bruk Snekkerblokk-appen på Hjem-skjermen.');
+  }
+});
+$('#openFile').addEventListener('click', () => $('#fileIn').click());
+$('#fileIn').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const o = JSON.parse(await f.text()), d = o.drawing || o;
+    if (!d || typeof d.points !== 'object' || !Array.isArray(d.lines)) throw new Error('format');
+    flushSave();
+    d.id = uid(); d.updated = Date.now(); d.rute = d.rute || 10; d.name = d.name || f.name.replace(/\.snekkerblokk\.json$|\.json$/, '');
+    delete d.view;
+    openDoc(d); flushSave(); syncControls();
+    toast('Åpnet «' + d.name + '».');
+  } catch (err) {
+    toast('Filen kunne ikke åpnes. Er det en fil lagret fra Snekkerblokk?');
+  }
+});
+
+/* ---------- bilde ---------- */
+$('#imgBtn').addEventListener('click', () => {
+  const B = bounds(), saved = { ...view }, pad = 90;
+  let W = 1600, H = 1100;
+  if (B) {
+    const z = Math.min((W - pad * 2) / Math.max(1, (B.x1 - B.x0) * PX_PER_CM), (H - pad * 2) / Math.max(1, (B.y1 - B.y0) * PX_PER_CM), 6);
+    view.z = z;
+    W = Math.round((B.x1 - B.x0) * PX_PER_CM * z + pad * 2); H = Math.round((B.y1 - B.y0) * PX_PER_CM * z + pad * 2);
+    view.ox = pad - B.x0 * k(); view.oy = pad - B.y0 * k();
+  }
+  const off = document.createElement('canvas'); off.width = W * 2; off.height = H * 2;
+  const g = off.getContext('2d');
+  const prevSel = sel; sel = null;
+  render(g, W, H, { export: true, scale: 2 });
+  g.setTransform(2, 0, 0, 2, 0, 0);
+  g.font = '600 15px "IBM Plex Sans Condensed", sans-serif'; g.fillStyle = C.ink; g.textBaseline = 'top';
+  g.fillText(doc.name + '   ·   1 rute = ' + fmtLen(doc.rute), 20, 18);
+  sel = prevSel; view = saved;
+  $('#imgOut').src = off.toDataURL('image/png');
+  $('#imgOverlay').hidden = false;
+  requestRender();
+});
+$('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true; });
+
+/* ---------- oppstart ---------- */
+loadStore();
+const startDoc = store.current && store.drawings[store.current] ? JSON.parse(JSON.stringify(store.drawings[store.current])) : sampleDoc();
+if (window.innerWidth <= 760 && !Object.prototype.hasOwnProperty.call(store.settings || {}, 'panel')) settings.panel = false;
+readColors();
+panel.hidden = !settings.panel; $('#panelBtn').setAttribute('aria-pressed', String(settings.panel));
+openDoc(startDoc);
+if (!store.drawings[doc.id]) flushSave();
+syncControls();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+window.addEventListener('resize', () => { closeEditor(false); requestRender(); });
+if (document.fonts) document.fonts.ready.then(() => requestRender());
+})();
+</script>
