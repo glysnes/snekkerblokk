@@ -103,9 +103,16 @@ select.ctl{padding-right:6px}
 .rail hr{border:0;border-top:1px solid var(--chrome-line);margin:4px 2px}
 .rail button:disabled{opacity:.35;cursor:default}
 
-.panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:var(--float-top);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+.panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:var(--float-top);max-height:calc(100% - var(--float-top) - env(safe-area-inset-bottom,0px) - 12px);
   width:330px;display:flex;flex-direction:column;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 6px 20px rgb(0 0 0 / .08);overflow:hidden}
-.panel-scroll{overflow-y:auto;padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-user-select:text;user-select:text}
+.panel-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 0 16px}
+.panel-close{width:36px;height:36px;border:0;background:transparent;border-radius:8px;font-size:22px;line-height:1;color:var(--chrome-muted)}
+.panel-close:hover{background:var(--hover);color:var(--chrome-fg)}
+.menu.parts{width:400px;padding:8px 12px 12px}
+.parts-box{padding:0 4px}
+.help-box{width:min(680px,100%)}
+.help-scroll{overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px;-webkit-user-select:text;user-select:text}
+.panel-scroll{overflow-y:auto;padding:6px 16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-user-select:text;user-select:text}
 .panel h3{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted);font-weight:600}
 .panel h4{margin:6px 0 0;font-size:13px;font-weight:600}
 .sec{display:flex;flex-direction:column;gap:10px}
@@ -186,7 +193,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   .brand > div{display:none}
   .ibtn{width:44px}
   .ibtn span{display:none}
-  .panel{left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));width:auto;top:auto;max-height:50%}
+  .panel{left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));width:auto;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);max-height:50%}
   .rail button{width:46px;height:46px}
   .badge{display:none}
 }
@@ -236,8 +243,14 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Vis alt</span></button>
       <button id="imgBtn" class="ibtn" type="button" title="Skriv ut på A4 eller lagre som PDF">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>Skriv ut</span></button>
-      <button id="panelBtn" class="ibtn" type="button" aria-pressed="true" title="Vis eller skjul panelet med mål og kappliste">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16M17.5 8.5h1M17.5 12h1"/></svg><span>Mål</span></button>
+      <div class="menu-wrap">
+        <button id="partsBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Deleliste: alle deler med lengde og vinkel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg><span>Deler</span></button>
+        <div class="menu right parts" id="partsMenu" hidden>
+          <div class="menu-head">Deleliste</div>
+          <div id="cutBox" class="parts-box"></div>
+        </div>
+      </div>
       <div class="menu-wrap">
         <button id="setBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Valg">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Valg</span></button>
@@ -252,6 +265,8 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
           <hr>
           <button class="menu-toggle" type="button" id="autoBtn" aria-pressed="true"><span><b>Auto-regler</b><small>Vannrette og loddrette streker får regelen selv</small></span><i></i></button>
           <button class="menu-toggle" type="button" id="penBtn" aria-pressed="false"><span><b>Penn-modus</b><small>Pennen tegner, fingeren flytter. Slås på av seg selv når du bruker Apple Pencil.</small></span><i></i></button>
+          <hr>
+          <button class="menu-item" type="button" id="helpBtn">Hjelp<small>Slik bruker du Snekkerblokk</small></button>
         </div>
       </div>
     </div>
@@ -274,28 +289,11 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <button type="button" id="redoBtn" title="Gjør om (⇧⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg>Gjør om</button>
   </nav>
 
-  <aside class="panel" id="panel" aria-label="Mål og vinkler">
+  <aside class="panel" id="panel" aria-label="Valgt" hidden>
+    <div class="panel-bar"><h3>Valgt</h3><button type="button" class="panel-close" id="panelClose" aria-label="Lukk panelet">×</button></div>
     <div class="panel-scroll">
       <section class="sec" id="statusBox"></section>
       <section class="sec" id="selBox"></section>
-      <section class="sec">
-        <h3>Kappliste</h3>
-        <div id="cutBox"></div>
-      </section>
-      <section class="sec">
-        <h3>Slik bruker du den</h3>
-        <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
-        <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
-        <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
-        <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
-        <p class="hint"><b>Målebånd:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. I panelet kan du feste målene på tegningen, så de blir stående og kommer med på utskriften, eller dele streken opp ved kryssene.</p>
-        <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
-        <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
-        <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
-        <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
-        <p class="hint">Lengdene måles fra punkt til punkt langs streken. Ta hensyn til materialtykkelsen selv. Sagvinkler er regnet fra rett kapp (0°).</p>
-        <p class="hint version" id="versionLine"></p>
-      </section>
     </div>
   </aside>
 
@@ -306,6 +304,24 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   <div class="badge" id="badge"></div>
 </div>
 
+<div class="overlay" id="helpOverlay" hidden>
+  <div class="box help-box">
+    <div class="row"><strong>Slik bruker du Snekkerblokk</strong><button class="ctl" type="button" id="helpClose">Lukk</button></div>
+    <div class="help-scroll">
+        <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
+        <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
+        <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i delelisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
+        <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
+        <p class="hint"><b>Målebånd:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. I panelet kan du feste målene på tegningen, så de blir stående og kommer med på utskriften, eller dele streken opp ved kryssene.</p>
+        <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
+        <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
+        <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
+        <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
+        <p class="hint">Lengdene måles fra punkt til punkt langs streken. Ta hensyn til materialtykkelsen selv. Sagvinkler er regnet fra rett kapp (0°).</p>
+        <p class="hint version" id="versionLine"></p>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="imgOverlay" hidden>
   <div class="box">
     <div class="row"><strong>Utskrift på A4</strong><button class="ctl" type="button" id="imgClose">Lukk</button></div>
@@ -899,7 +915,12 @@ function deleteSel() {
 /* ---------- tegning ---------- */
 let renderQueued = false, panelDirty = true;
 function requestRender(panel) { if (panel) panelDirty = true; if (!renderQueued) { renderQueued = true; requestAnimationFrame(frame); } }
-function frame() { renderQueued = false; render(); if (panelDirty) updatePanel(); updateRail(); }
+function frame() {
+  renderQueued = false;
+  const want = panelWanted();
+  if (panel.hidden === want) { panel.hidden = !want; panelDirty = true; }
+  render(); if (panelDirty) updatePanel(); updateRail();
+}
 
 function readColors() {
   const cs = getComputedStyle(document.documentElement);
@@ -2083,13 +2104,11 @@ function cutHTML() {
     <tfoot><tr><td colspan="4">Sum ${nf1.format(Math.round(total) / 100)} løpemeter, ${lines.length} streker</td></tr></tfoot></table>${shapesHTML()}`;
 }
 function updatePanel() {
-  if (panel.hidden) { panelDirty = false; return; }
   const ae = document.activeElement;
   if (ae && ae.tagName === 'INPUT' && panel.contains(ae)) return;
   panelDirty = false;
-  statusBox.innerHTML = statusHTML();
-  selBox.innerHTML = selHTML();
-  cutBox.innerHTML = cutHTML();
+  if (!panel.hidden) { statusBox.innerHTML = statusHTML(); selBox.innerHTML = selHTML(); }
+  if (!$('#partsMenu').hidden) cutBox.innerHTML = statusHTML() + cutHTML();
 }
 panel.addEventListener('change', e => {
   const t = e.target, v = parseNum(t.value);
@@ -2136,7 +2155,7 @@ function toggleAux(l) {
   const before = snapshot();
   if (l.aux) delete l.aux; else l.aux = true;
   commit(before);
-  toast(l.aux ? `${l.name} er nå en hjelpelinje. Den er ikke med i kapplisten.` : `${l.name} er nå en vanlig strek.`);
+  toast(l.aux ? `${l.name} er nå en hjelpelinje. Den er ikke med i delelisten.` : `${l.name} er nå en vanlig strek.`);
 }
 function ruleClick(rule) {
   if (sel.type === 'circle') {
@@ -2185,8 +2204,13 @@ $('#autoBtn').addEventListener('click', () => { settings.auto = !settings.auto; 
 $('#unitSel').addEventListener('change', e => { settings.unit = e.target.value; scheduleSave(); requestRender(true); });
 $('#ruteSel').addEventListener('change', e => { doc.rute = +e.target.value; scheduleSave(); requestRender(true); });
 $('#fitBtn').addEventListener('click', fitView);
-function setPanel(on) { settings.panel = on; panel.hidden = !on; $('#panelBtn').setAttribute('aria-pressed', String(on)); scheduleSave(); requestRender(true); }
-$('#panelBtn').addEventListener('click', () => setPanel(!settings.panel));
+// panelet til høyre vises bare når noe er valgt eller målt
+function setPanel() { requestRender(true); }
+const panelWanted = () => !!(sel || pick || (settings.tool === 'measure' && measure));
+$('#panelClose').addEventListener('click', () => { sel = null; measure = null; if (pick) endPick(); requestRender(true); });
+$('#partsBtn').addEventListener('click', () => { toggleMenu($('#partsBtn'), $('#partsMenu')); if (!$('#partsMenu').hidden) cutBox.innerHTML = statusHTML() + cutHTML(); });
+$('#helpBtn').addEventListener('click', () => { closeMenus(); $('#helpOverlay').hidden = false; });
+$('#helpClose').addEventListener('click', () => { $('#helpOverlay').hidden = true; });
 
 function syncControls() {
   $('#snapBtn').setAttribute('aria-pressed', String(settings.snap));
@@ -2442,9 +2466,8 @@ if (APP_VERSION) {
 if (navigator.standalone) document.documentElement.classList.add('standalone');
 loadStore();
 const startDoc = store.current && store.drawings[store.current] ? JSON.parse(JSON.stringify(store.drawings[store.current])) : sampleDoc();
-if (window.innerWidth <= 760 && !Object.prototype.hasOwnProperty.call(store.settings || {}, 'panel')) settings.panel = false;
 readColors();
-panel.hidden = !settings.panel; $('#panelBtn').setAttribute('aria-pressed', String(settings.panel));
+panel.hidden = true;
 openDoc(startDoc);
 if (!store.drawings[doc.id]) flushSave();
 syncControls();
