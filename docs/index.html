@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="nb">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Snekkerblokk">
+<meta name="apple-mobile-web-app-title" content="D-Rafter">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#13212e" media="(prefers-color-scheme: dark)">
@@ -13,9 +13,9 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "55c7dfc", "label": "22.10.2026 10:52"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "e2cb004", "label": "22.10.2026 11:02"};</script>
 <meta charset="utf-8">
-<title>Snekkerblokk</title>
+<title>D-Rafter</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -223,7 +223,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 </head>
 <body>
 <div id="app">
-  <canvas id="c" aria-label="Tegneflate med rutenett"></canvas>
+  <canvas id="c" aria-label="Drawing area with grid"></canvas>
 
   <header class="topbar">
     <div class="brand">
@@ -236,121 +236,121 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
           <path d="M24 48 50 24" stroke="#5ddfbd" stroke-width="6.4" stroke-linecap="round"/>
         </g>
       </svg>
-      <div>Snekkerblokk<small>Rutepapir med mål</small></div>
+      <div>D-Rafter<small>Sketch · measure · cut</small></div>
     </div>
     <div class="menu-wrap doc-wrap">
-      <button id="docBtn" class="ctl doc-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Tegninger, navn og filer">
+      <button id="docBtn" class="ctl doc-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Drawings, name and files">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
         <span id="docTitle"></span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <div class="menu" id="docMenu" hidden>
-        <label class="menu-field"><span>Navn på tegningen</span><input id="nameIn" spellcheck="false" autocomplete="off"></label>
-        <div class="menu-head">Tegninger</div>
+        <label class="menu-field"><span>Drawing name</span><input id="nameIn" spellcheck="false" autocomplete="off"></label>
+        <div class="menu-head">Drawings</div>
         <div class="menu-list" id="drawList"></div>
-        <button class="menu-item" type="button" id="newDraw">+ Ny tegning</button>
+        <button class="menu-item" type="button" id="newDraw">+ New drawing</button>
         <hr>
-        <button class="menu-item" type="button" id="saveFile">Lagre fil …<small>Til Filer eller iCloud</small></button>
-        <button class="menu-item" type="button" id="openFile">Åpne fil …<small>Hent en lagret tegning</small></button>
+        <button class="menu-item" type="button" id="saveFile">Save file …<small>To Files or iCloud</small></button>
+        <button class="menu-item" type="button" id="openFile">Open file …<small>Load a saved drawing</small></button>
         <input type="file" id="fileIn" accept=".json,application/json" hidden>
         <hr>
-        <button class="menu-item danger" type="button" id="delDraw">Slett tegningen</button>
+        <button class="menu-item danger" type="button" id="delDraw">Delete drawing</button>
       </div>
     </div>
     <div class="spacer"></div>
     <div class="iconbar">
-      <button id="snapBtn" class="ibtn" type="button" aria-pressed="true" title="Fest til ruter">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" opacity=".55"/><circle cx="15" cy="9" r="2.6" fill="currentColor" stroke="none"/></svg><span>Ruter</span></button>
-      <button id="fitBtn" class="ibtn" type="button" title="Vis hele tegningen">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Vis alt</span></button>
-      <button id="imgBtn" class="ibtn" type="button" title="Skriv ut på A4 eller lagre som PDF">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>Skriv ut</span></button>
+      <button id="snapBtn" class="ibtn" type="button" aria-pressed="true" title="Snap to grid">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" opacity=".55"/><circle cx="15" cy="9" r="2.6" fill="currentColor" stroke="none"/></svg><span>Snap</span></button>
+      <button id="fitBtn" class="ibtn" type="button" title="Show the whole drawing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Fit</span></button>
+      <button id="imgBtn" class="ibtn" type="button" title="Print on A4 or save as PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>Print</span></button>
       <div class="menu-wrap">
-        <button id="partsBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Deleliste: alle deler med lengde og vinkel">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg><span>Deler</span></button>
+        <button id="partsBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Parts list: every part with length and angle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg><span>Parts</span></button>
         <div class="menu right parts" id="partsMenu" hidden>
-          <div class="menu-head">Deleliste</div>
+          <div class="menu-head">Parts list</div>
           <div id="cutBox" class="parts-box"></div>
         </div>
       </div>
       <div class="menu-wrap">
-        <button id="setBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Valg">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Valg</span></button>
+        <button id="setBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Settings</span></button>
         <div class="menu right" id="setMenu" hidden>
-          <label class="menu-row"><span>1 rute er</span>
-            <select id="ruteSel" aria-label="Størrelse på en rute">
+          <label class="menu-row"><span>1 square is</span>
+            <select id="ruteSel" aria-label="Size of one grid square">
               <option value="1">1 cm</option><option value="2">2 cm</option><option value="5">5 cm</option>
               <option value="10">10 cm</option><option value="20">20 cm</option><option value="25">25 cm</option>
               <option value="50">50 cm</option><option value="100">1 m</option>
             </select></label>
-          <label class="menu-row"><span>Mål i</span><select id="unitSel" aria-label="Enhet for mål"><option value="cm">cm</option><option value="mm">mm</option></select></label>
+          <label class="menu-row"><span>Units</span><select id="unitSel" aria-label="Units for dimensions"><option value="cm">cm</option><option value="mm">mm</option></select></label>
           <hr>
-          <button class="menu-toggle" type="button" id="autoBtn" aria-pressed="true"><span><b>Auto-regler</b><small>Vannrette og loddrette streker får regelen selv</small></span><i></i></button>
-          <button class="menu-toggle" type="button" id="penBtn" aria-pressed="false"><span><b>Penn-modus</b><small>Pennen tegner, fingeren flytter. Slås på av seg selv når du bruker Apple Pencil.</small></span><i></i></button>
+          <button class="menu-toggle" type="button" id="autoBtn" aria-pressed="true"><span><b>Auto constraints</b><small>Horizontal and vertical lines get the constraint automatically</small></span><i></i></button>
+          <button class="menu-toggle" type="button" id="penBtn" aria-pressed="false"><span><b>Pencil mode</b><small>The Pencil draws, your finger moves things. Turns on by itself when you use Apple Pencil.</small></span><i></i></button>
           <hr>
-          <button class="menu-item" type="button" id="helpBtn">Hjelp<small>Slik bruker du Snekkerblokk</small></button>
+          <button class="menu-item" type="button" id="helpBtn">Help<small>How to use D-Rafter</small></button>
         </div>
       </div>
     </div>
     <div class="version-tag" id="versionTag" hidden></div>
   </header>
 
-  <nav class="rail" aria-label="Verktøy">
-    <button type="button" data-tool="line" title="Strek (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/></svg>Strek</button>
-    <button type="button" data-tool="aux" title="Hjelpelinje (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3.5"><path d="M5 19 19 5"/></svg>Hjelpelinje</button>
-    <button type="button" data-tool="rect" title="Rektangel (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rektangel</button>
-    <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
-    <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
-    <button type="button" data-tool="trim" title="Klipp bort biten du trykker på (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Klipp</button>
-    <button type="button" data-tool="measure" title="Målebånd: mål bitene mellom kryss og vinklene der streker krysser (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="2.5" y="5" width="13" height="13" rx="3"/><circle cx="9" cy="11.5" r="2.5"/><path d="M15.5 15H21v3h-5.5M18 15v1.5"/></svg>Målebånd</button>
-    <button type="button" data-tool="move" title="Flytt punkter og streker (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Flytt</button>
-    <button type="button" data-tool="free" title="Frihånd (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Frihånd</button>
-    <button type="button" data-tool="erase" title="Viskelær (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Visk</button>
+  <nav class="rail" aria-label="Tools">
+    <button type="button" data-tool="line" title="Line (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/></svg>Line</button>
+    <button type="button" data-tool="aux" title="Guide line (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3.5"><path d="M5 19 19 5"/></svg>Guide</button>
+    <button type="button" data-tool="rect" title="Rectangle (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rectangle</button>
+    <button type="button" data-tool="circle" title="Circle (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Circle</button>
+    <button type="button" data-tool="arc" title="Arc (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Arc</button>
+    <button type="button" data-tool="trim" title="Trim the piece you tap (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Trim</button>
+    <button type="button" data-tool="measure" title="Tape: measure the pieces between crossings and the angles where lines cross (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="2.5" y="5" width="13" height="13" rx="3"/><circle cx="9" cy="11.5" r="2.5"/><path d="M15.5 15H21v3h-5.5M18 15v1.5"/></svg>Tape</button>
+    <button type="button" data-tool="move" title="Move points and lines (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>
+    <button type="button" data-tool="free" title="Freehand (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Freehand</button>
+    <button type="button" data-tool="erase" title="Eraser (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Erase</button>
     <hr>
-    <button type="button" id="undoBtn" title="Angre (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Angre</button>
-    <button type="button" id="redoBtn" title="Gjør om (⇧⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg>Gjør om</button>
+    <button type="button" id="undoBtn" title="Undo (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Undo</button>
+    <button type="button" id="redoBtn" title="Redo (⇧⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg>Redo</button>
   </nav>
 
-  <aside class="panel" id="panel" aria-label="Valgt" hidden>
-    <div class="panel-bar"><h3>Valgt</h3><button type="button" class="panel-close" id="panelClose" aria-label="Lukk panelet">×</button></div>
+  <aside class="panel" id="panel" aria-label="Selected" hidden>
+    <div class="panel-bar"><h3>Selected</h3><button type="button" class="panel-close" id="panelClose" aria-label="Close panel">×</button></div>
     <div class="panel-scroll">
       <section class="sec" id="statusBox"></section>
       <section class="sec" id="selBox"></section>
     </div>
   </aside>
 
-  <div class="editor" id="editor" hidden><input id="edIn" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Nytt mål"><span id="edUnit"></span></div>
-  <div class="pickbar" id="pickbar" hidden><span id="pickText"></span><button type="button" id="pickCancel">Avbryt</button></div>
+  <div class="editor" id="editor" hidden><input id="edIn" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="New value"><span id="edUnit"></span></div>
+  <div class="pickbar" id="pickbar" hidden><span id="pickText"></span><button type="button" id="pickCancel">Cancel</button></div>
   <div class="toast" id="toast" role="status" hidden></div>
-  <div class="updatebar" id="updateBar" role="status" hidden><span id="updateText">Ny versjon av Snekkerblokk er klar.</span><button type="button" id="updateBtn">Oppdater</button></div>
+  <div class="updatebar" id="updateBar" role="status" hidden><span id="updateText">A new version of D-Rafter is ready.</span><button type="button" id="updateBtn">Update</button></div>
   <div class="badge" id="badge"></div>
 </div>
 
 <div class="overlay" id="helpOverlay" hidden>
   <div class="box help-box">
-    <div class="row"><strong>Slik bruker du Snekkerblokk</strong><button class="ctl" type="button" id="helpClose">Lukk</button></div>
+    <div class="row"><strong>How to use D-Rafter</strong><button class="ctl" type="button" id="helpClose">Close</button></div>
     <div class="help-scroll">
-        <p class="hint"><b>Penn-modus:</b> pennen tegner, fingeren flytter. Den slås på av seg selv første gang du bruker Apple Pencil, og kan slås av i menylinja. Fingeren drar punkter, mål og knotten på buer i alle verktøy. På tomt ark drar den arket, og to fingre zoomer. Et trykk velger. Hele streker og sirkler flytter du med <b>Flytt</b>.</p>
-        <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
-        <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i delelisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
-        <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
-        <p class="hint"><b>Målebånd:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. I panelet kan du feste målene på tegningen, så de blir stående og kommer med på utskriften, eller dele streken opp ved kryssene.</p>
-        <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
-        <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
-        <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
-        <p class="hint"><b>Regler</b> bestemmer hvordan ting henger sammen: vannrett, loddrett, parallell, vinkelrett, lik lengde, midt på. Velg en strek eller et punkt og trykk på en regel. Reglene holdes når du drar med Flytt.</p>
-        <p class="hint">Lengdene måles fra punkt til punkt langs streken. Ta hensyn til materialtykkelsen selv. Sagvinkler er regnet fra rett kapp (0°).</p>
+        <p class="hint"><b>Pencil mode:</b> the Pencil draws, your finger moves things. It turns on by itself the first time you use Apple Pencil, and can be turned off under Settings. Your finger drags points, dimensions and the handle on arcs in every tool. On empty paper it moves the sheet, and two fingers zoom. A tap selects. Whole lines and circles are moved with <b>Move</b>.</p>
+        <p class="hint"><b>Shapes:</b> Rectangle, Circle and Arc are drawn by dragging with the Pencil. An arc is dragged from end to end and gets a standard curve. Drag the handle in the middle of the arc with Move to adjust it by eye.</p>
+        <p class="hint"><b>Guide lines</b> are dashed and are left out of the parts list. Use them to anchor things, for example the centre of a circle. The Pencil snaps to the middle of a line when you see “mid”. Turn a regular line into a guide line in the panel, or press X.</p>
+        <p class="hint"><b>Trim:</b> tap the piece that sticks out, and it is trimmed at the nearest crossing with a line, circle or arc. The line gets new end points and correct dimensions. A circle becomes an arc. You can drag the Pencil across several pieces.</p>
+        <p class="hint"><b>Tape:</b> tap a line to see how long each piece is between crossings, and the angles where it crosses other lines. In the panel you can pin the dimensions to the drawing, so they stay and are printed, or split the line at the crossings.</p>
+        <p class="hint"><b>Dimension in the way?</b> Drag the dimension or angle wherever you want it, with Pencil or finger. Drag it back and it returns to its place. A short tap lets you type a new value.</p>
+        <p class="hint"><b>Change a dimension:</b> tap the number in the drawing and type the value you want. The dimension is locked and the line changes. Locked dimensions have a coloured background.</p>
+        <p class="hint"><b>Locked or free:</b> lines in the same colour as the text (black, or white in dark mode) are locked by dimensions and constraints. Blue lines can still move, as in Fusion.</p>
+        <p class="hint"><b>Constraints</b> decide how things relate: horizontal, vertical, parallel, perpendicular, equal length, midpoint. Select a line or a point and tap a constraint. Constraints hold while you drag with Move.</p>
+        <p class="hint">Lengths are measured point to point along the line. Allow for material thickness yourself. Saw angles are measured from a square cut (0°).</p>
         <p class="hint version" id="versionLine"></p>
     </div>
   </div>
 </div>
 <div class="overlay" id="imgOverlay" hidden>
   <div class="box">
-    <div class="row"><strong>Utskrift på A4</strong><button class="ctl" type="button" id="imgClose">Lukk</button></div>
-    <img id="imgOut" alt="Forhåndsvisning av A4-arket">
+    <div class="row"><strong>Print on A4</strong><button class="ctl" type="button" id="imgClose">Close</button></div>
+    <img id="imgOut" alt="Preview of the A4 sheet">
     <div class="row">
-      <p class="hint">På iPad: trykk Lagre PDF og velg «Skriv ut» eller «Arkiver i Filer».</p>
-      <div class="group"><button class="ctl" type="button" id="savePng">Lagre bilde</button><button class="ctl primary" type="button" id="savePdf">Lagre PDF</button></div>
+      <p class="hint">On iPad: tap Save PDF and choose Print or Save to Files.</p>
+      <div class="group"><button class="ctl" type="button" id="savePng">Save image</button><button class="ctl primary" type="button" id="savePdf">Save PDF</button></div>
     </div>
   </div>
 </div>
@@ -395,7 +395,7 @@ function flushSave() {
 }
 
 function sampleDoc() {
-  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] };
+  const d = { id: uid(), name: 'Example: shed gable', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] };
   const pts = { g0: [0, 0], g1: [240, 0], w0: [0, -200], w1: [240, -200], r: [120, -270] };
   for (const [k, [x, y]] of Object.entries(pts)) d.points[k] = { x, y };
   [['g0', 'g1'], ['g0', 'w0'], ['g1', 'w1'], ['w0', 'w1'], ['w0', 'r'], ['w1', 'r']]
@@ -406,7 +406,7 @@ function sampleDoc() {
   ];
   return d;
 }
-function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] }; }
+function blankDoc() { return { id: uid(), name: 'New drawing', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] }; }
 
 /* ---------- hjelpere ---------- */
 function nameFor(i) { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
@@ -462,10 +462,10 @@ function projSeg(p, a, b) {
   const x = a.x + tc * dx, y = a.y + tc * dy;
   return { t, x, y, d: Math.hypot(p.x - x, p.y - y) };
 }
-const nf1 = new Intl.NumberFormat('nb-NO', { maximumFractionDigits: 1 });
-const nfA = new Intl.NumberFormat('nb-NO', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const nf1 = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 1 });
+const nfA = new Intl.NumberFormat('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const unitName = () => settings.unit;
-function lenNum(cm) { return settings.unit === 'mm' ? Math.round(cm * 10).toLocaleString('nb-NO') : nf1.format(Math.round(cm * 10) / 10); }
+function lenNum(cm) { return settings.unit === 'mm' ? Math.round(cm * 10).toLocaleString('en-GB') : nf1.format(Math.round(cm * 10) / 10); }
 const fmtLen = cm => lenNum(cm) + ' ' + unitName();
 const fmtAng = d => nfA.format(Math.round(d * 10) / 10) + '°';
 const parseNum = s => parseFloat(String(s).replace(/\s/g, '').replace(',', '.'));
@@ -631,7 +631,7 @@ function nearPts(pids) {
 }
 function setRad(A, r) {
   const g = arcGeom(A);
-  if (!(r > g.chord / 2 + 1e-6)) { toast(`Radien må være større enn halve spennet (${fmtLen(g.chord / 2)}).`); return; }
+  if (!(r > g.chord / 2 + 1e-6)) { toast(`The radius must be larger than half the span (${fmtLen(g.chord / 2)}).`); return; }
   const before = snapshot();
   const c = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
   if (c) c.v = r; else doc.cons.push({ id: uid(), type: 'rad', arc: A.id, v: r });
@@ -639,7 +639,7 @@ function setRad(A, r) {
   const M = { x: (g.a.x + g.b.x) / 2, y: (g.a.y + g.b.y) / 2 }, ux = (g.b.x - g.a.x) / g.chord, uy = (g.b.y - g.a.y) / g.chord;
   const nx = -uy, ny = ux, side = Math.sign((g.c.x - M.x) * nx + (g.c.y - M.y) * ny) || 1, d = Math.sqrt(r * r - g.chord * g.chord / 4);
   Object.assign(P(A.c), { x: M.x + nx * d * side, y: M.y + ny * d * side });
-  if (!solveWithHold(new Set([A.a, A.b]), new Set([A.c]))) { restore(before); toast('Det går ikke: radien strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(new Set([A.a, A.b]), new Set([A.c]))) { restore(before); toast('Not possible: the radius conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 // dra punkter: prøv å holde dem der fingeren er; går ikke det, kommer de så nær som reglene tillater
@@ -713,7 +713,7 @@ function addConstraint(c, hold, quiet) {
   c.id = uid(); doc.cons.push(c);
   if (!solveWithHold(hold, new Set(consPoints(c)), [c.l, c.l2].filter(Boolean))) {
     restore(before);
-    if (!quiet) toast('Det går ikke: regelen strider mot regler som allerede finnes.');
+    if (!quiet) toast('Not possible: this constraint conflicts with existing ones.');
     requestRender(true); return false;
   }
   commit(before); return true;
@@ -721,22 +721,22 @@ function addConstraint(c, hold, quiet) {
 function removeCon(id) { const before = snapshot(); doc.cons = doc.cons.filter(c => c.id !== id); commit(before); }
 
 function setCircleR(c, r) {
-  if (!(r > 0)) { toast('Skriv inn et mål større enn null.'); return; }
+  if (!(r > 0)) { toast('Enter a value greater than zero.'); return; }
   const before = snapshot(); c.r = r;
-  if (!solveWithHold(new Set(), new Set([c.c]))) { restore(before); toast('Det går ikke: størrelsen strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(new Set(), new Set([c.c]))) { restore(before); toast('Not possible: the size conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 function setDim(c, v) {
-  if (!(v >= 0)) { toast('Skriv inn et mål på null eller mer.'); return; }
+  if (!(v >= 0)) { toast('Enter a value of zero or more.'); return; }
   const before = snapshot(), cc = doc.cons.find(x => x.id === c.id);
   cc.v = v;
   const hold = cc.type === 'pdist' ? linePts(cc.l) : new Set([cc.p2]);
-  if (!solveWithHold(hold, new Set([cc.p]))) { restore(before); toast('Det går ikke: målet strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(hold, new Set([cc.p]))) { restore(before); toast('Not possible: the dimension conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 function fixedEnd(l) { return degree(l.a) >= degree(l.b) ? ['a', 'b'] : ['b', 'a']; }
 function setLen(l, L) {
-  if (!(L > 0)) { toast('Skriv inn en lengde større enn null.'); return; }
+  if (!(L > 0)) { toast('Enter a length greater than zero.'); return; }
   const before = snapshot();
   const c = conOf('len', c => c.l === l.id);
   if (c) c.v = L; else doc.cons.push({ id: uid(), type: 'len', l: l.id, v: L });
@@ -746,11 +746,11 @@ function setLen(l, L) {
     const f = P(l[fk]), m = P(l[mk]), d = Math.hypot(m.x - f.x, m.y - f.y) || 1;
     m.x = f.x + (m.x - f.x) / d * L; m.y = f.y + (m.y - f.y) / d * L;
   }
-  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: lengden strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Not possible: the length conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 function setAng(l, v) {
-  if (!(v >= 0 && v <= 90)) { toast('Vinkelen må være mellom 0 og 90°.'); return; }
+  if (!(v >= 0 && v <= 90)) { toast('The angle must be between 0 and 90°.'); return; }
   const before = snapshot();
   doc.cons = doc.cons.filter(c => !(c.l === l.id && (c.type === 'h' || c.type === 'v' || c.type === 'ang')));
   const phi = rawAng(P(l.a), P(l.b));
@@ -762,11 +762,11 @@ function setAng(l, v) {
     const L = Math.hypot(m.x - f.x, m.y - f.y), dir = fk === 'a' ? np : np + 180;
     m.x = f.x + L * Math.cos(dir / DEG); m.y = f.y - L * Math.sin(dir / DEG);
   }
-  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: vinkelen strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Not possible: the angle conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 function setJoint(pid, l1, l2, v) {
-  if (!(v > 0 && v < 180)) { toast('Vinkelen må være mellom 0 og 180°.'); return; }
+  if (!(v > 0 && v < 180)) { toast('The angle must be between 0 and 180°.'); return; }
   const before = snapshot();
   let c = doc.cons.find(c => c.type === 'angle2' && c.p === pid && ((c.l === l1 && c.l2 === l2) || (c.l === l2 && c.l2 === l1)));
   if (c) { c.l = l1; c.l2 = l2; c.v = v; } else doc.cons.push({ id: uid(), type: 'angle2', p: pid, l: l1, l2, v });
@@ -779,7 +779,7 @@ function setJoint(pid, l1, l2, v) {
     const dir = swing === ob ? base + v / DEG : base - v / DEG;
     s.x = p.x + Ls * Math.cos(dir); s.y = p.y - Ls * Math.sin(dir);
   }
-  if (!solveWithHold(hold, linePts(l1, l2), [l1, l2])) { restore(before); toast('Det går ikke: vinkelen strider mot andre regler.'); requestRender(true); return; }
+  if (!solveWithHold(hold, linePts(l1, l2), [l1, l2])) { restore(before); toast('Not possible: the angle conflicts with other constraints.'); requestRender(true); return; }
   commit(before);
 }
 
@@ -1066,7 +1066,7 @@ function snapRing(g, p) {
   g.strokeStyle = C.select; g.lineWidth = 1.5;
   if (p.kind === 'mid') {
     g.beginPath(); g.moveTo(s.x, s.y - 8); g.lineTo(s.x + 7, s.y + 5); g.lineTo(s.x - 7, s.y + 5); g.closePath(); g.stroke();
-    drawParts(g, s.x, s.y - 20, 0, [{ text: 'midt', color: C.select }]);
+    drawParts(g, s.x, s.y - 20, 0, [{ text: 'mid', color: C.select }]);
     return;
   }
   g.beginPath(); g.arc(s.x, s.y, p.kind === 'point' ? 9 : 5, 0, Math.PI * 2); g.stroke();
@@ -1161,8 +1161,8 @@ function drawGlyphs(g, l, pairNo) {
   const glyphs = [];
   for (const c of doc.cons) {
     if (c.l !== l.id && c.l2 !== l.id) continue;
-    if (c.type === 'h') glyphs.push('vannrett');
-    else if (c.type === 'v') glyphs.push('loddrett');
+    if (c.type === 'h') glyphs.push('horizontal');
+    else if (c.type === 'v') glyphs.push('vertical');
     else if (c.type === 'par') glyphs.push('∥' + pairNo.get(c.id));
     else if (c.type === 'perp') glyphs.push('⊥' + pairNo.get(c.id));
     else if (c.type === 'eq') glyphs.push('=' + pairNo.get(c.id));
@@ -1312,14 +1312,14 @@ edIn.addEventListener('blur', () => closeEditor(true));
 
 /* ---------- velg strek nr. 2 for en regel ---------- */
 const PICK_TEXT = {
-  par: n => `Trykk på streken som skal være parallell med ${n}`,
-  perp: n => `Trykk på streken som skal stå vinkelrett på ${n}`,
-  eq: n => `Trykk på streken som skal være like lang som ${n}`,
-  mid: () => 'Trykk på streken punktet skal ligge midt på',
-  pdist: () => 'Trykk på streken du vil måle avstanden til',
-  ppdist: () => 'Trykk på punktet du vil måle avstanden til',
-  tan: n => `Trykk på streken sirkelen ${n} skal ligge inntil`,
-  online: () => 'Trykk på streken punktet skal ligge på'
+  par: n => `Tap the line that should be parallel to ${n}`,
+  perp: n => `Tap the line that should be perpendicular to ${n}`,
+  eq: n => `Tap the line that should be as long as ${n}`,
+  mid: () => 'Tap the line whose midpoint the point should sit on',
+  pdist: () => 'Tap the line to measure the distance to',
+  ppdist: () => 'Tap the point to measure the distance to',
+  tan: n => `Tap the line circle ${n} should touch`,
+  online: () => 'Tap the line the point should sit on'
 };
 function startPick(type) {
   if (!sel) return;
@@ -1336,12 +1336,12 @@ function openDimEditor(id) {
   const h = labelHits.find(h => h.hit.kind === 'dim' && h.hit.con === id);
   if (h) openEditor(h);
 }
-const DUP_MSG = 'Den regelen finnes allerede.';
+const DUP_MSG = 'That constraint already exists.';
 function handlePick(sp) {
   if (pick.type === 'ppdist') {
     const h = hitTest(sp.x, sp.y);
-    if (!h || h.type !== 'point') { toast('Trykk på et punkt, eller Avbryt.'); return; }
-    if (h.id === pick.p) { toast('Velg et annet punkt.'); return; }
+    if (!h || h.type !== 'point') { toast('Tap a point, or Cancel.'); return; }
+    if (h.id === pick.p) { toast('Choose another point.'); return; }
     if (doc.cons.some(c => c.type === 'ppdist' && ((c.p === pick.p && c.p2 === h.id) || (c.p === h.id && c.p2 === pick.p)))) { toast(DUP_MSG); endPick(); return; }
     const p = P(pick.p), q = P(h.id), c = { type: 'ppdist', p: pick.p, p2: h.id, v: Math.hypot(q.x - p.x, q.y - p.y) };
     endPick();
@@ -1349,7 +1349,7 @@ function handlePick(sp) {
     return;
   }
   const h = hitLine(sp.x, sp.y);
-  if (!h) { toast('Trykk på en strek, eller Avbryt.'); return; }
+  if (!h) { toast('Tap a line, or Cancel.'); return; }
   const target = lineById(h.id);
   if (doc.cons.some(c => c.type === pick.type && c.l === h.id && (pick.type === 'tan' ? c.circle === pick.circle : c.p === pick.p))) { toast(DUP_MSG); endPick(); return; }
   if (pick.type === 'tan') {
@@ -1359,18 +1359,18 @@ function handlePick(sp) {
     return;
   }
   if (pick.type === 'pdist') {
-    if (target.a === pick.p || target.b === pick.p) { toast('Punktet er et endepunkt på den streken. Velg en annen.'); return; }
+    if (target.a === pick.p || target.b === pick.p) { toast('The point is an end point of that line. Choose another.'); return; }
     const sd = sdist(P(pick.p), target), c = { type: 'pdist', p: pick.p, l: h.id, v: Math.abs(sd), side: Math.sign(sd) || 1 };
     endPick();
     if (addConstraint(c, new Set([target.a, target.b]))) openDimEditor(c.id);
     return;
   }
   if (pick.l) {
-    if (h.id === pick.l) { toast('Velg en annen strek.'); return; }
+    if (h.id === pick.l) { toast('Choose another line.'); return; }
     const src = lineById(pick.l);
     addConstraint({ type: pick.type, l: pick.l, l2: h.id }, new Set([src.a, src.b]));
   } else {
-    if (target.a === pick.p || target.b === pick.p) { toast('Punktet er et endepunkt på den streken. Velg en annen.'); return; }
+    if (target.a === pick.p || target.b === pick.p) { toast('The point is an end point of that line. Choose another.'); return; }
     addConstraint({ type: pick.type, p: pick.p, l: h.id }, new Set([target.a, target.b]));
   }
   endPick();
@@ -1592,23 +1592,23 @@ function drawMeasure(g, m = measure, active = true) {
 }
 function measureHTML() {
   const M = measureInfo();
-  if (!M) return `<h3>Målebånd</h3><p class="hint">Trykk på en strek, sirkel eller bue. Du får målet på hver bit mellom kryssene, og vinklene der streker krysser. Ingenting endres i tegningen før du ber om det.</p>`;
+  if (!M) return `<h3>Tape</h3><p class="hint">Tap a line, circle or arc. You get the length of each piece between crossings, and the angles where lines cross. Nothing in the drawing changes unless you ask.</p>`;
   const name = M.type === 'line' ? M.l.name : M.ent.name;
-  const what = M.type === 'line' ? 'Strek' : M.type === 'arc' ? 'Bue' : 'Sirkel';
-  const start = M.type === 'line' ? `<p class="hint">Fra ${endLabel(M.l, 'a').toLowerCase()}:</p>` : '';
-  const rows = M.pieces.map((pc, i) => `<dt>Bit ${i + 1}</dt><dd>${fmtLen(pc.len)}</dd>`).join('');
-  const angs = (M.angles || []).map(A => `<li>Mot ${esc(A.other.name)}: <span class="num">${fmtAng(A.acute)}</span> og <span class="num">${fmtAng(A.obtuse)}</span></li>`).join('');
+  const what = M.type === 'line' ? 'Line' : M.type === 'arc' ? 'Arc' : 'Circle';
+  const start = M.type === 'line' ? `<p class="hint">From the ${endLabel(M.l, 'a').toLowerCase()}:</p>` : '';
+  const rows = M.pieces.map((pc, i) => `<dt>Piece ${i + 1}</dt><dd>${fmtLen(pc.len)}</dd>`).join('');
+  const angs = (M.angles || []).map(A => `<li>With ${esc(A.other.name)}: <span class="num">${fmtAng(A.acute)}</span> and <span class="num">${fmtAng(A.obtuse)}</span></li>`).join('');
   const canSplit = M.type === 'circle' ? M.ss.length >= 2 : M.pieces.length > 1;
   const pinned = isPinned(measure);
-  return `<div class="sel-head"><span class="tag">${esc(name)}</span><span class="title">${what} målt</span></div>
-    ${M.pieces.length < 2 ? '<p class="hint">Ingen kryss på denne. Hele lengden:</p>' : start}
+  return `<div class="sel-head"><span class="tag">${esc(name)}</span><span class="title">${what} measured</span></div>
+    ${M.pieces.length < 2 ? '<p class="hint">No crossings on this one. Full length:</p>' : start}
     <dl class="facts">${rows}</dl>
-    ${angs ? `<h4>Vinkler der den krysser</h4><ul class="joints">${angs}</ul>` : ''}
+    ${angs ? `<h4>Angles where it crosses</h4><ul class="joints">${angs}</ul>` : ''}
     <div class="rules">
-      <button type="button" class="rule" data-act="pin" aria-pressed="${pinned}">${pinned ? 'Festet på tegningen' : 'Fest målene på tegningen'}</button>
-      ${canSplit ? `<button type="button" class="rule" data-act="split">Del opp ved kryssene</button>` : ''}
+      <button type="button" class="rule" data-act="pin" aria-pressed="${pinned}">${pinned ? 'Pinned to the drawing' : 'Pin dimensions to the drawing'}</button>
+      ${canSplit ? `<button type="button" class="rule" data-act="split">Split at crossings</button>` : ''}
     </div>
-    <p class="hint">${pinned ? 'Målene blir stående når du bytter verktøy, og kommer med på utskriften. Trykk igjen for å fjerne dem.' : 'Festede mål blir stående når du bytter verktøy, og kommer med på utskriften.'}</p>`;
+    <p class="hint">${pinned ? 'The dimensions stay when you switch tools, and are printed. Tap again to remove them.' : 'Pinned dimensions stay when you switch tools, and are printed.'}</p>`;
 }
 function measureAt(sp) {
   const h = hitLine(sp.x, sp.y) || hitShape(sp.x, sp.y);
@@ -1651,7 +1651,7 @@ function splitMeasured() {
   }
   measure = null;
   cleanup(); commit(before);
-  toast(`Delt i ${count} deler.`);
+  toast(`Split into ${count} parts.`);
 }
 
 /* ---------- peker ---------- */
@@ -1667,7 +1667,7 @@ canvas.addEventListener('pointerdown', e => {
     // første gang vi ser en Apple Pencil: slå på penn-modus (med mindre du har slått den av selv)
     if (settings.penMode === undefined) {
       settings.penMode = true; syncControls(); scheduleSave();
-      toast('Apple Pencil oppdaget: pennen tegner, fingeren flytter. Du kan slå av Penn-modus i menylinja.');
+      toast('Apple Pencil detected: the Pencil draws, your finger moves things. You can turn off Pencil mode under Settings.');
     }
   }
   const sp = spt(e);
@@ -1878,7 +1878,7 @@ function endPointer(e) {
       }
       if (a.shape === 'rect') {
         const x0 = a.start.x, y0 = a.start.y, x1 = a.end.x, y1 = a.end.y;
-        if (Math.abs(x1 - x0) < 0.1 || Math.abs(y1 - y0) < 0.1) { toast('Dra på skrå for å lage et rektangel.'); break; }
+        if (Math.abs(x1 - x0) < 0.1 || Math.abs(y1 - y0) < 0.1) { toast('Drag diagonally to make a rectangle.'); break; }
         const p0 = a.start.pid || addPoint(a.start), p2 = a.end.pid || addPoint(a.end);
         const p1 = addPoint({ x: x1, y: y0 }), p3 = addPoint({ x: x0, y: y1 });
         const ids = [];
@@ -1926,7 +1926,7 @@ function endPointer(e) {
     }
     case 'erase': case 'trim': cleanup(); commit(a.before); validateSel(); break;
     case 'dragPoint':
-      if (isFixed(a.pid) && Math.hypot(sp.x - a.s0.x, sp.y - a.s0.y) > 6) toast('Punktet er låst. Lås det opp i panelet for å flytte det.');
+      if (isFixed(a.pid) && Math.hypot(sp.x - a.s0.x, sp.y - a.s0.y) > 6) toast('The point is locked. Unlock it in the panel to move it.');
       if (a.target && a.target !== a.pid) { mergePoint(a.pid, a.target); sel = { type: 'point', id: a.target }; solve(); }
       validateSel(); commit(a.before); requestRender(true); break;
     case 'dragLine': case 'dragArc': case 'dragCircle': commit(a.before); requestRender(true); break;
@@ -1988,47 +1988,47 @@ const panel = $('#panel'), selBox = $('#selBox'), cutBox = $('#cutBox'), statusB
 function statusHTML() {
   if (!doc.lines.length && !doc.arcs.length && !doc.circles.length) return '';
   const d = computeDof();
-  if (d.dof === 0) return '<div class="status done"><i></i><span><b>Fullt bestemt.</b> Mål og regler låser hele tegningen.</span></div>';
-  if (!doc.cons.length) return '<div class="status"><i></i><span><b>Ingenting er låst ennå.</b> Blå streker kan flytte seg. Legg til mål og regler for å låse dem.</span></div>';
-  const tip = !fixedPts().size ? ' Lås posisjonen til ett punkt, ellers kan hele tegningen flytte seg.' : ' Lås flere mål for å låse dem.';
-  return `<div class="status"><i></i><span><b>${d.dof} ${d.dof === 1 ? 'frihetsgrad' : 'frihetsgrader'} igjen.</b> Blå streker kan fortsatt flytte seg.${tip}</span></div>`;
+  if (d.dof === 0) return '<div class="status done"><i></i><span><b>Fully defined.</b> Dimensions and constraints lock the whole drawing.</span></div>';
+  if (!doc.cons.length) return '<div class="status"><i></i><span><b>Nothing is locked yet.</b> Blue lines can move. Add dimensions and constraints to lock them.</span></div>';
+  const tip = !fixedPts().size ? ' Lock the position of one point, or the whole drawing can move.' : ' Lock more dimensions to lock them.';
+  return `<div class="status"><i></i><span><b>${d.dof} ${d.dof === 1 ? 'degree of freedom' : 'degrees of freedom'} left.</b> Blue lines can still move.${tip}</span></div>`;
 }
 function endLabel(l, end) {
   const a = P(l.a), b = P(l.b), me = end === 'a' ? a : b, other = end === 'a' ? b : a;
-  if (Math.abs(b.x - a.x) >= Math.abs(b.y - a.y)) return me.x <= other.x ? 'Venstre ende' : 'Høyre ende';
-  return me.y >= other.y ? 'Nedre ende' : 'Øvre ende';
+  if (Math.abs(b.x - a.x) >= Math.abs(b.y - a.y)) return me.x <= other.x ? 'Left end' : 'Right end';
+  return me.y >= other.y ? 'Bottom end' : 'Top end';
 }
 function describe(c, fromLine) {
   const nm = id => esc(lineById(id).name);
   const other = c.l === fromLine ? c.l2 : c.l;
   switch (c.type) {
-    case 'h': return 'Vannrett';
-    case 'v': return 'Loddrett';
-    case 'len': return 'Lengden er låst: ' + fmtLen(c.v);
-    case 'ang': { let t = Math.abs(c.v); if (t > 90) t = 180 - t; return 'Vinkelen er låst: ' + fmtAng(t); }
-    case 'par': return 'Parallell med ' + nm(other);
-    case 'perp': return 'Vinkelrett på ' + nm(other);
-    case 'eq': return 'Like lang som ' + nm(other);
-    case 'angle2': return `${nm(c.l)} og ${nm(c.l2)} er låst til ${fmtAng(c.v)}`;
-    case 'fix': return 'Posisjonen er låst';
-    case 'online': return 'Ligger på ' + nm(c.l);
-    case 'mid': return 'Ligger midt på ' + nm(c.l);
-    case 'rad': return 'Radius låst: ' + fmtLen(c.v);
-    case 'pdist': return 'Avstand til ' + nm(c.l);
-    case 'ppdist': return 'Avstand mellom punkter';
-    case 'tan': return 'Ligger inntil ' + nm(c.l);
+    case 'h': return 'Horizontal';
+    case 'v': return 'Vertical';
+    case 'len': return 'Length locked: ' + fmtLen(c.v);
+    case 'ang': { let t = Math.abs(c.v); if (t > 90) t = 180 - t; return 'Angle locked: ' + fmtAng(t); }
+    case 'par': return 'Parallel to ' + nm(other);
+    case 'perp': return 'Perpendicular to ' + nm(other);
+    case 'eq': return 'Same length as ' + nm(other);
+    case 'angle2': return `${nm(c.l)} and ${nm(c.l2)} locked at ${fmtAng(c.v)}`;
+    case 'fix': return 'Position locked';
+    case 'online': return 'On ' + nm(c.l);
+    case 'mid': return 'Midpoint of ' + nm(c.l);
+    case 'rad': return 'Radius locked: ' + fmtLen(c.v);
+    case 'pdist': return 'Distance to ' + nm(c.l);
+    case 'ppdist': return 'Distance between points';
+    case 'tan': return 'Touches ' + nm(c.l);
   }
 }
 function rulesList(cons, fromLine) {
-  if (!cons.length) return '<p class="hint">Ingen regler ennå.</p>';
+  if (!cons.length) return '<p class="hint">No constraints yet.</p>';
   return '<ul class="active-rules">' + cons.map(c => `<li><span>${describe(c, fromLine)}</span>${c.type === 'pdist' || c.type === 'ppdist'
-    ? `<input class="dim-in" inputmode="decimal" data-dim="${esc(c.id)}" value="${inputLen(c.v)}" aria-label="Avstand"><em class="dim-unit">${unitName()}</em>` : ''}<button type="button" data-del-con="${esc(c.id)}" aria-label="Fjern regelen">×</button></li>`).join('') + '</ul>';
+    ? `<input class="dim-in" inputmode="decimal" data-dim="${esc(c.id)}" value="${inputLen(c.v)}" aria-label="Avstand"><em class="dim-unit">${unitName()}</em>` : ''}<button type="button" data-del-con="${esc(c.id)}" aria-label="Remove constraint">×</button></li>`).join('') + '</ul>';
 }
 const ruleBtn = (rule, label, on, glyph) => `<button type="button" class="rule" data-rule="${rule}" aria-pressed="${!!on}">${glyph ? `<b>${glyph}</b>` : ''}${label}</button>`;
 
 function selHTML() {
   if (settings.tool === 'measure') return measureHTML();
-  if (!sel) return `<h3>Valgt</h3><p class="hint">Trykk på en strek eller et punkt for å se og endre mål, vinkler og regler.</p>`;
+  if (!sel) return `<h3>Selected</h3><p class="hint">Tap a line or a point to see and change dimensions, angles and constraints.</p>`;
   if (sel.type === 'line') {
     const l = lineById(sel.id), L = lenOf(l), t = acuteAng(l), a = P(l.a), b = P(l.b);
     const dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
@@ -2036,10 +2036,10 @@ function selHTML() {
     let facts = '';
     if (!isAxis(t)) {
       facts = `<dl class="facts">
-        <dt>Høyde × bredde</dt><dd>${lenNum(dy)} × ${lenNum(dx)} ${unitName()}</dd>
-        <dt>Stigning</dt><dd>${lenNum(Math.tan(t / DEG) * 100)} ${unitName()} per meter</dd>
-        <dt>Loddrett kapp</dt><dd class="saw">sag på ${fmtAng(t)}</dd>
-        <dt>Vannrett kapp</dt><dd class="saw">sag på ${fmtAng(90 - t)}</dd>
+        <dt>Height × width</dt><dd>${lenNum(dy)} × ${lenNum(dx)} ${unitName()}</dd>
+        <dt>Slope</dt><dd>${lenNum(Math.tan(t / DEG) * 100)} ${unitName()} per metre</dd>
+        <dt>Plumb cut</dt><dd class="saw">set saw to ${fmtAng(t)}</dd>
+        <dt>Level cut</dt><dd class="saw">set saw to ${fmtAng(90 - t)}</dd>
       </dl>`;
     }
     let joints = '';
@@ -2050,68 +2050,68 @@ function selHTML() {
         // en T-skjøt gir samme vinkel på begge sider; vis den bare én gang
         const jk = end + o.id + j.deg.toFixed(1);
         if (seenJ.has(jk)) continue; seenJ.add(jk);
-        const miterTxt = j.deg >= 89.95 ? `<br>Gjæring: sag på <span class="num">${fmtAng(90 - j.deg / 2)}</span> på begge` : '';
-        joints += `<li><b>${endLabel(l, end)}</b> mot ${esc(o.name)}: <span class="num">${fmtAng(j.deg)}</span>${miterTxt}</li>`;
+        const miterTxt = j.deg >= 89.95 ? `<br>Mitre: set saw to <span class="num">${fmtAng(90 - j.deg / 2)}</span> on both` : '';
+        joints += `<li><b>${endLabel(l, end)}</b> to ${esc(o.name)}: <span class="num">${fmtAng(j.deg)}</span>${miterTxt}</li>`;
       }
     }
-    return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">${l.aux ? 'Hjelpelinje' : 'Strek'}</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
-      <label class="field"><span>Lengde</span><span class="inbox"><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em></span>
-        <button type="button" class="lock" data-lock="len" aria-pressed="${has('len')}" aria-label="Lås lengden">${LOCK_SVG}</button></label>
-      <label class="field"><span>Vinkel mot vannrett</span><span class="inbox"><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em></span>
-        <button type="button" class="lock" data-lock="ang" aria-pressed="${has('ang')}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>
+    return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">${l.aux ? 'Guide line' : 'Line'}</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
+      <label class="field"><span>Length</span><span class="inbox"><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em></span>
+        <button type="button" class="lock" data-lock="len" aria-pressed="${has('len')}" aria-label="Lock length">${LOCK_SVG}</button></label>
+      <label class="field"><span>Angle from horizontal</span><span class="inbox"><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em></span>
+        <button type="button" class="lock" data-lock="ang" aria-pressed="${has('ang')}" aria-label="Lock angle">${LOCK_SVG}</button></label>
       ${facts}
-      <h4>Regler</h4>
+      <h4>Constraints</h4>
       <div class="rules">
-        ${ruleBtn('h', 'Vannrett', has('h'))}${ruleBtn('v', 'Loddrett', has('v'))}
-        ${ruleBtn('aux', 'Hjelpelinje', !!l.aux, '┄')}${ruleBtn('par', 'Parallell med …', false, '∥')}${ruleBtn('perp', 'Vinkelrett på …', false, '⊥')}${ruleBtn('eq', 'Like lang som …', false, '=')}
+        ${ruleBtn('h', 'Horizontal', has('h'))}${ruleBtn('v', 'Vertical', has('v'))}
+        ${ruleBtn('aux', 'Guide line', !!l.aux, '┄')}${ruleBtn('par', 'Parallel to …', false, '∥')}${ruleBtn('perp', 'Perpendicular to …', false, '⊥')}${ruleBtn('eq', 'Same length as …', false, '=')}
       </div>
       ${rulesList(lineCons(l.id), l.id)}
-      ${joints ? `<h4>Skjøter</h4><ul class="joints">${joints}</ul>` : ''}`;
+      ${joints ? `<h4>Joints</h4><ul class="joints">${joints}</ul>` : ''}`;
   }
   if (sel.type === 'arc') {
     const A = arcById(sel.id), G = arcGeom(A), locked = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
-    return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">Bue</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+    return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">Arc</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
       <label class="field"><span>Radius</span><span class="inbox"><input id="inRad" inputmode="decimal" value="${inputLen(G.r)}"><em>${unitName()}</em></span>
-        <button type="button" class="lock" data-lock-rad="1" aria-pressed="${!!locked}" aria-label="Lås radien">${LOCK_SVG}</button></label>
+        <button type="button" class="lock" data-lock-rad="1" aria-pressed="${!!locked}" aria-label="Lock radius">${LOCK_SVG}</button></label>
       <dl class="facts">
-        <dt>Spenn</dt><dd>${fmtLen(G.chord)}</dd>
-        <dt>Pilhøyde</dt><dd>${fmtLen(G.sag)}</dd>
-        <dt>Buelengde</dt><dd>${fmtLen(G.len)}</dd>
-        <dt>Vinkel</dt><dd>${fmtAng(G.span * DEG)}</dd>
+        <dt>Span</dt><dd>${fmtLen(G.chord)}</dd>
+        <dt>Rise</dt><dd>${fmtLen(G.sag)}</dd>
+        <dt>Arc length</dt><dd>${fmtLen(G.len)}</dd>
+        <dt>Angle</dt><dd>${fmtAng(G.span * DEG)}</dd>
       </dl>
-      <p class="hint">Med Flytt kan du dra i den runde knotten midt på buen for å gjøre den flatere eller rundere. Endepunktene står stille.</p>
-      <p class="hint">Merke opp: sett en spiker i sentrum og bruk en snor eller lekt på ${fmtLen(G.r)}.</p>`;
+      <p class="hint">With Move you can drag the round handle in the middle of the arc to make it flatter or rounder. The end points stay put.</p>
+      <p class="hint">To mark it out: put a nail at the centre and use a string or batten of ${fmtLen(G.r)}.</p>`;
   }
   if (sel.type === 'circle') {
     const c = circById(sel.id);
-    return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">Sirkel</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
+    return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">Circle</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
       <label class="field"><span>Diameter</span><span class="inbox"><input id="inDia" inputmode="decimal" value="${inputLen(2 * c.r)}"><em>${unitName()}</em></span><span></span></label>
-      <dl class="facts"><dt>Radius</dt><dd>${fmtLen(c.r)}</dd><dt>Omkrets</dt><dd>${fmtLen(2 * Math.PI * c.r)}</dd></dl>
-      <h4>Regler</h4>
-      <div class="rules">${ruleBtn('pdist', 'Avstand fra sentrum til strek …', false, '↔')}${ruleBtn('ppdist', 'Avstand til punkt …', false, '↔')}${ruleBtn('tan', 'Ligger inntil strek …')}${ruleBtn('fix', 'Lås sentrum', isFixed(c.c))}</div>
+      <dl class="facts"><dt>Radius</dt><dd>${fmtLen(c.r)}</dd><dt>Circumference</dt><dd>${fmtLen(2 * Math.PI * c.r)}</dd></dl>
+      <h4>Constraints</h4>
+      <div class="rules">${ruleBtn('pdist', 'Distance from centre to line …', false, '↔')}${ruleBtn('ppdist', 'Distance to point …', false, '↔')}${ruleBtn('tan', 'Touches line …')}${ruleBtn('fix', 'Lock centre', isFixed(c.c))}</div>
       ${rulesList(doc.cons.filter(x => x.circle === c.id || x.p === c.c || x.p2 === c.c))}
-      <p class="hint">Med Flytt: dra i kanten for å endre størrelsen, eller i krysset i midten for å flytte sirkelen.</p>`;
+      <p class="hint">With Move: drag the edge to resize, or the cross in the middle to move the circle.</p>`;
   }
   const pid = sel.id, gs = gaps(pid);
   const angleFields = gs.map(j => j.editable
-    ? `<label class="field joint"><span>Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}</span><span class="inbox"><input inputmode="decimal" data-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" value="${inputAng(j.deg)}"><em>°</em></span>
-        <button type="button" class="lock" data-lock-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" aria-pressed="${j.locked}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>`
-    : `<p class="hint">Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}: ${fmtAng(j.deg)}</p>`).join('');
+    ? `<label class="field joint"><span>Between ${esc(j.u.line.name)} and ${esc(j.v.line.name)}</span><span class="inbox"><input inputmode="decimal" data-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" value="${inputAng(j.deg)}"><em>°</em></span>
+        <button type="button" class="lock" data-lock-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" aria-pressed="${j.locked}" aria-label="Lock angle">${LOCK_SVG}</button></label>`
+    : `<p class="hint">Between ${esc(j.u.line.name)} and ${esc(j.v.line.name)}: ${fmtAng(j.deg)}</p>`).join('');
   const pc = doc.cons.filter(c => c.p === pid || c.p2 === pid);
-  return `<div class="sel-head"><span class="tag">•</span><span class="title">Punkt</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
-    ${angleFields || '<p class="hint">Ingen vinkler her ennå. Tegn en strek til fra dette punktet.</p>'}
-    <h4>Regler</h4>
-    <div class="rules">${ruleBtn('fix', 'Lås posisjon', isFixed(pid))}${ruleBtn('mid', 'Midt på …')}${ruleBtn('online', 'På streken …')}${ruleBtn('pdist', 'Avstand til strek …', false, '↔')}${ruleBtn('ppdist', 'Avstand til punkt …', false, '↔')}</div>
+  return `<div class="sel-head"><span class="tag">•</span><span class="title">Point</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
+    ${angleFields || '<p class="hint">No angles here yet. Draw another line from this point.</p>'}
+    <h4>Constraints</h4>
+    <div class="rules">${ruleBtn('fix', 'Lock position', isFixed(pid))}${ruleBtn('mid', 'Midpoint of …')}${ruleBtn('online', 'On line …')}${ruleBtn('pdist', 'Distance to line …', false, '↔')}${ruleBtn('ppdist', 'Distance to point …', false, '↔')}</div>
     ${rulesList(pc)}`;
 }
 function shapesHTML() {
-  const rows = doc.arcs.map(A => { const G = arcGeom(A); return `<tr><td class="n">${esc(A.name)}</td><td>Bue</td><td class="l">R ${fmtLen(G.r)}</td><td class="l">spenn ${fmtLen(G.chord)}<br>pil ${fmtLen(G.sag)}</td></tr>`; })
-    .concat(doc.circles.map(c => `<tr><td class="n">${esc(c.name)}</td><td>Sirkel</td><td class="l">Ø ${fmtLen(2 * c.r)}</td><td></td></tr>`));
-  return rows.length ? `<table class="cut" style="margin-top:12px"><thead><tr><th></th><th>Form</th><th>Mål</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '';
+  const rows = doc.arcs.map(A => { const G = arcGeom(A); return `<tr><td class="n">${esc(A.name)}</td><td>Arc</td><td class="l">R ${fmtLen(G.r)}</td><td class="l">span ${fmtLen(G.chord)}<br>rise ${fmtLen(G.sag)}</td></tr>`; })
+    .concat(doc.circles.map(c => `<tr><td class="n">${esc(c.name)}</td><td>Circle</td><td class="l">Ø ${fmtLen(2 * c.r)}</td><td></td></tr>`));
+  return rows.length ? `<table class="cut" style="margin-top:12px"><thead><tr><th></th><th>Shape</th><th>Size</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '';
 }
 function cutHTML() {
   const lines = doc.lines.filter(l => !l.aux);
-  if (!lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Tegn streker med pennen, så kommer lengdene her.</p>';
+  if (!lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Draw lines with the Pencil and their lengths show up here.</p>';
   const groups = new Map();
   let total = 0;
   for (const l of lines) {
@@ -2122,8 +2122,8 @@ function cutHTML() {
   }
   const rows = [...groups.values()].sort((a, b) => b.L - a.L).map(g =>
     `<tr><td class="n">${g.names.length}×</td><td class="l">${fmtLen(g.L)}</td><td class="a">${isAxis(g.t) ? '' : fmtAng(g.t)}</td><td class="names">${g.names.map(esc).join(' ')}</td></tr>`).join('');
-  return `<table class="cut"><thead><tr><th>Ant.</th><th>Lengde</th><th>Vinkel</th><th>Streker</th></tr></thead><tbody>${rows}</tbody>
-    <tfoot><tr><td colspan="4">Sum ${nf1.format(Math.round(total) / 100)} løpemeter, ${lines.length} streker</td></tr></tfoot></table>${shapesHTML()}`;
+  return `<table class="cut"><thead><tr><th>Qty</th><th>Length</th><th>Angle</th><th>Lines</th></tr></thead><tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="4">Total ${nf1.format(Math.round(total) / 100)} m of material, ${lines.length} lines</td></tr></tfoot></table>${shapesHTML()}`;
 }
 function updatePanel() {
   const ae = document.activeElement;
@@ -2177,7 +2177,7 @@ function toggleAux(l) {
   const before = snapshot();
   if (l.aux) delete l.aux; else l.aux = true;
   commit(before);
-  toast(l.aux ? `${l.name} er nå en hjelpelinje. Den er ikke med i delelisten.` : `${l.name} er nå en vanlig strek.`);
+  toast(l.aux ? `${l.name} is now a guide line. It is left out of the parts list.` : `${l.name} is now a regular line.`);
 }
 function ruleClick(rule) {
   if (sel.type === 'circle') {
@@ -2196,7 +2196,7 @@ function ruleClick(rule) {
       doc.cons = doc.cons.filter(c => !(c.l === l.id && (c.type === 'h' || c.type === 'v' || c.type === 'ang')));
       const [fk] = fixedEnd(l);
       doc.cons.push({ id: uid(), type: rule, l: l.id });
-      if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Det går ikke: regelen strider mot regler som allerede finnes.'); requestRender(true); return; }
+      if (!solveWithHold(new Set([l[fk]]), linePts(l.id), [l.id])) { restore(before); toast('Not possible: this constraint conflicts with existing ones.'); requestRender(true); return; }
       commit(before);
     } else startPick(rule);
   } else {
@@ -2214,12 +2214,12 @@ function updateRail() {
   document.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === settings.tool)));
   $('#undoBtn').disabled = !undoStack.length; $('#redoBtn').disabled = !redoStack.length;
   canvas.style.cursor = spaceDown ? 'grab' : pick ? 'pointer' : settings.tool === 'move' ? 'default' : 'crosshair';
-  $('#badge').textContent = `1 rute = ${fmtLen(doc.rute)} · ${Math.round(view.z * 100)} %`;
+  $('#badge').textContent = `1 square = ${fmtLen(doc.rute)} · ${Math.round(view.z * 100)} %`;
 }
 $('#snapBtn').addEventListener('click', () => { settings.snap = !settings.snap; syncControls(); scheduleSave(); });
 $('#penBtn').addEventListener('click', () => {
   settings.penMode = !settings.penMode; syncControls(); scheduleSave();
-  toast(settings.penMode ? 'Penn-modus på: pennen tegner, fingeren flytter.' : 'Penn-modus av: fingeren tegner også.');
+  toast(settings.penMode ? 'Pencil mode on: the Pencil draws, your finger moves things.' : 'Pencil mode off: your finger draws too.');
   requestRender();
 });
 $('#autoBtn').addEventListener('click', () => { settings.auto = !settings.auto; syncControls(); scheduleSave(); });
@@ -2241,10 +2241,10 @@ function syncControls() {
   $('#unitSel').value = settings.unit;
   $('#ruteSel').value = String(doc.rute);
   if (document.activeElement !== $('#nameIn')) $('#nameIn').value = doc.name;
-  $('#docTitle').textContent = doc.name || 'Uten navn';
+  $('#docTitle').textContent = doc.name || 'Untitled';
   const list = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
   if (!store.drawings[doc.id]) list.unshift(doc);
-  $('#drawList').innerHTML = list.map(d => `<button class="menu-item" type="button" data-doc="${esc(d.id)}" aria-current="${d.id === doc.id}">${esc(d.name || 'Uten navn')}</button>`).join('');
+  $('#drawList').innerHTML = list.map(d => `<button class="menu-item" type="button" data-doc="${esc(d.id)}" aria-current="${d.id === doc.id}">${esc(d.name || 'Untitled')}</button>`).join('');
 }
 /* ---------- menyer i menylinja ---------- */
 function closeMenus(except) {
@@ -2277,13 +2277,13 @@ function openDoc(d) {
   syncControls();
   if (d.view) { view = { ...d.view }; requestRender(true); } else fitView();
 }
-$('#nameIn').addEventListener('input', e => { doc.name = e.target.value; $('#docTitle').textContent = doc.name || 'Uten navn'; scheduleSave(); });
+$('#nameIn').addEventListener('input', e => { doc.name = e.target.value; $('#docTitle').textContent = doc.name || 'Untitled'; scheduleSave(); });
 $('#nameIn').addEventListener('change', () => { flushSave(); syncControls(); });
 let delArm = null;
 $('#delDraw').addEventListener('click', e => {
   const b = e.currentTarget;
-  if (!delArm) { b.textContent = 'Trykk igjen for å slette «' + (doc.name || 'Uten navn') + '»'; delArm = setTimeout(() => { delArm = null; b.textContent = 'Slett tegningen'; }, 3000); return; }
-  clearTimeout(delArm); delArm = null; b.textContent = 'Slett tegningen'; closeMenus();
+  if (!delArm) { b.textContent = 'Tap again to delete “' + (doc.name || 'Untitled') + '”'; delArm = setTimeout(() => { delArm = null; b.textContent = 'Delete drawing'; }, 3000); return; }
+  clearTimeout(delArm); delArm = null; b.textContent = 'Delete drawing'; closeMenus();
   delete store.drawings[doc.id];
   const rest = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
   openDoc(rest.length ? JSON.parse(JSON.stringify(rest[0])) : blankDoc());
@@ -2291,15 +2291,15 @@ $('#delDraw').addEventListener('click', e => {
 });
 
 /* ---------- fil ---------- */
-const FILE_EXT = '.snekkerblokk.json';
-const safeName = n => (n || '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 60) || 'tegning';
+const FILE_EXT = '.d-rafter.json';
+const safeName = n => (n || '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 60) || 'drawing';
 async function saveBlob(name, blob, what) {
   const file = new File([blob], name, { type: blob.type });
   try {
     // inne i Claude: lagring går via Claude sin egen bekreftelse
     if (downloadsApi) {
       await downloadsApi.save({ filename: name, data: blob });
-      toast(what + ' er lagret som ' + name + '.');
+      toast(what + ' saved as ' + name + '.');
       return;
     }
     // på iPad: delingsarket, med «Arkiver i Filer» og «Skriv ut»
@@ -2310,17 +2310,17 @@ async function saveBlob(name, blob, what) {
     const url = URL.createObjectURL(file), a = document.createElement('a');
     a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    toast(what + ' er lagret som ' + name + '.');
+    toast(what + ' saved as ' + name + '.');
   } catch (e) {
     if (e && (e.name === 'AbortError' || e.code === 'declined')) return;
-    toast('Kunne ikke lagre filen her. Bruk Snekkerblokk-appen på Hjem-skjermen.');
+    toast('Could not save the file here. Use the D-Rafter app on your Home Screen.');
   }
 }
 $('#saveFile').addEventListener('click', () => {
   closeMenus(); flushSave();
   const d = JSON.parse(JSON.stringify(doc)); delete d.view;
-  const json = JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d });
-  saveBlob(safeName(doc.name) + FILE_EXT, new Blob([json], { type: 'application/json' }), 'Tegningen');
+  const json = JSON.stringify({ app: 'D-Rafter', format: 1, saved: new Date().toISOString(), drawing: d });
+  saveBlob(safeName(doc.name) + FILE_EXT, new Blob([json], { type: 'application/json' }), 'The drawing');
 });
 let downloadsApi = null;
 if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloadsApi = d; }).catch(() => {});
@@ -2332,12 +2332,12 @@ $('#fileIn').addEventListener('change', async e => {
     const o = JSON.parse(await f.text()), d = o.drawing || o;
     if (!d || typeof d.points !== 'object' || !Array.isArray(d.lines)) throw new Error('format');
     flushSave();
-    d.id = uid(); d.updated = Date.now(); d.rute = d.rute || 10; d.name = d.name || f.name.replace(/\.snekkerblokk\.json$|\.json$/, '');
+    d.id = uid(); d.updated = Date.now(); d.rute = d.rute || 10; d.name = d.name || f.name.replace(/\.(d-rafter|snekkerblokk)\.json$|\.json$/, '');
     delete d.view;
     openDoc(d); flushSave(); syncControls();
-    toast('Åpnet «' + d.name + '».');
+    toast('Opened “' + d.name + '”.');
   } catch (err) {
-    toast('Filen kunne ikke åpnes. Er det en fil lagret fra Snekkerblokk?');
+    toast('The file could not be opened. Is it a file saved from D-Rafter?');
   }
 });
 
@@ -2371,12 +2371,12 @@ function makePrintPage() {
   const tx = M + logo + 4 * mm;
   g.textBaseline = 'alphabetic'; g.textAlign = 'left';
   g.fillStyle = C['ink-soft']; g.font = `600 ${3 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
-  g.fillText('SNEKKERBLOKK', tx, M + 4 * mm);
+  g.fillText('D-RAFTER', tx, M + 4 * mm);
   g.fillStyle = C.ink; g.font = `700 ${7 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
-  let title = doc.name || 'Uten navn';
+  let title = doc.name || 'Untitled';
   const maxW = PW - tx - M - 60 * mm;
   while (g.measureText(title).width > maxW && title.length > 4) title = title.slice(0, -2);
-  if (title !== (doc.name || 'Uten navn')) title += '…';
+  if (title !== (doc.name || 'Untitled')) title += '…';
   g.fillText(title, tx, M + 11.5 * mm);
   // innhold i rammen
   const fx = M, fy = M + headH, fw = PW - 2 * M, fh = PH - M - fy, rad = 5 * mm, S = 2.4;
@@ -2395,10 +2395,10 @@ function makePrintPage() {
   // høyre side av topptekst: dato, rute og målestokk
   const ratio = Math.round(10 / (PX_PER_CM * view.z * S / mm));
   g.textAlign = 'right'; g.fillStyle = C.ink; g.font = `500 ${3.6 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
-  g.fillText(new Date().toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }), PW - M, M + 5 * mm);
+  g.fillText(new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), PW - M, M + 5 * mm);
   g.fillStyle = C['ink-soft']; g.font = `400 ${3.2 * mm}px "IBM Plex Mono", ui-monospace, monospace`;
-  g.fillText(`1 rute = ${fmtLen(doc.rute)}${F ? ' · målestokk ca. 1:' + ratio : ''}`, PW - M, M + 10.5 * mm);
-  g.fillText(`Mål i ${unitName()}`, PW - M, M + 15 * mm);
+  g.fillText(`1 square = ${fmtLen(doc.rute)}${F ? ' · scale approx. 1:' + ratio : ''}`, PW - M, M + 10.5 * mm);
+  g.fillText(`Dimensions in ${unitName()}`, PW - M, M + 15 * mm);
   Object.assign(C, savedC); view = savedView; sel = savedSel;
   return { cv, landscape };
 }
@@ -2438,12 +2438,12 @@ $('#savePdf').addEventListener('click', async () => {
   if (!printPage) return;
   const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/jpeg', 0.92));
   const pdf = pdfFromJpeg(new Uint8Array(await blob.arrayBuffer()), printPage.cv.width, printPage.cv.height, printPage.landscape);
-  saveBlob(safeName(doc.name) + '.pdf', new Blob([pdf], { type: 'application/pdf' }), 'Utskriften');
+  saveBlob(safeName(doc.name) + '.pdf', new Blob([pdf], { type: 'application/pdf' }), 'The print');
 });
 $('#savePng').addEventListener('click', async () => {
   if (!printPage) return;
   const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/png'));
-  saveBlob(safeName(doc.name) + '.png', blob, 'Bildet');
+  saveBlob(safeName(doc.name) + '.png', blob, 'The image');
 });
 $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true; });
 
@@ -2451,10 +2451,10 @@ $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true;
 const APP_VERSION = window.SNEKKERBLOKK_VERSION || null;
 if (APP_VERSION) {
   const vt = $('#versionTag');
-  vt.innerHTML = `<b>Versjon ${esc(APP_VERSION.id)}</b>${esc(APP_VERSION.label)}`;
+  vt.innerHTML = `<b>Version ${esc(APP_VERSION.id)}</b>${esc(APP_VERSION.label)}`;
   vt.hidden = false;
-  $('#versionLine').textContent = `Versjon ${APP_VERSION.label} (${APP_VERSION.id})`;
-} else $('#versionLine').textContent = 'Versjon i Claude';
+  $('#versionLine').textContent = `Version ${APP_VERSION.label} (${APP_VERSION.id})`;
+} else $('#versionLine').textContent = 'Version in Claude';
 // kalles fra service worker-koden når en ny versjon er lastet ned i bakgrunnen
 window.snekkerblokkUpdateReady = () => { $('#updateBar').hidden = false; };
 $('#updateBtn').addEventListener('click', async () => {
@@ -2470,7 +2470,7 @@ async function checkForUpdate() {
     if (!r.ok) return;
     const v = await r.json();
     if (v.id && v.id !== APP_VERSION.id) {
-      $('#updateText').textContent = `Ny versjon av Snekkerblokk er klar (${v.id}).`;
+      $('#updateText').textContent = `A new version of D-Rafter is ready (${v.id}).`;
       $('#updateBar').hidden = false;
     }
   } catch (e) {}

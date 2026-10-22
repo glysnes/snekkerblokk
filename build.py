@@ -20,13 +20,13 @@ SRC = ROOT / 'src' / 'snekkerblokk.html'
 OUT = ROOT / 'docs'
 
 HEAD = """<!doctype html>
-<html lang="nb">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Snekkerblokk">
+<meta name="apple-mobile-web-app-title" content="D-Rafter">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#13212e" media="(prefers-color-scheme: dark)">
@@ -84,10 +84,10 @@ self.addEventListener('fetch', e => {
 """
 
 MANIFEST = {
-    'name': 'Snekkerblokk',
-    'short_name': 'Snekkerblokk',
-    'description': 'Rutepapir med mål, vinkler og regler for snekkerprosjekter.',
-    'lang': 'nb',
+    'name': 'D-Rafter',
+    'short_name': 'D-Rafter',
+    'description': 'Grid paper with dimensions, angles and constraints for woodworking projects.',
+    'lang': 'en',
     'start_url': './',
     'scope': './',
     'display': 'standalone',

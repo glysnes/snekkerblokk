@@ -1,8 +1,8 @@
 {
-  "name": "Snekkerblokk",
-  "short_name": "Snekkerblokk",
-  "description": "Rutepapir med mål, vinkler og regler for snekkerprosjekter.",
-  "lang": "nb",
+  "name": "D-Rafter",
+  "short_name": "D-Rafter",
+  "description": "Grid paper with dimensions, angles and constraints for woodworking projects.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
