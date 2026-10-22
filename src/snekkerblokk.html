@@ -119,14 +119,18 @@ select.ctl{padding-right:6px}
 .sel-head{display:flex;align-items:center;gap:10px}
 .sel-head .title{font-size:18px;font-weight:600;flex:1}
 .tag{font-family:var(--font-num);font-weight:600;font-size:13px;min-width:26px;height:26px;padding:0 6px;border-radius:6px;display:inline-grid;place-items:center;background:var(--hover);color:var(--measure)}
-.field{display:grid;grid-template-columns:1fr 96px 22px 38px;align-items:center;gap:6px}
-.field span{font-size:14px}
-.field input{height:40px;border:1px solid var(--chrome-line);border-radius:8px;background:var(--paper);padding:0 10px;font-family:var(--font-num);font-size:16px;text-align:right;width:100%;min-width:0;-webkit-user-select:text;user-select:text}
-.field em{font-style:normal;color:var(--chrome-muted);font-size:13px}
+.field{display:grid;grid-template-columns:minmax(0,1fr) 132px 38px;align-items:center;gap:8px}
+.field > span:first-child{font-size:14px}
+/* tall og enhet i samme boks, så enheten aldri havner oppå tallet */
+.field .inbox{display:flex;align-items:center;gap:6px;height:40px;border:1px solid var(--chrome-line);border-radius:8px;background:var(--paper);padding:0 10px;min-width:0}
+.field .inbox:focus-within{border-color:var(--select)}
+.field input{flex:1;width:100%;min-width:0;height:100%;border:0;background:transparent;padding:0;font-family:var(--font-num);font-size:16px;text-align:right;color:var(--chrome-fg);-webkit-user-select:text;user-select:text}
+.field input:focus{outline:none}
+.field em{flex:none;font-style:normal;color:var(--chrome-muted);font-size:13px;font-family:var(--font-num)}
 .lock{width:38px;height:38px;border:1px solid var(--chrome-line);border-radius:8px;background:transparent;display:grid;place-items:center;color:var(--chrome-muted)}
 .lock svg{width:18px;height:18px}
 .lock[aria-pressed="true"]{background:var(--measure);border-color:var(--measure);color:var(--chrome)}
-.field.joint{grid-template-columns:1fr 96px 22px 38px}
+
 .facts{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0}
 .facts dt{color:var(--chrome-muted);font-size:14px}
 .facts dd{margin:0;font-family:var(--font-num);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
@@ -2033,9 +2037,9 @@ function selHTML() {
       }
     }
     return `<div class="sel-head"><span class="tag">${esc(l.name)}</span><span class="title">${l.aux ? 'Hjelpelinje' : 'Strek'}</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
-      <label class="field"><span>Lengde</span><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em>
+      <label class="field"><span>Lengde</span><span class="inbox"><input id="inLen" inputmode="decimal" value="${inputLen(L)}"><em>${unitName()}</em></span>
         <button type="button" class="lock" data-lock="len" aria-pressed="${has('len')}" aria-label="Lås lengden">${LOCK_SVG}</button></label>
-      <label class="field"><span>Vinkel mot vannrett</span><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em>
+      <label class="field"><span>Vinkel mot vannrett</span><span class="inbox"><input id="inAng" inputmode="decimal" value="${inputAng(t)}"><em>°</em></span>
         <button type="button" class="lock" data-lock="ang" aria-pressed="${has('ang')}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>
       ${facts}
       <h4>Regler</h4>
@@ -2049,7 +2053,7 @@ function selHTML() {
   if (sel.type === 'arc') {
     const A = arcById(sel.id), G = arcGeom(A), locked = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
     return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">Bue</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
-      <label class="field"><span>Radius</span><input id="inRad" inputmode="decimal" value="${inputLen(G.r)}"><em>${unitName()}</em>
+      <label class="field"><span>Radius</span><span class="inbox"><input id="inRad" inputmode="decimal" value="${inputLen(G.r)}"><em>${unitName()}</em></span>
         <button type="button" class="lock" data-lock-rad="1" aria-pressed="${!!locked}" aria-label="Lås radien">${LOCK_SVG}</button></label>
       <dl class="facts">
         <dt>Spenn</dt><dd>${fmtLen(G.chord)}</dd>
@@ -2063,7 +2067,7 @@ function selHTML() {
   if (sel.type === 'circle') {
     const c = circById(sel.id);
     return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">Sirkel</span><button class="btn-danger" type="button" data-act="del">Slett</button></div>
-      <label class="field"><span>Diameter</span><input id="inDia" inputmode="decimal" value="${inputLen(2 * c.r)}"><em>${unitName()}</em><span></span></label>
+      <label class="field"><span>Diameter</span><span class="inbox"><input id="inDia" inputmode="decimal" value="${inputLen(2 * c.r)}"><em>${unitName()}</em></span><span></span></label>
       <dl class="facts"><dt>Radius</dt><dd>${fmtLen(c.r)}</dd><dt>Omkrets</dt><dd>${fmtLen(2 * Math.PI * c.r)}</dd></dl>
       <h4>Regler</h4>
       <div class="rules">${ruleBtn('pdist', 'Avstand fra sentrum til strek …', false, '↔')}${ruleBtn('ppdist', 'Avstand til punkt …', false, '↔')}${ruleBtn('tan', 'Ligger inntil strek …')}${ruleBtn('fix', 'Lås sentrum', isFixed(c.c))}</div>
@@ -2072,7 +2076,7 @@ function selHTML() {
   }
   const pid = sel.id, gs = gaps(pid);
   const angleFields = gs.map(j => j.editable
-    ? `<label class="field joint"><span>Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}</span><input inputmode="decimal" data-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" value="${inputAng(j.deg)}"><em>°</em>
+    ? `<label class="field joint"><span>Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}</span><span class="inbox"><input inputmode="decimal" data-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" value="${inputAng(j.deg)}"><em>°</em></span>
         <button type="button" class="lock" data-lock-joint="${esc(pid)}|${esc(j.u.line.id)}|${esc(j.v.line.id)}" aria-pressed="${j.locked}" aria-label="Lås vinkelen">${LOCK_SVG}</button></label>`
     : `<p class="hint">Mellom ${esc(j.u.line.name)} og ${esc(j.v.line.name)}: ${fmtAng(j.deg)}</p>`).join('');
   const pc = doc.cons.filter(c => c.p === pid || c.p2 === pid);
