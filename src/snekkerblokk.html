@@ -265,6 +265,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
     <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
     <button type="button" data-tool="trim" title="Klipp bort biten du trykker på (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Klipp</button>
+    <button type="button" data-tool="measure" title="Linjal: mål bitene mellom kryss og vinklene der streker krysser (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m3 16 13-13 5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2" stroke-linecap="round"/></svg>Linjal</button>
     <button type="button" data-tool="move" title="Flytt punkter og streker (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Flytt</button>
     <button type="button" data-tool="free" title="Frihånd (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Frihånd</button>
     <button type="button" data-tool="erase" title="Viskelær (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Visk</button>
@@ -287,6 +288,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
         <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
+        <p class="hint"><b>Linjal:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. Ingenting endres i tegningen.</p>
         <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
@@ -956,6 +958,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   for (const c of doc.cons) if (c.type === 'par' || c.type === 'perp' || c.type === 'eq') pairNo.set(c.id, ++pn);
   for (const l of doc.lines) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
   for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
+  if (settings.tool === 'measure' && !opts.export) drawMeasure(g);
   for (const c of doc.circles) {
     const ce = toS(P(c.c)), rr = c.r * k();
     if (rr < 12) continue;
@@ -1471,6 +1474,92 @@ function trimAt(sp) {
   applyTrim(pl); cleanup(); validateSel(); requestRender(true);
 }
 
+
+/* ---------- linjal: mål av biter mellom kryss, og vinkler der streker krysser ---------- */
+let measure = null;
+function measureInfo() {
+  if (!measure) return null;
+  if (measure.type === 'line') {
+    const l = lineById(measure.id); if (!l) return null;
+    const a = P(l.a), b = P(l.b), d = { x: b.x - a.x, y: b.y - a.y }, L = Math.hypot(d.x, d.y);
+    const cs = crossings('line', l.id).sort((p, q) => p.t - q.t);
+    const ts = [0], marks = [];
+    for (const c of cs) if (c.t - ts[ts.length - 1] > 1e-4) { ts.push(c.t); marks.push(c); }
+    ts.push(1);
+    const at = t => ({ x: a.x + d.x * t, y: a.y + d.y * t });
+    const pieces = ts.slice(1).map((t, i) => ({ from: at(ts[i]), to: at(t), len: (t - ts[i]) * L }));
+    const angles = marks.filter(c => c.with.type === 'line').map(c => {
+      const o = c.with.o, e = vec(o);
+      let th = Math.abs(Math.atan2(d.x * e.y - d.y * e.x, d.x * e.x + d.y * e.y)) * DEG;
+      const acute = Math.min(th, 180 - th);
+      return { x: c.x, y: c.y, other: o, acute, obtuse: 180 - acute, du: Math.atan2(-d.y, d.x), dw: Math.atan2(-e.y, e.x) };
+    });
+    return { type: 'line', l, pieces, angles, marks };
+  }
+  const ent = measure.type === 'circle' ? circById(measure.id) : arcById(measure.id); if (!ent) return null;
+  const ce = P(ent.c), g = measure.type === 'arc' ? arcGeom(ent) : null, r = g ? g.r : ent.r, base = g ? g.t0 : 0, span = g ? g.span : 2 * Math.PI;
+  const ss = [...new Set(crossings(measure.type, measure.id).map(c => norm2pi(angUp(ce, c) - base)).filter(s => s > 1e-6 && s < span - 1e-6).map(s => +s.toFixed(6)))].sort((p, q) => p - q);
+  let cuts = measure.type === 'arc' ? [0, ...ss, span] : (ss.length ? [...ss, ss[0] + 2 * Math.PI] : [0, 2 * Math.PI]);
+  const pieces = cuts.slice(1).map((s2, i) => ({ s0: cuts[i], s1: s2, len: r * (s2 - cuts[i]) }));
+  return { type: measure.type, ent, ce, r, base, pieces, marks: ss.map(s => angPoint(ce, r, base + s)) };
+}
+function drawMeasure(g) {
+  const M = measureInfo(); if (!M) return;
+  g.save(); g.strokeStyle = C.select; g.lineWidth = 2;
+  const tick = (p, ang) => { const s = toS(p), nx = Math.sin(ang), ny = Math.cos(ang); g.beginPath(); g.moveTo(s.x - nx * 9, s.y - ny * 9); g.lineTo(s.x + nx * 9, s.y + ny * 9); g.stroke(); };
+  if (M.type === 'line') {
+    const a = toS(P(M.l.a)), b = toS(P(M.l.b)), ang = Math.atan2(-(b.y - a.y), b.x - a.x);
+    g.globalAlpha = .3; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; g.lineWidth = 2;
+    for (const c of M.marks) tick(c, ang);
+    let rot = Math.atan2(b.y - a.y, b.x - a.x); if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
+    const nx = -Math.sin(rot), ny = Math.cos(rot); // motsatt side av vanlig mål
+    for (const pc of M.pieces) {
+      const p = toS(pc.from), q = toS(pc.to), lenPx = Math.hypot(q.x - p.x, q.y - p.y);
+      if (lenPx < 30) continue;
+      drawParts(g, (p.x + q.x) / 2 + nx * 16, (p.y + q.y) / 2 + ny * 16, rot, [{ text: fmtLen(pc.len), color: C.select, outline: true }]);
+    }
+    for (const A of M.angles) {
+      const c = toS(A), rays = [A.du, A.dw, A.du + Math.PI, A.dw + Math.PI].map(norm2pi).sort((p, q) => p - q);
+      for (let i = 0; i < 2; i++) {
+        const s0 = rays[i], s1 = rays[i + 1], deg = (s1 - s0) * DEG, m = (s0 + s1) / 2;
+        g.beginPath(); g.arc(c.x, c.y, i ? 30 : 24, -s0, -s1, true); g.stroke();
+        drawParts(g, c.x + Math.cos(m) * 50, c.y - Math.sin(m) * 50, 0, [{ text: fmtAng(deg), color: C.select, filled: true }]);
+      }
+    }
+  } else {
+    const c = toS(M.ce), R = M.r * k();
+    g.globalAlpha = .3; g.lineWidth = 9; g.beginPath();
+    if (M.type === 'arc') g.arc(c.x, c.y, R, -M.base, -(M.base + arcGeom(M.ent).span), true); else g.arc(c.x, c.y, R, 0, Math.PI * 2);
+    g.stroke(); g.globalAlpha = 1; g.lineWidth = 2;
+    for (const p of M.marks) { const s = toS(p), ux = (s.x - c.x) / R, uy = (s.y - c.y) / R; g.beginPath(); g.moveTo(s.x - ux * 9, s.y - uy * 9); g.lineTo(s.x + ux * 9, s.y + uy * 9); g.stroke(); }
+    for (const pc of M.pieces) {
+      if (pc.len * k() < 30) continue;
+      const m = M.base + (pc.s0 + pc.s1) / 2;
+      drawParts(g, c.x + Math.cos(m) * (R - 22), c.y - Math.sin(m) * (R - 22), 0, [{ text: fmtLen(pc.len), color: C.select, outline: true }]);
+    }
+  }
+  g.restore();
+}
+function measureHTML() {
+  const M = measureInfo();
+  if (!M) return `<h3>Linjal</h3><p class="hint">Trykk på en strek, sirkel eller bue. Du får målet på hver bit mellom kryssene, og vinklene der streker krysser. Ingenting endres i tegningen.</p>`;
+  const name = M.type === 'line' ? M.l.name : M.ent.name;
+  const what = M.type === 'line' ? 'Strek' : M.type === 'arc' ? 'Bue' : 'Sirkel';
+  const start = M.type === 'line' ? `<p class="hint">Fra ${endLabel(M.l, 'a').toLowerCase()}:</p>` : '';
+  const rows = M.pieces.map((pc, i) => `<dt>Bit ${i + 1}</dt><dd>${fmtLen(pc.len)}</dd>`).join('');
+  const angs = (M.angles || []).map(A => `<li>Mot ${esc(A.other.name)}: <span class="num">${fmtAng(A.acute)}</span> og <span class="num">${fmtAng(A.obtuse)}</span></li>`).join('');
+  return `<div class="sel-head"><span class="tag">${esc(name)}</span><span class="title">${what} målt</span></div>
+    ${M.pieces.length < 2 ? '<p class="hint">Ingen kryss på denne. Hele lengden:</p>' : start}
+    <dl class="facts">${rows}</dl>
+    ${angs ? `<h4>Vinkler der den krysser</h4><ul class="joints">${angs}</ul>` : ''}`;
+}
+function measureAt(sp) {
+  const h = hitLine(sp.x, sp.y) || hitShape(sp.x, sp.y);
+  measure = h ? { type: h.type, id: h.id } : null;
+  if (measure) setPanel(true);
+  requestRender(true);
+}
+
 /* ---------- peker ---------- */
 const touches = new Map();
 let gesture = null;
@@ -1581,6 +1670,8 @@ function startAction(e, sp) {
   } else if (tool === 'trim') {
     action = { ...base, type: 'trim', before: snapshot() };
     trimHover = null; trimAt(sp);
+  } else if (tool === 'measure') {
+    measureAt(sp);
   }
 }
 function cancelAction() {
@@ -1753,6 +1844,7 @@ canvas.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && 
 
 function tapSelect(sp) {
   if (pick) { handlePick(sp); return; }
+  if (settings.tool === 'measure') { measureAt(sp); return; }
   const lab = hitLabel(sp.x, sp.y);
   if (lab) { openEditor(lab); setPanel(true); return; }
   sel = hitTest(sp.x, sp.y); if (sel) setPanel(true); requestRender(true);
@@ -1786,7 +1878,7 @@ document.addEventListener('keydown', e => {
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
   if (mod) return;
   if (e.key.toLowerCase() === 'x' && sel && sel.type === 'line') { toggleAux(lineById(sel.id)); return; }
-  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', v: 'move', f: 'free', e: 'erase' };
+  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', m: 'measure', v: 'move', f: 'free', e: 'erase' };
   if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
   else if (e.key === 'Escape') { if (pick) endPick(); sel = null; if (action) cancelAction(); requestRender(true); }
   else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
@@ -1841,6 +1933,7 @@ function rulesList(cons, fromLine) {
 const ruleBtn = (rule, label, on, glyph) => `<button type="button" class="rule" data-rule="${rule}" aria-pressed="${!!on}">${glyph ? `<b>${glyph}</b>` : ''}${label}</button>`;
 
 function selHTML() {
+  if (settings.tool === 'measure') return measureHTML();
   if (!sel) return `<h3>Valgt</h3><p class="hint">Trykk på en strek eller et punkt for å se og endre mål, vinkler og regler.</p>`;
   if (sel.type === 'line') {
     const l = lineById(sel.id), L = lenOf(l), t = acuteAng(l), a = P(l.a), b = P(l.b);
@@ -2018,7 +2111,7 @@ function ruleClick(rule) {
 }
 
 /* ---------- verktøylinje ---------- */
-function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
+function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'measure') measure = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
 document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#undoBtn').addEventListener('click', undo);
 $('#redoBtn').addEventListener('click', redo);
