@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "76833c5", "label": "22.10.2026 11:20"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "76833c5", "label": "22.10.2026 11:26"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2831,10 +2831,6 @@ if (document.fonts) document.fonts.ready.then(() => requestRender());
 </script>
 <script>
 if ('serviceWorker' in navigator) addEventListener('load', () => {
-  const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (hadController && window.snekkerblokkUpdateReady) window.snekkerblokkUpdateReady();
-  });
   navigator.serviceWorker.register('sw.js').then(reg => reg.update()).catch(() => {});
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});

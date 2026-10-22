@@ -36,13 +36,10 @@ HEAD = """<!doctype html>
 <style>body{margin:0}</style>
 """
 
-# Når en ny service worker tar over en side som allerede kjører, er en ny versjon lastet ned.
+# Service workeren gir bare offline-støtte. Beskjeden om ny versjon kommer fra appens egen
+# sjekk mot version.json, så den vises bare når versjonen faktisk er nyere enn den som kjører.
 SW_REGISTER = """<script>
 if ('serviceWorker' in navigator) addEventListener('load', () => {
-  const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (hadController && window.snekkerblokkUpdateReady) window.snekkerblokkUpdateReady();
-  });
   navigator.serviceWorker.register('sw.js').then(reg => reg.update()).catch(() => {});
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {});
