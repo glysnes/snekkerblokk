@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>D-Rafter</title>
+<title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,9 +94,9 @@ select.ctl{padding-right:6px}
 .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-muted);white-space:nowrap}
 
 .rail{position:absolute;z-index:4;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));top:var(--float-top);
-  display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;
+  display:flex;flex-direction:column;gap:2px;padding:6px;max-height:calc(100% - var(--float-top) - env(safe-area-inset-bottom,0px) - 56px);overflow-y:auto;scrollbar-width:none;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;
   box-shadow:0 6px 20px rgb(0 0 0 / .08)}
-.rail button{width:52px;height:52px;border:0;border-radius:10px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500}
+.rail button{width:52px;height:46px;flex:none;border:0;border-radius:10px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500}
 .rail button svg{width:24px;height:24px}
 .rail button:hover{background:var(--hover)}
 .rail button[aria-pressed="true"]{background:var(--select);color:var(--chrome)}
@@ -218,7 +218,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
           <path d="M24 48 50 24" stroke="#5ddfbd" stroke-width="6.4" stroke-linecap="round"/>
         </g>
       </svg>
-      <div>D-Rafter<small>Sketch · measure · cut</small></div>
+      <div>Snekkerblokk<small>Sketch · measure · cut</small></div>
     </div>
     <div class="menu-wrap doc-wrap">
       <button id="docBtn" class="ctl doc-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Drawings, name and files">
@@ -270,7 +270,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
           <button class="menu-toggle" type="button" id="autoBtn" aria-pressed="true"><span><b>Auto constraints</b><small>Horizontal and vertical lines get the constraint automatically</small></span><i></i></button>
           <button class="menu-toggle" type="button" id="penBtn" aria-pressed="false"><span><b>Pencil mode</b><small>The Pencil draws, your finger moves things. Turns on by itself when you use Apple Pencil.</small></span><i></i></button>
           <hr>
-          <button class="menu-item" type="button" id="helpBtn">Help<small>How to use D-Rafter</small></button>
+          <button class="menu-item" type="button" id="helpBtn">Help<small>How to use Snekkerblokk</small></button>
         </div>
       </div>
     </div>
@@ -285,6 +285,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <button type="button" data-tool="arc" title="Arc (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Arc</button>
     <button type="button" data-tool="trim" title="Trim the piece you tap (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Trim</button>
     <button type="button" data-tool="measure" title="Tape: measure the pieces between crossings and the angles where lines cross (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="2.5" y="5" width="13" height="13" rx="3"/><circle cx="9" cy="11.5" r="2.5"/><path d="M15.5 15H21v3h-5.5M18 15v1.5"/></svg>Tape</button>
+    <button type="button" data-tool="select" title="Select several objects to copy, mirror or move them (S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" /><path d="M10 10l7 3-3 1-1 3z"/></svg>Select</button>
     <button type="button" data-tool="move" title="Move points and lines (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Move</button>
     <button type="button" data-tool="free" title="Freehand (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Freehand</button>
     <button type="button" data-tool="erase" title="Eraser (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Erase</button>
@@ -304,19 +305,20 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   <div class="editor" id="editor" hidden><input id="edIn" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="New value"><span id="edUnit"></span></div>
   <div class="pickbar" id="pickbar" hidden><span id="pickText"></span><button type="button" id="pickCancel">Cancel</button></div>
   <div class="toast" id="toast" role="status" hidden></div>
-  <div class="updatebar" id="updateBar" role="status" hidden><span id="updateText">A new version of D-Rafter is ready.</span><button type="button" id="updateBtn">Update</button></div>
+  <div class="updatebar" id="updateBar" role="status" hidden><span id="updateText">A new version of Snekkerblokk is ready.</span><button type="button" id="updateBtn">Update</button></div>
   <div class="badge" id="badge"></div>
 </div>
 
 <div class="overlay" id="helpOverlay" hidden>
   <div class="box help-box">
-    <div class="row"><strong>How to use D-Rafter</strong><button class="ctl" type="button" id="helpClose">Close</button></div>
+    <div class="row"><strong>How to use Snekkerblokk</strong><button class="ctl" type="button" id="helpClose">Close</button></div>
     <div class="help-scroll">
         <p class="hint"><b>Pencil mode:</b> the Pencil draws, your finger moves things. It turns on by itself the first time you use Apple Pencil, and can be turned off under Settings. Your finger drags points, dimensions and the handle on arcs in every tool. On empty paper it moves the sheet, and two fingers zoom. A tap selects. Whole lines and circles are moved with <b>Move</b>.</p>
         <p class="hint"><b>Shapes:</b> Rectangle, Circle and Arc are drawn by dragging with the Pencil. An arc is dragged from end to end and gets a standard curve. Drag the handle in the middle of the arc with Move to adjust it by eye.</p>
         <p class="hint"><b>Guide lines</b> are dashed and are left out of the parts list. Use them to anchor things, for example the centre of a circle. The Pencil snaps to the middle of a line when you see “mid”. Turn a regular line into a guide line in the panel, or press X.</p>
         <p class="hint"><b>Trim:</b> tap the piece that sticks out, and it is trimmed at the nearest crossing with a line, circle or arc. The line gets new end points and correct dimensions. A circle becomes an arc. You can drag the Pencil across several pieces.</p>
         <p class="hint"><b>Tape:</b> tap a line to see how long each piece is between crossings, and the angles where it crosses other lines. In the panel you can pin the dimensions to the drawing, so they stay and are printed, or split the line at the crossings.</p>
+        <p class="hint"><b>Select:</b> drag a box around objects, or tap them to add or remove. In the panel you can copy, paste, duplicate, delete, mirror across a line or flip. With Move you drag the whole selection. Keyboard: ⌘C, ⌘V, ⌘D, Delete.</p>
         <p class="hint"><b>Dimension in the way?</b> Drag the dimension or angle wherever you want it, with Pencil or finger. Drag it back and it returns to its place. A short tap lets you type a new value.</p>
         <p class="hint"><b>Change a dimension:</b> tap the number in the drawing and type the value you want. The dimension is locked and the line changes. Locked dimensions have a coloured background.</p>
         <p class="hint"><b>Locked or free:</b> lines in the same colour as the text (black, or white in dark mode) are locked by dimensions and constraints. Blue lines can still move, as in Fusion.</p>
@@ -473,6 +475,7 @@ function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines 
 function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); validateSel(); changed(); }
 function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); validateSel(); changed(); }
 function validateSel() {
+  validateMulti();
   if (!sel) return;
   const ok = { line: lineById, point: P, arc: arcById, circle: circById }[sel.type](sel.id);
   if (!ok) sel = null;
@@ -946,12 +949,15 @@ function render(target = ctx, W0, H0, opts = {}) {
   drawGrid(g, W, H);
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.strokeStyle = C['ink-soft']; g.lineWidth = 1.8;
-  for (const s of doc.strokes) drawStroke(g, s.pts);
+  for (const s of doc.strokes) {
+    if (inMulti('stroke', s.id) && !opts.export) { g.strokeStyle = C.select; g.lineWidth = 3.5; drawStroke(g, s.pts); g.strokeStyle = C['ink-soft']; g.lineWidth = 1.8; }
+    else drawStroke(g, s.pts);
+  }
   if (action && action.type === 'free') drawStroke(g, action.pts);
   const pickSrc = pick && pick.l;
   const dofInfo = (doc.lines.length || doc.arcs.length || doc.circles.length) && !opts.export ? computeDof() : null;
   for (const l of doc.lines) {
-    const a = toS(P(l.a)), b = toS(P(l.b)), on = (sel && sel.type === 'line' && sel.id === l.id) || pickSrc === l.id;
+    const a = toS(P(l.a)), b = toS(P(l.b)), on = !opts.export && ((sel && sel.type === 'line' && sel.id === l.id) || pickSrc === l.id || inMulti('line', l.id));
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; }
     const free = dofInfo && !(dofInfo.det.has(l.a) && dofInfo.det.has(l.b));
     if (l.aux) {
@@ -961,14 +967,14 @@ function render(target = ctx, W0, H0, opts = {}) {
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; line(g, a, b);
   }
   for (const c of doc.circles) {
-    const ce = toS(P(c.c)), on = sel && sel.type === 'circle' && sel.id === c.id;
+    const ce = toS(P(c.c)), on = !opts.export && ((sel && sel.type === 'circle' && sel.id === c.id) || inMulti('circle', c.id));
     const free = dofInfo && !dofInfo.det.has(c.c);
     g.beginPath(); g.arc(ce.x, ce.y, c.r * k(), 0, Math.PI * 2);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
   }
   for (const A of doc.arcs) {
-    const G = arcGeom(A), ce = toS(G.c), on = sel && sel.type === 'arc' && sel.id === A.id;
+    const G = arcGeom(A), ce = toS(G.c), on = !opts.export && ((sel && sel.type === 'arc' && sel.id === A.id) || inMulti('arc', A.id));
     const free = dofInfo && ![A.a, A.b, A.c].every(id => dofInfo.det.has(id));
     g.beginPath(); g.arc(ce.x, ce.y, G.r * k(), -G.t0, -(G.t0 + G.span), true);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
@@ -986,6 +992,12 @@ function render(target = ctx, W0, H0, opts = {}) {
   for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
   for (const p of doc.pins) if (!(settings.tool === 'measure' && measure && p.type === measure.type && p.id === measure.id && !opts.export)) drawMeasure(g, p, false);
   if (settings.tool === 'measure' && !opts.export) drawMeasure(g);
+  if (action && action.type === 'marquee') {
+    const a = toS(action.w0), b = toS(action.w1);
+    g.save(); g.setLineDash([6, 4]); g.strokeStyle = C.select; g.lineWidth = 1.5; g.fillStyle = C.select; g.globalAlpha = .08;
+    g.fillRect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y)); g.globalAlpha = 1;
+    g.strokeRect(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.abs(b.x - a.x), Math.abs(b.y - a.y)); g.restore();
+  }
   for (const c of doc.circles) {
     const ce = toS(P(c.c)), rr = c.r * k();
     if (rr < 12) continue;
@@ -1301,7 +1313,8 @@ const PICK_TEXT = {
   pdist: () => 'Tap the line to measure the distance to',
   ppdist: () => 'Tap the point to measure the distance to',
   tan: n => `Tap the line circle ${n} should touch`,
-  online: () => 'Tap the line the point should sit on'
+  online: () => 'Tap the line the point should sit on',
+  mirror: () => 'Tap the line to mirror across'
 };
 function startPick(type) {
   if (!sel) return;
@@ -1320,6 +1333,11 @@ function openDimEditor(id) {
 }
 const DUP_MSG = 'That constraint already exists.';
 function handlePick(sp) {
+  if (pick.type === 'mirror') {
+    const h = hitLine(sp.x, sp.y);
+    if (!h) { toast('Tap a line, or Cancel.'); return; }
+    endPick(); mirrorAcross(h.id); return;
+  }
   if (pick.type === 'ppdist') {
     const h = hitTest(sp.x, sp.y);
     if (!h || h.type !== 'point') { toast('Tap a point, or Cancel.'); return; }
@@ -1636,6 +1654,197 @@ function splitMeasured() {
   toast(`Split into ${count} parts.`);
 }
 
+
+/* ---------- utvalg av flere ting: kopier, lim inn, speil ---------- */
+let multi = [];   // valgte objekter: { type: 'line' | 'circle' | 'arc' | 'stroke', id }
+let clipboard = null, pasteCount = 0;
+try { clipboard = JSON.parse(localStorage.getItem('snekkerblokk.clip')) || null; } catch (e) {}
+const inMulti = (type, id) => multi.some(m => m.type === type && m.id === id);
+const strokeById = id => doc.strokes.find(s2 => s2.id === id);
+function entityPoints(m) {
+  if (m.type === 'line') { const l = lineById(m.id); return l ? [l.a, l.b] : []; }
+  if (m.type === 'circle') { const c = circById(m.id); return c ? [c.c] : []; }
+  if (m.type === 'arc') { const A = arcById(m.id); return A ? [A.a, A.b, A.c] : []; }
+  return [];
+}
+function validateMulti() { multi = multi.filter(m => ({ line: lineById, circle: circById, arc: arcById, stroke: strokeById })[m.type](m.id)); }
+function selectAll() {
+  multi = [...doc.lines.map(o => ({ type: 'line', id: o.id })), ...doc.circles.map(o => ({ type: 'circle', id: o.id })),
+    ...doc.arcs.map(o => ({ type: 'arc', id: o.id })), ...doc.strokes.map(o => ({ type: 'stroke', id: o.id }))];
+  sel = null; requestRender(true);
+}
+function hitAny(sx, sy) {
+  const h = hitLine(sx, sy) || hitShape(sx, sy);
+  if (h) return h;
+  const w = toW(sx, sy), r = hitR() / k();
+  for (const st of doc.strokes) if (st.pts.some(p => Math.hypot(p.x - w.x, p.y - w.y) < r)) return { type: 'stroke', id: st.id };
+  return null;
+}
+function toggleMulti(h) {
+  if (!h) return;
+  if (inMulti(h.type, h.id)) multi = multi.filter(m => !(m.type === h.type && m.id === h.id)); else multi.push({ type: h.type, id: h.id });
+}
+function selectInBox(a, b) {
+  const x0 = Math.min(a.x, b.x), x1 = Math.max(a.x, b.x), y0 = Math.min(a.y, b.y), y1 = Math.max(a.y, b.y);
+  const inside = p => p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1;
+  const add = (type, id) => { if (!inMulti(type, id)) multi.push({ type, id }); };
+  for (const l of doc.lines) if (inside(P(l.a)) && inside(P(l.b))) add('line', l.id);
+  for (const c of doc.circles) { const ce = P(c.c); if (inside({ x: ce.x - c.r, y: ce.y - c.r }) && inside({ x: ce.x + c.r, y: ce.y + c.r })) add('circle', c.id); }
+  for (const A of doc.arcs) if ([A.a, A.b].every(id => inside(P(id))) && inside(arcGeom(A).mid)) add('arc', A.id);
+  for (const st of doc.strokes) if (st.pts.every(inside)) add('stroke', st.id);
+}
+// en bit av tegningen som kan limes inn igjen: punktene, formene og reglene som bare gjelder dem
+function fragmentOf(items) {
+  const lineIds = new Set(items.filter(m => m.type === 'line').map(m => m.id));
+  const circIds = new Set(items.filter(m => m.type === 'circle').map(m => m.id));
+  const arcIds = new Set(items.filter(m => m.type === 'arc').map(m => m.id));
+  const pts = new Set(items.flatMap(entityPoints));
+  const points = {}; for (const id of pts) points[id] = { ...P(id) };
+  const inside = c => (!c.l || lineIds.has(c.l)) && (!c.l2 || lineIds.has(c.l2)) && (!c.arc || arcIds.has(c.arc)) && (!c.circle || circIds.has(c.circle))
+    && (!c.p || pts.has(c.p)) && (!c.p2 || pts.has(c.p2)) && c.type !== 'fix';
+  return JSON.parse(JSON.stringify({
+    points,
+    lines: doc.lines.filter(l => lineIds.has(l.id)), circles: doc.circles.filter(c => circIds.has(c.id)), arcs: doc.arcs.filter(A => arcIds.has(A.id)),
+    strokes: doc.strokes.filter(st => items.some(m => m.type === 'stroke' && m.id === st.id)),
+    cons: doc.cons.filter(inside)
+  }));
+}
+// speiling over en linje gjennom Q med retning u (i tegningens koordinater)
+function mirrorMap(Q, u) {
+  const phi = Math.atan2(-u.y, u.x) * DEG;
+  return {
+    pt: p => { const d = (p.x - Q.x) * u.x + (p.y - Q.y) * u.y, fx = Q.x + u.x * d, fy = Q.y + u.y * d; return { x: 2 * fx - p.x, y: 2 * fy - p.y }; },
+    ang: t => { let a = 2 * phi - t; while (a > 180) a -= 360; while (a <= -180) a += 360; return a; }
+  };
+}
+// gjør om en vannrett/loddrett-regel etter speiling; blir den skrå, blir den en låst vinkel
+function mirroredDirCons(c, M) {
+  const a = M.ang(c.type === 'h' ? 0 : 90), sn = Math.abs(Math.sin(a / DEG)), cs = Math.abs(Math.cos(a / DEG));
+  if (sn < 1e-6) return { ...c, type: 'h' };
+  if (cs < 1e-6) return { ...c, type: 'v' };
+  return { ...c, type: 'ang', v: a };
+}
+function insertFragment(frag, mapPt, M) {
+  const pid = {}, lid = {}, cid = {}, aid = {}, out = [];
+  for (const id in frag.points) {
+    const p = mapPt(frag.points[id]);
+    // punkter som havner der de var (på speillinjen) deles, så halvdelene henger sammen
+    pid[id] = (M && P(id) && Math.hypot(P(id).x - p.x, P(id).y - p.y) < 0.01) ? id : addPoint(p);
+  }
+  for (const l of frag.lines) { const nl = { ...l, id: uid(), a: pid[l.a], b: pid[l.b], name: nextName() }; lid[l.id] = nl.id; doc.lines.push(nl); out.push({ type: 'line', id: nl.id }); }
+  for (const c of frag.circles) { const nc = { ...c, id: uid(), c: pid[c.c], name: nextName() }; cid[c.id] = nc.id; doc.circles.push(nc); out.push({ type: 'circle', id: nc.id }); }
+  for (const A of frag.arcs) {
+    const na = { ...A, id: uid(), a: pid[A.a], b: pid[A.b], c: pid[A.c], name: nextName() };
+    if (M) { const t = na.a; na.a = na.b; na.b = t; } // speiling snur retningen på buen
+    aid[A.id] = na.id; doc.arcs.push(na); out.push({ type: 'arc', id: na.id });
+  }
+  for (const st of frag.strokes) { const ns = { id: uid(), pts: st.pts.map(mapPt) }; doc.strokes.push(ns); out.push({ type: 'stroke', id: ns.id }); }
+  for (const c of frag.cons) {
+    let n = { ...c, id: uid() };
+    if (n.l) n.l = lid[n.l]; if (n.l2) n.l2 = lid[n.l2]; if (n.arc) n.arc = aid[n.arc]; if (n.circle) n.circle = cid[n.circle];
+    if (n.p) n.p = pid[n.p]; if (n.p2) n.p2 = pid[n.p2];
+    if (M) {
+      if (n.type === 'h' || n.type === 'v') n = mirroredDirCons(n, M);
+      else if (n.type === 'ang') n.v = M.ang(n.v);
+      else if (n.type === 'angle2') { const t = n.l; n.l = n.l2; n.l2 = t; }
+      else if (n.type === 'tan' || n.type === 'pdist') n.side = -n.side;
+    }
+    doc.cons.push(n);
+  }
+  return out;
+}
+function copySelection() {
+  if (!multi.length) { toast('Select something first.'); return; }
+  clipboard = fragmentOf(multi); pasteCount = 0;
+  try { localStorage.setItem('snekkerblokk.clip', JSON.stringify(clipboard)); } catch (e) {}
+  toast(`Copied ${multi.length} ${multi.length === 1 ? 'object' : 'objects'}.`); requestRender(true);
+}
+function pasteClipboard() {
+  if (!clipboard) { toast('Nothing to paste yet. Select something and tap Copy.'); return; }
+  const before = snapshot(), off = doc.rute * 2 * ++pasteCount;
+  multi = insertFragment(clipboard, p => ({ x: p.x + off, y: p.y + off }), null);
+  sel = null; cleanup(); commit(before);
+  toast('Pasted. Drag it into place with Move.');
+}
+function duplicateSelection() {
+  if (!multi.length) return;
+  const before = snapshot(), off = doc.rute * 2;
+  multi = insertFragment(fragmentOf(multi), p => ({ x: p.x + off, y: p.y + off }), null);
+  cleanup(); commit(before);
+}
+function deleteMulti() {
+  if (!multi.length) return;
+  const before = snapshot();
+  const has = t => new Set(multi.filter(m => m.type === t).map(m => m.id));
+  const L = has('line'), Ci = has('circle'), Ar = has('arc'), St = has('stroke');
+  doc.lines = doc.lines.filter(l => !L.has(l.id)); doc.circles = doc.circles.filter(c => !Ci.has(c.id));
+  doc.arcs = doc.arcs.filter(A => !Ar.has(A.id)); doc.strokes = doc.strokes.filter(st => !St.has(st.id));
+  multi = []; cleanup(); commit(before);
+}
+function selectionBox(items) {
+  const xs = [], ys = [];
+  for (const id of new Set(items.flatMap(entityPoints))) { xs.push(P(id).x); ys.push(P(id).y); }
+  for (const m of items) {
+    if (m.type === 'circle') { const c = circById(m.id), ce = P(c.c); xs.push(ce.x - c.r, ce.x + c.r); ys.push(ce.y - c.r, ce.y + c.r); }
+    if (m.type === 'stroke') strokeById(m.id).pts.forEach(p => { xs.push(p.x); ys.push(p.y); });
+  }
+  return xs.length ? { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) } : null;
+}
+// snu utvalget der det står, om en loddrett (↔) eller vannrett (↕) akse gjennom midten
+function flipSelection(leftRight) {
+  if (!multi.length) return;
+  const B = selectionBox(multi); if (!B) return;
+  const before = snapshot();
+  const Q = { x: (B.x0 + B.x1) / 2, y: (B.y0 + B.y1) / 2 }, M = mirrorMap(Q, leftRight ? { x: 0, y: 1 } : { x: 1, y: 0 });
+  const pts = new Set(multi.flatMap(entityPoints));
+  for (const id of pts) Object.assign(P(id), M.pt(P(id)));
+  for (const m of multi) if (m.type === 'stroke') { const st = strokeById(m.id); st.pts = st.pts.map(M.pt); }
+  const L = new Set(multi.filter(m => m.type === 'line').map(m => m.id)), Ar = new Set(multi.filter(m => m.type === 'arc').map(m => m.id));
+  for (const A of doc.arcs) if (Ar.has(A.id)) { const t = A.a; A.a = A.b; A.b = t; }
+  doc.cons = doc.cons.map(c => {
+    if (!(L.has(c.l) || L.has(c.l2) || Ar.has(c.arc) || pts.has(c.p))) return c;
+    if (c.type === 'ang') return { ...c, v: M.ang(c.v) };
+    if (c.type === 'angle2') return { ...c, l: c.l2, l2: c.l };
+    if (c.type === 'tan' || c.type === 'pdist') return { ...c, side: -c.side };
+    return c;
+  });
+  if (!solveWithHold(pts)) { restore(before); toast('Not possible: the flip conflicts with other constraints.'); requestRender(true); return; }
+  commit(before);
+}
+function mirrorAcross(lineId) {
+  const ml = lineById(lineId); if (!ml) return;
+  const items = multi.filter(m => !(m.type === 'line' && m.id === lineId));
+  if (!items.length) { toast('Select what to mirror first, then pick a different line to mirror across.'); return; }
+  const a = P(ml.a), b = P(ml.b), L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const M = mirrorMap(a, { x: (b.x - a.x) / L, y: (b.y - a.y) / L });
+  const before = snapshot();
+  const added = insertFragment(fragmentOf(items), M.pt, M);
+  multi = [...items, ...added];
+  cleanup(); commit(before);
+  toast(`Mirrored across ${ml.name}.`);
+}
+function multiHTML() {
+  const n = multi.length;
+  const clip = clipboard ? '' : ' disabled';
+  if (!n) return `<h3>Select</h3><p class="hint">Drag a box around objects, or tap objects to add or remove them.</p>
+    <div class="rules"><button type="button" class="rule" data-act="selall">Select all</button><button type="button" class="rule" data-act="paste"${clip}>Paste</button></div>`;
+  return `<div class="sel-head"><span class="tag">${n}</span><span class="title">${n === 1 ? '1 object' : n + ' objects'} selected</span><button class="btn-danger" type="button" data-act="mdel">Delete</button></div>
+    <div class="rules">
+      <button type="button" class="rule" data-act="copy">Copy</button>
+      <button type="button" class="rule" data-act="paste"${clip}>Paste</button>
+      <button type="button" class="rule" data-act="dup">Duplicate</button>
+      <button type="button" class="rule" data-act="mclear">Clear selection</button>
+    </div>
+    <h4>Mirror</h4>
+    <div class="rules">
+      <button type="button" class="rule" data-act="mirror">Mirror across line …</button>
+      <button type="button" class="rule" data-act="fliph"><b>↔</b>Flip</button>
+      <button type="button" class="rule" data-act="flipv"><b>↕</b>Flip</button>
+    </div>
+    <p class="hint">Mirror makes a mirrored copy on the other side of a line you pick, for example a guide line down the middle. Points on that line are shared, so the two halves stay joined. Flip turns the selection over where it is.</p>
+    <p class="hint">With Move, drag one of the selected objects to move them all.</p>`;
+}
+
 /* ---------- peker ---------- */
 const touches = new Map();
 let gesture = null;
@@ -1723,8 +1932,17 @@ function startAction(e, sp) {
     const s = snapPos(w);
     if (label && s.kind !== 'point') { action = { ...base, type: 'labelTap', label, w0: w }; return; }
     action = { ...base, type: 'line', shape: tool, start: s, end: s };
+  } else if (tool === 'select') {
+    action = { ...base, type: 'marquee', w0: w, w1: w, moved: false };
   } else if (tool === 'move') {
-    const h = hitTest(sp.x, sp.y);
+    const h = hitTest(sp.x, sp.y), ha = hitAny(sp.x, sp.y);
+    if (multi.length && ha && inMulti(ha.type, ha.id) && !(h && h.type === 'point')) {
+      // dra hele utvalget
+      const pts = [...new Set(multi.flatMap(entityPoints))];
+      action = { ...base, type: 'dragGroup', w0: w, p0: pts.map(id => ({ id, ...P(id) })),
+        s0pts: multi.filter(m => m.type === 'stroke').map(m => ({ st: strokeById(m.id), pts: strokeById(m.id).pts.map(p => ({ ...p })) })), before: snapshot() };
+      requestRender(true); return;
+    }
     if (h && h.type === 'arc') {
       sel = h; action = { ...base, type: 'dragArc', arc: h.id, before: snapshot() };
     } else if (h && h.type === 'circle' && !label) {
@@ -1777,6 +1995,19 @@ canvas.addEventListener('pointermove', e => {
         action = { ...action, type: 'labelDrag', key: action.label.key, o0: { ...o }, before: snapshot() };
       }
       break;
+    }
+    case 'marquee': {
+      action.w1 = w;
+      if (Math.hypot(sp.x - action.s0.x, sp.y - action.s0.y) > 6) action.moved = true;
+      requestRender(); break;
+    }
+    case 'dragGroup': {
+      let dx = w.x - action.w0.x, dy = w.y - action.w0.y;
+      const st = settings.snap ? doc.rute : 0.5;
+      dx = Math.round(dx / st) * st; dy = Math.round(dy / st) * st;
+      if (action.p0.length) dragPoints(action.p0.map(p => ({ id: p.id, x: p.x + dx, y: p.y + dy })));
+      for (const o of action.s0pts) o.st.pts = o.pts.map(p => ({ x: p.x + dx, y: p.y + dy }));
+      requestRender(true); break;
     }
     case 'labelDrag': {
       const o = { x: action.o0.x + (sp.x - action.s0.x) / k(), y: action.o0.y + (sp.y - action.s0.y) / k() };
@@ -1845,6 +2076,11 @@ function endPointer(e) {
     case 'pan': if (!a.moved) { sel = null; requestRender(true); } scheduleSave(); break;
     case 'labelTap': openEditor(a.label); break;
     case 'labelDrag': commit(a.before); break;
+    case 'marquee':
+      if (a.moved) selectInBox(a.w0, a.w1);
+      else { const h = hitAny(sp.x, sp.y); if (h) toggleMulti(h); else multi = []; }
+      sel = null; requestRender(true); break;
+    case 'dragGroup': commit(a.before); requestRender(true); break;
     case 'line': {
       const dpx = Math.hypot(a.start.x - a.end.x, a.start.y - a.end.y) * k();
       if (dpx < 8) { tapSelect(sp); break; }
@@ -1921,6 +2157,7 @@ canvas.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch' && 
 function tapSelect(sp) {
   if (pick) { handlePick(sp); return; }
   if (settings.tool === 'measure') { measureAt(sp); return; }
+  if (settings.tool === 'select') { const h = hitAny(sp.x, sp.y); if (h) toggleMulti(h); else multi = []; sel = null; requestRender(true); return; }
   const lab = hitLabel(sp.x, sp.y);
   if (lab) { openEditor(lab); setPanel(true); return; }
   sel = hitTest(sp.x, sp.y); if (sel) setPanel(true); requestRender(true);
@@ -1952,12 +2189,16 @@ document.addEventListener('keydown', e => {
   const mod = e.metaKey || e.ctrlKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
+  if (mod && e.key.toLowerCase() === 'c' && multi.length) { e.preventDefault(); copySelection(); return; }
+  if (mod && e.key.toLowerCase() === 'v') { e.preventDefault(); pasteClipboard(); return; }
+  if (mod && e.key.toLowerCase() === 'd' && multi.length) { e.preventDefault(); duplicateSelection(); return; }
+  if (mod && e.key.toLowerCase() === 'a' && settings.tool === 'select') { e.preventDefault(); selectAll(); return; }
   if (mod) return;
   if (e.key.toLowerCase() === 'x' && sel && sel.type === 'line') { toggleAux(lineById(sel.id)); return; }
-  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', m: 'measure', v: 'move', f: 'free', e: 'erase' };
+  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', m: 'measure', s: 'select', v: 'move', f: 'free', e: 'erase' };
   if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
-  else if (e.key === 'Escape') { if (pick) endPick(); sel = null; if (action) cancelAction(); requestRender(true); }
-  else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
+  else if (e.key === 'Escape') { if (pick) endPick(); sel = null; multi = []; if (action) cancelAction(); requestRender(true); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); if (multi.length) deleteMulti(); else deleteSel(); }
   else if (e.key === ' ') { spaceDown = true; canvas.style.cursor = 'grab'; }
   else if (e.key === '+' || e.key === '=') zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.25);
   else if (e.key === '-') zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 0.8);
@@ -2010,6 +2251,7 @@ const ruleBtn = (rule, label, on, glyph) => `<button type="button" class="rule" 
 
 function selHTML() {
   if (settings.tool === 'measure') return measureHTML();
+  if (multi.length || settings.tool === 'select') return multiHTML();
   if (!sel) return `<h3>Selected</h3><p class="hint">Tap a line or a point to see and change dimensions, angles and constraints.</p>`;
   if (sel.type === 'line') {
     const l = lineById(sel.id), L = lenOf(l), t = acuteAng(l), a = P(l.a), b = P(l.b);
@@ -2130,6 +2372,10 @@ panel.addEventListener('click', e => {
   const b0 = e.target.closest('button');
   if (b0 && b0.dataset.act === 'pin') { togglePin(); return; }
   if (b0 && b0.dataset.act === 'split') { splitMeasured(); return; }
+  const MA = { copy: copySelection, paste: pasteClipboard, dup: duplicateSelection, mdel: deleteMulti, selall: selectAll,
+    mclear: () => { multi = []; requestRender(true); }, fliph: () => flipSelection(true), flipv: () => flipSelection(false),
+    mirror: () => { pick = { type: 'mirror' }; $('#pickText').textContent = PICK_TEXT.mirror(); $('#pickbar').hidden = false; requestRender(); } };
+  if (b0 && MA[b0.dataset.act]) { e.preventDefault(); MA[b0.dataset.act](); requestRender(true); return; }
   const b = b0; if (!b || !sel) return;
   e.preventDefault();
   if (b.dataset.act === 'del') deleteSel();
@@ -2188,7 +2434,7 @@ function ruleClick(rule) {
 }
 
 /* ---------- verktøylinje ---------- */
-function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'measure') measure = null; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
+function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'measure') measure = null; if (t !== 'select' && t !== 'move') multi = []; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
 document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#undoBtn').addEventListener('click', undo);
 $('#redoBtn').addEventListener('click', redo);
@@ -2210,7 +2456,7 @@ $('#ruteSel').addEventListener('change', e => { doc.rute = +e.target.value; sche
 $('#fitBtn').addEventListener('click', fitView);
 // panelet til høyre vises bare når noe er valgt eller målt
 function setPanel() { requestRender(true); }
-const panelWanted = () => !!(sel || pick || (settings.tool === 'measure' && measure));
+const panelWanted = () => !!(sel || pick || multi.length || settings.tool === 'select' || (settings.tool === 'measure' && measure));
 $('#panelClose').addEventListener('click', () => { sel = null; measure = null; if (pick) endPick(); requestRender(true); });
 $('#partsBtn').addEventListener('click', () => { toggleMenu($('#partsBtn'), $('#partsMenu')); if (!$('#partsMenu').hidden) cutBox.innerHTML = statusHTML() + cutHTML(); });
 $('#helpBtn').addEventListener('click', () => { closeMenus(); $('#helpOverlay').hidden = false; });
@@ -2273,7 +2519,7 @@ $('#delDraw').addEventListener('click', e => {
 });
 
 /* ---------- fil ---------- */
-const FILE_EXT = '.d-rafter.json';
+const FILE_EXT = '.snekkerblokk.json';
 const safeName = n => (n || '').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 60) || 'drawing';
 async function saveBlob(name, blob, what) {
   const file = new File([blob], name, { type: blob.type });
@@ -2295,13 +2541,13 @@ async function saveBlob(name, blob, what) {
     toast(what + ' saved as ' + name + '.');
   } catch (e) {
     if (e && (e.name === 'AbortError' || e.code === 'declined')) return;
-    toast('Could not save the file here. Use the D-Rafter app on your Home Screen.');
+    toast('Could not save the file here. Use the Snekkerblokk app on your Home Screen.');
   }
 }
 $('#saveFile').addEventListener('click', () => {
   closeMenus(); flushSave();
   const d = JSON.parse(JSON.stringify(doc)); delete d.view;
-  const json = JSON.stringify({ app: 'D-Rafter', format: 1, saved: new Date().toISOString(), drawing: d });
+  const json = JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d });
   saveBlob(safeName(doc.name) + FILE_EXT, new Blob([json], { type: 'application/json' }), 'The drawing');
 });
 let downloadsApi = null;
@@ -2319,7 +2565,7 @@ $('#fileIn').addEventListener('change', async e => {
     openDoc(d); flushSave(); syncControls();
     toast('Opened “' + d.name + '”.');
   } catch (err) {
-    toast('The file could not be opened. Is it a file saved from D-Rafter?');
+    toast('The file could not be opened. Is it a file saved from Snekkerblokk?');
   }
 });
 
@@ -2353,7 +2599,7 @@ function makePrintPage() {
   const tx = M + logo + 4 * mm;
   g.textBaseline = 'alphabetic'; g.textAlign = 'left';
   g.fillStyle = C['ink-soft']; g.font = `600 ${3 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
-  g.fillText('D-RAFTER', tx, M + 4 * mm);
+  g.fillText('SNEKKERBLOKK', tx, M + 4 * mm);
   g.fillStyle = C.ink; g.font = `700 ${7 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
   let title = doc.name || 'Untitled';
   const maxW = PW - tx - M - 60 * mm;
@@ -2452,7 +2698,7 @@ async function checkForUpdate() {
     if (!r.ok) return;
     const v = await r.json();
     if (v.id && v.id !== APP_VERSION.id) {
-      $('#updateText').textContent = `A new version of D-Rafter is ready (${v.id}).`;
+      $('#updateText').textContent = `A new version of Snekkerblokk is ready (${v.id}).`;
       $('#updateBar').hidden = false;
     }
   } catch (e) {}

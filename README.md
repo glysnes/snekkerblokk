@@ -1,4 +1,4 @@
-# D-Rafter
+# Snekkerblokk
 
 Grid paper for iPad and Apple Pencil: draw lines, rectangles, circles and arcs, set dimensions and constraints like a Fusion sketch, and read off lengths, angles and saw settings.
 
@@ -18,6 +18,6 @@ python3 build.py
 
 1. Open the app's address in **Safari** on the iPad.
 2. Tap the Share button and choose **Add to Home Screen**.
-3. Open D-Rafter from the Home Screen. It runs full screen and works offline after the first visit.
+3. Open Snekkerblokk from the Home Screen. It runs full screen and works offline after the first visit.
 
 Drawings are stored in the app on the iPad. Use **Save file** to keep a copy in Files or iCloud, and **Open file** to load it again.
