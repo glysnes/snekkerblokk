@@ -317,7 +317,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <p class="hint"><b>Shapes:</b> Rectangle, Circle and Arc are drawn by dragging with the Pencil. An arc is dragged from end to end and gets a standard curve. Drag the handle in the middle of the arc with Move to adjust it by eye.</p>
         <p class="hint"><b>Guide lines</b> are dashed and are left out of the parts list. Use them to anchor things, for example the centre of a circle. The Pencil snaps to the middle of a line when you see “mid”. Turn a regular line into a guide line in the panel, or press X.</p>
         <p class="hint"><b>Trim:</b> tap the piece that sticks out, and it is trimmed at the nearest crossing with a line, circle or arc. The line gets new end points and correct dimensions. A circle becomes an arc. You can drag the Pencil across several pieces.</p>
-        <p class="hint"><b>Tape:</b> tap a line to see how long each piece is between crossings, and the angles where it crosses other lines. In the panel you can pin the dimensions to the drawing, so they stay and are printed, or split the line at the crossings.</p>
+        <p class="hint"><b>Tape:</b> tap a line to see how long each piece is between crossings, and the angles where it crosses other lines. Tap a second object (point, line or circle) to measure the distance between them, and lock it as a constraint if you like. In the panel you can pin the dimensions to the drawing, so they stay and are printed, or split the line at the crossings.</p>
         <p class="hint"><b>Select:</b> drag a box around objects, or tap them to add or remove. In the panel you can copy, paste, duplicate, delete, mirror across a line or flip. With Move you drag the whole selection. Keyboard: ⌘C, ⌘V, ⌘D, Delete.</p>
         <p class="hint"><b>Dimension in the way?</b> Drag the dimension or angle wherever you want it, with Pencil or finger. Drag it back and it returns to its place. A short tap lets you type a new value.</p>
         <p class="hint"><b>Change a dimension:</b> tap the number in the drawing and type the value you want. The dimension is locked and the line changes. Locked dimensions have a coloured background.</p>
@@ -991,7 +991,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   for (const l of doc.lines) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
   for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
   for (const p of doc.pins) if (!(settings.tool === 'measure' && measure && p.type === measure.type && p.id === measure.id && !opts.export)) drawMeasure(g, p, false);
-  if (settings.tool === 'measure' && !opts.export) drawMeasure(g);
+  if (settings.tool === 'measure' && !opts.export) { if (measure2) drawMeasureDistance(g); else if (measure && measure.type === 'point') glowEnt(g, measure); else drawMeasure(g); }
   if (action && action.type === 'marquee') {
     const a = toS(action.w0), b = toS(action.w1);
     g.save(); g.setLineDash([6, 4]); g.strokeStyle = C.select; g.lineWidth = 1.5; g.fillStyle = C.select; g.globalAlpha = .08;
@@ -1591,8 +1591,10 @@ function drawMeasure(g, m = measure, active = true) {
   g.restore();
 }
 function measureHTML() {
+  if (measure2) return distanceHTML();
+  if (measure && measure.type === 'point') return `<h3>Tape</h3><p class="hint">Point selected. Tap another point, line or circle to measure the distance to it.</p>`;
   const M = measureInfo();
-  if (!M) return `<h3>Tape</h3><p class="hint">Tap a line, circle or arc. You get the length of each piece between crossings, and the angles where lines cross. Nothing in the drawing changes unless you ask.</p>`;
+  if (!M) return `<h3>Tape</h3><p class="hint">Tap a line, circle or arc to get the length of each piece between crossings, and the angles where lines cross. Then tap a second object to measure the distance between the two. Nothing in the drawing changes unless you ask.</p>`;
   const name = M.type === 'line' ? M.l.name : M.ent.name;
   const what = M.type === 'line' ? 'Line' : M.type === 'arc' ? 'Arc' : 'Circle';
   const start = M.type === 'line' ? `<p class="hint">From the ${endLabel(M.l, 'a').toLowerCase()}:</p>` : '';
@@ -1608,13 +1610,91 @@ function measureHTML() {
       <button type="button" class="rule" data-act="pin" aria-pressed="${pinned}">${pinned ? 'Pinned to the drawing' : 'Pin dimensions to the drawing'}</button>
       ${canSplit ? `<button type="button" class="rule" data-act="split">Split at crossings</button>` : ''}
     </div>
-    <p class="hint">${pinned ? 'The dimensions stay when you switch tools, and are printed. Tap again to remove them.' : 'Pinned dimensions stay when you switch tools, and are printed.'}</p>`;
+    <p class="hint">${pinned ? 'The dimensions stay when you switch tools, and are printed. Tap again to remove them.' : 'Pinned dimensions stay when you switch tools, and are printed.'}</p>
+    <p class="hint">Tap another object to measure the distance to it.</p>`;
 }
+// første trykk: én ting (biter og vinkler); andre trykk på noe annet: avstanden mellom dem
 function measureAt(sp) {
-  const h = hitLine(sp.x, sp.y) || hitShape(sp.x, sp.y);
-  measure = h ? { type: h.type, id: h.id } : null;
+  const h = hitTest(sp.x, sp.y);
+  const same = (x, y) => x && y && x.type === y.type && x.id === y.id;
+  if (!h) { measure = null; measure2 = null; }
+  else if (measure && !measure2 && !same(h, measure)) measure2 = { type: h.type, id: h.id };
+  else if (measure2 && same(h, measure)) measure2 = null;
+  else { measure = { type: h.type, id: h.id }; measure2 = null; }
   if (measure) setPanel(true);
   requestRender(true);
+}
+let measure2 = null;
+function entGeom(m) {
+  if (!m) return null;
+  if (m.type === 'point') return P(m.id) ? { kind: 'pt', p: P(m.id), pid: m.id, name: 'the point' } : null;
+  if (m.type === 'line') { const l = lineById(m.id); return l ? { kind: 'line', l, name: l.name } : null; }
+  if (m.type === 'circle') { const c = circById(m.id); return c ? { kind: 'circ', p: P(c.c), pid: c.c, r: c.r, name: c.name } : null; }
+  if (m.type === 'arc') { const A = arcById(m.id); return A ? { kind: 'circ', p: P(A.c), pid: A.c, r: arcGeom(A).r, name: A.name } : null; }
+  return null;
+}
+function footOn(l, p) { const a = P(l.a), b = P(l.b), t = projSeg(p, a, b).t; return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
+function measureDistance() {
+  let A = entGeom(measure), B = entGeom(measure2);
+  if (!A || !B) return null;
+  if (A.kind === 'line' && B.kind !== 'line') [A, B] = [B, A];
+  if (B.kind === 'line' && A.kind !== 'line') {
+    const sd = sdist(A.p, B.l), d = Math.abs(sd);
+    const rows = A.kind === 'circ' ? [[`Centre of ${A.name} to ${B.name}`, d], ['Gap from the edge', d - A.r]] : [[`Point to ${B.name}`, d]];
+    return { from: A.p, to: footOn(B.l, A.p), d, rows, lock: { type: 'pdist', p: A.pid, l: B.l.id, v: d, side: Math.sign(sd) || 1 } };
+  }
+  if (A.kind === 'line' && B.kind === 'line') {
+    const d1 = vec(A.l), d2 = vec(B.l), cr = (d1.x * d2.y - d1.y * d2.x) / ((Math.hypot(d1.x, d1.y) * Math.hypot(d2.x, d2.y)) || 1);
+    if (Math.abs(cr) > 1e-4) return { notParallel: true, angle: Math.asin(Math.min(1, Math.abs(cr))) * DEG, names: [A.name, B.name] };
+    const pa = P(A.l.a), sd = sdist(pa, B.l);
+    return { from: pa, to: footOn(B.l, pa), d: Math.abs(sd), rows: [[`Between ${A.name} and ${B.name}`, Math.abs(sd)]],
+      lock: { type: 'pdist', p: A.l.a, l: B.l.id, v: Math.abs(sd), side: Math.sign(sd) || 1 }, par: [A.l.id, B.l.id] };
+  }
+  const d = Math.hypot(B.p.x - A.p.x, B.p.y - A.p.y), rows = [[A.r || B.r ? 'Centre to centre' : 'Point to point', d]];
+  if (A.r || B.r) rows.push(['Gap between the edges', d - (A.r || 0) - (B.r || 0)]);
+  return { from: A.p, to: B.p, d, rows, lock: A.pid !== B.pid ? { type: 'ppdist', p: A.pid, p2: B.pid, v: d } : null };
+}
+function glowEnt(g, m) {
+  g.save(); g.strokeStyle = C.select; g.globalAlpha = .3; g.lineWidth = 9;
+  if (m.type === 'line') { const l = lineById(m.id); if (l) line(g, toS(P(l.a)), toS(P(l.b))); }
+  else if (m.type === 'point') { const p = toS(P(m.id)); g.beginPath(); g.arc(p.x, p.y, 8, 0, Math.PI * 2); g.stroke(); }
+  else { const E = entGeom(m); if (E) { const c = toS(E.p); g.beginPath(); g.arc(c.x, c.y, E.r * k(), 0, Math.PI * 2); g.stroke(); } }
+  g.restore();
+}
+function drawMeasureDistance(g) {
+  glowEnt(g, measure); glowEnt(g, measure2);
+  const D = measureDistance(); if (!D || !D.from) return;
+  const a = toS(D.from), b = toS(D.to);
+  g.save(); g.setLineDash([6, 4]); g.strokeStyle = C.select; g.lineWidth = 1.6; line(g, a, b); g.setLineDash([]);
+  const ang = Math.atan2(b.y - a.y, b.x - a.x), ux = Math.cos(ang), uy = Math.sin(ang);
+  g.beginPath(); for (const e of [a, b]) { g.moveTo(e.x - uy * 6, e.y + ux * 6); g.lineTo(e.x + uy * 6, e.y - ux * 6); } g.stroke();
+  let rot = ang; if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
+  drawParts(g, (a.x + b.x) / 2, (a.y + b.y) / 2, rot, [{ text: fmtLen(D.d), color: C.select, filled: true }]);
+  g.restore();
+}
+function distanceHTML() {
+  const D = measureDistance();
+  if (!D) return '';
+  if (D.notParallel) return `<div class="sel-head"><span class="tag">↔</span><span class="title">Distance</span></div>
+    <p class="hint">${esc(D.names[0])} and ${esc(D.names[1])} are not parallel, so the distance between them varies. They meet at <b>${fmtAng(D.angle)}</b>.</p>
+    <p class="hint">Tap empty paper to start over.</p>`;
+  const rows = D.rows.map(([t, v]) => `<dt>${esc(t)}</dt><dd>${v < -0.05 ? 'overlaps ' + fmtLen(-v) : fmtLen(v)}</dd>`).join('');
+  return `<div class="sel-head"><span class="tag">↔</span><span class="title">Distance</span></div>
+    <dl class="facts">${rows}</dl>
+    ${D.lock ? `<div class="rules"><button type="button" class="rule" data-act="lockdist">Lock this distance</button></div>
+    <p class="hint">Locking adds a distance constraint${D.par ? ' and keeps the lines parallel' : ''}. Tap its dimension later to change it.</p>` : ''}
+    <p class="hint">Tap empty paper to start over, or tap the first object again to measure it alone.</p>`;
+}
+function lockMeasuredDistance() {
+  const D = measureDistance(); if (!D || !D.lock) return;
+  const c = D.lock;
+  const exists = doc.cons.some(x => x.type === c.type && (c.type === 'pdist' ? x.p === c.p && x.l === c.l : (x.p === c.p && x.p2 === c.p2) || (x.p === c.p2 && x.p2 === c.p)));
+  if (exists) { toast('That distance is already locked.'); return; }
+  const before = snapshot();
+  if (D.par && !doc.cons.some(x => x.type === 'par' && [x.l, x.l2].includes(D.par[0]) && [x.l, x.l2].includes(D.par[1]))) doc.cons.push({ id: uid(), type: 'par', l: D.par[0], l2: D.par[1] });
+  doc.cons.push({ ...c, id: uid() });
+  commit(before);
+  toast('Distance locked. Tap the dimension to change it.');
 }
 function togglePin() {
   if (!measure) return;
@@ -1764,13 +1844,16 @@ function pasteClipboard() {
   const before = snapshot(), off = doc.rute * 2 * ++pasteCount;
   multi = insertFragment(clipboard, p => ({ x: p.x + off, y: p.y + off }), null);
   sel = null; cleanup(); commit(before);
-  toast('Pasted. Drag it into place with Move.');
+  setTool('move');
+  toast('Pasted. Drag it into place.');
 }
 function duplicateSelection() {
   if (!multi.length) return;
   const before = snapshot(), off = doc.rute * 2;
   multi = insertFragment(fragmentOf(multi), p => ({ x: p.x + off, y: p.y + off }), null);
   cleanup(); commit(before);
+  setTool('move');
+  toast('Duplicated. Drag it into place.');
 }
 function deleteMulti() {
   if (!multi.length) return;
@@ -2073,7 +2156,7 @@ function endPointer(e) {
   if (e.type === 'pointercancel') { if (a.before) { restore(a.before); cleanup(); } requestRender(true); return; }
   switch (a.type) {
     case 'pick': handlePick(sp); break;
-    case 'pan': if (!a.moved) { sel = null; requestRender(true); } scheduleSave(); break;
+    case 'pan': if (!a.moved) { sel = null; multi = []; requestRender(true); } scheduleSave(); break;
     case 'labelTap': openEditor(a.label); break;
     case 'labelDrag': commit(a.before); break;
     case 'marquee':
@@ -2160,6 +2243,7 @@ function tapSelect(sp) {
   if (settings.tool === 'select') { const h = hitAny(sp.x, sp.y); if (h) toggleMulti(h); else multi = []; sel = null; requestRender(true); return; }
   const lab = hitLabel(sp.x, sp.y);
   if (lab) { openEditor(lab); setPanel(true); return; }
+  multi = [];
   sel = hitTest(sp.x, sp.y); if (sel) setPanel(true); requestRender(true);
 }
 function eraseAt(sp) {
@@ -2372,7 +2456,7 @@ panel.addEventListener('click', e => {
   const b0 = e.target.closest('button');
   if (b0 && b0.dataset.act === 'pin') { togglePin(); return; }
   if (b0 && b0.dataset.act === 'split') { splitMeasured(); return; }
-  const MA = { copy: copySelection, paste: pasteClipboard, dup: duplicateSelection, mdel: deleteMulti, selall: selectAll,
+  const MA = { lockdist: lockMeasuredDistance, copy: copySelection, paste: pasteClipboard, dup: duplicateSelection, mdel: deleteMulti, selall: selectAll,
     mclear: () => { multi = []; requestRender(true); }, fliph: () => flipSelection(true), flipv: () => flipSelection(false),
     mirror: () => { pick = { type: 'mirror' }; $('#pickText').textContent = PICK_TEXT.mirror(); $('#pickbar').hidden = false; requestRender(); } };
   if (b0 && MA[b0.dataset.act]) { e.preventDefault(); MA[b0.dataset.act](); requestRender(true); return; }
@@ -2434,7 +2518,7 @@ function ruleClick(rule) {
 }
 
 /* ---------- verktøylinje ---------- */
-function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'measure') measure = null; if (t !== 'select' && t !== 'move') multi = []; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
+function setTool(t) { settings.tool = t; hover = null; trimHover = null; if (t !== 'measure') { measure = null; measure2 = null; } if (t !== 'select' && t !== 'move') multi = []; if (t !== 'move' && sel && sel.type === 'point') sel = null; scheduleSave(); requestRender(true); }
 document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#undoBtn').addEventListener('click', undo);
 $('#redoBtn').addEventListener('click', redo);
