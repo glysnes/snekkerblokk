@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "d07d612", "label": "22.10.2026 08:10"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "b4c7d00", "label": "22.10.2026 08:21"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -283,7 +283,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <button type="button" data-tool="circle" title="Sirkel (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Sirkel</button>
     <button type="button" data-tool="arc" title="Bue (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Bue</button>
     <button type="button" data-tool="trim" title="Klipp bort biten du trykker på (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.6 7.6 20 18M8.6 16.4 20 6"/></svg>Klipp</button>
-    <button type="button" data-tool="measure" title="Linjal: mål bitene mellom kryss og vinklene der streker krysser (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m3 16 13-13 5 5L8 21z"/><path d="M7 12l2 2M10 9l2 2M13 6l2 2" stroke-linecap="round"/></svg>Linjal</button>
+    <button type="button" data-tool="measure" title="Målebånd: mål bitene mellom kryss og vinklene der streker krysser (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="2.5" y="5" width="13" height="13" rx="3"/><circle cx="9" cy="11.5" r="2.5"/><path d="M15.5 15H21v3h-5.5M18 15v1.5"/></svg>Målebånd</button>
     <button type="button" data-tool="move" title="Flytt punkter og streker (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>Flytt</button>
     <button type="button" data-tool="free" title="Frihånd (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17c3-6 5-9 7-7s-2 7 1 8 5-9 10-10"/></svg>Frihånd</button>
     <button type="button" data-tool="erase" title="Viskelær (E)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m14 4 6 6-9 9H6l-3-3 11-12Z"/><path d="M9 9l6 6M11 19h10" stroke-linecap="round"/></svg>Visk</button>
@@ -306,7 +306,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
         <p class="hint"><b>Former:</b> Rektangel, Sirkel og Bue tegnes ved å dra med pennen. En bue dras fra ende til ende og får en standard rundhet. Dra i knotten midt på buen med Flytt for å justere den på øyemål.</p>
         <p class="hint"><b>Hjelpelinjer</b> er stiplede og kommer ikke med i kapplisten. Bruk dem til å feste ting, for eksempel sentrum av en sirkel. Pennen fester seg til midten av en strek når du ser «midt». Gjør en vanlig strek om til hjelpelinje i panelet, eller trykk X.</p>
         <p class="hint"><b>Klipp:</b> trykk på biten som stikker ut, så klippes den bort ved nærmeste kryss med en strek, sirkel eller bue. Streken får nye endepunkter og riktige mål. En sirkel blir en bue. Du kan dra pennen over flere biter.</p>
-        <p class="hint"><b>Linjal:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. Ingenting endres i tegningen.</p>
+        <p class="hint"><b>Målebånd:</b> trykk på en strek for å se hvor lang hver bit er mellom kryssene, og vinklene der den krysser andre streker. I panelet kan du feste målene på tegningen, så de blir stående og kommer med på utskriften, eller dele streken opp ved kryssene.</p>
         <p class="hint"><b>Mål i veien?</b> Dra målet eller vinkelen dit du vil ha den, med penn eller finger. Drar du den tilbake, havner den på plassen sin igjen. Et kort trykk lar deg skrive inn et nytt mål.</p>
         <p class="hint"><b>Endre et mål:</b> trykk på tallet i tegningen og skriv inn det du vil ha. Målet blir låst, og streken endrer seg. Låste mål har farget bakgrunn.</p>
         <p class="hint"><b>Låst eller fri:</b> streker i samme farge som skriften (svarte, eller hvite i mørk modus) er låst av mål og regler. Blå streker kan fortsatt bevege seg, som i Fusion.</p>
@@ -375,7 +375,7 @@ function flushSave() {
 }
 
 function sampleDoc() {
-  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {} };
+  const d = { id: uid(), name: 'Eksempel: gavl på bod', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] };
   const pts = { g0: [0, 0], g1: [240, 0], w0: [0, -200], w1: [240, -200], r: [120, -270] };
   for (const [k, [x, y]] of Object.entries(pts)) d.points[k] = { x, y };
   [['g0', 'g1'], ['g0', 'w0'], ['g1', 'w1'], ['w0', 'w1'], ['w0', 'r'], ['w1', 'r']]
@@ -386,7 +386,7 @@ function sampleDoc() {
   ];
   return d;
 }
-function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {} }; }
+function blankDoc() { return { id: uid(), name: 'Ny tegning', rute: 10, points: {}, lines: [], strokes: [], cons: [], circles: [], arcs: [], labelOffs: {}, pins: [] }; }
 
 /* ---------- hjelpere ---------- */
 function nameFor(i) { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
@@ -460,14 +460,14 @@ let toastTimer;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200); }
 
 /* ---------- angre ---------- */
-const snapshot = () => JSON.stringify({ points: doc.points, lines: doc.lines, strokes: doc.strokes, cons: doc.cons, circles: doc.circles, arcs: doc.arcs, labelOffs: doc.labelOffs });
+const snapshot = () => JSON.stringify({ points: doc.points, lines: doc.lines, strokes: doc.strokes, cons: doc.cons, circles: doc.circles, arcs: doc.arcs, labelOffs: doc.labelOffs, pins: doc.pins });
 function commit(before) {
   if (before === snapshot()) return;
   undoStack.push(before); if (undoStack.length > 200) undoStack.shift();
   redoStack = [];
   changed();
 }
-function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines = o.lines; doc.strokes = o.strokes; doc.cons = o.cons || []; doc.circles = o.circles || []; doc.arcs = o.arcs || []; doc.labelOffs = o.labelOffs || {}; }
+function restore(s) { const o = JSON.parse(s); doc.points = o.points; doc.lines = o.lines; doc.strokes = o.strokes; doc.cons = o.cons || []; doc.circles = o.circles || []; doc.arcs = o.arcs || []; doc.labelOffs = o.labelOffs || {}; doc.pins = o.pins || []; }
 function undo() { if (!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); validateSel(); changed(); }
 function redo() { if (!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); validateSel(); changed(); }
 function validateSel() {
@@ -874,6 +874,7 @@ function cleanup() {
   doc.lines = doc.lines.filter(l => { const key = [l.a, l.b].sort().join('|'); if (seen.has(key)) return false; seen.add(key); return true; });
   doc.circles = doc.circles.filter(c => P(c.c) && c.r > 0);
   doc.arcs = doc.arcs.filter(A => P(A.a) && P(A.b) && P(A.c) && A.a !== A.b && A.c !== A.a && A.c !== A.b);
+  doc.pins = (doc.pins || []).filter(p => ({ line: lineById, arc: arcById, circle: circById })[p.type](p.id));
   const used = new Set(); doc.lines.forEach(l => { used.add(l.a); used.add(l.b); });
   doc.circles.forEach(c => used.add(c.c)); doc.arcs.forEach(A => { used.add(A.a); used.add(A.b); used.add(A.c); });
   for (const id in doc.points) if (!used.has(id)) delete doc.points[id];
@@ -976,6 +977,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   for (const c of doc.cons) if (c.type === 'par' || c.type === 'perp' || c.type === 'eq') pairNo.set(c.id, ++pn);
   for (const l of doc.lines) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
   for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
+  for (const p of doc.pins) if (!(settings.tool === 'measure' && measure && p.type === measure.type && p.id === measure.id && !opts.export)) drawMeasure(g, p, false);
   if (settings.tool === 'measure' && !opts.export) drawMeasure(g);
   for (const c of doc.circles) {
     const ce = toS(P(c.c)), rr = c.r * k();
@@ -1493,12 +1495,13 @@ function trimAt(sp) {
 }
 
 
-/* ---------- linjal: mål av biter mellom kryss, og vinkler der streker krysser ---------- */
+/* ---------- målebånd: mål av biter mellom kryss, og vinkler der streker krysser ---------- */
 let measure = null;
-function measureInfo() {
-  if (!measure) return null;
-  if (measure.type === 'line') {
-    const l = lineById(measure.id); if (!l) return null;
+const isPinned = m => m && doc.pins.some(p => p.type === m.type && p.id === m.id);
+function measureInfo(m = measure) {
+  if (!m) return null;
+  if (m.type === 'line') {
+    const l = lineById(m.id); if (!l) return null;
     const a = P(l.a), b = P(l.b), d = { x: b.x - a.x, y: b.y - a.y }, L = Math.hypot(d.x, d.y);
     const cs = crossings('line', l.id).sort((p, q) => p.t - q.t);
     const ts = [0], marks = [];
@@ -1508,74 +1511,122 @@ function measureInfo() {
     const pieces = ts.slice(1).map((t, i) => ({ from: at(ts[i]), to: at(t), len: (t - ts[i]) * L }));
     const angles = marks.filter(c => c.with.type === 'line').map(c => {
       const o = c.with.o, e = vec(o);
-      let th = Math.abs(Math.atan2(d.x * e.y - d.y * e.x, d.x * e.x + d.y * e.y)) * DEG;
-      const acute = Math.min(th, 180 - th);
+      const th = Math.abs(Math.atan2(d.x * e.y - d.y * e.x, d.x * e.x + d.y * e.y)) * DEG, acute = Math.min(th, 180 - th);
       return { x: c.x, y: c.y, other: o, acute, obtuse: 180 - acute, du: Math.atan2(-d.y, d.x), dw: Math.atan2(-e.y, e.x) };
     });
     return { type: 'line', l, pieces, angles, marks };
   }
-  const ent = measure.type === 'circle' ? circById(measure.id) : arcById(measure.id); if (!ent) return null;
-  const ce = P(ent.c), g = measure.type === 'arc' ? arcGeom(ent) : null, r = g ? g.r : ent.r, base = g ? g.t0 : 0, span = g ? g.span : 2 * Math.PI;
-  const ss = [...new Set(crossings(measure.type, measure.id).map(c => norm2pi(angUp(ce, c) - base)).filter(s => s > 1e-6 && s < span - 1e-6).map(s => +s.toFixed(6)))].sort((p, q) => p - q);
-  let cuts = measure.type === 'arc' ? [0, ...ss, span] : (ss.length ? [...ss, ss[0] + 2 * Math.PI] : [0, 2 * Math.PI]);
+  const ent = m.type === 'circle' ? circById(m.id) : arcById(m.id); if (!ent) return null;
+  const ce = P(ent.c), g = m.type === 'arc' ? arcGeom(ent) : null, r = g ? g.r : ent.r, base = g ? g.t0 : 0, span = g ? g.span : 2 * Math.PI;
+  const ss = [...new Set(crossings(m.type, m.id).map(c => norm2pi(angUp(ce, c) - base)).filter(s2 => s2 > 1e-6 && s2 < span - 1e-6).map(s2 => +s2.toFixed(6)))].sort((p, q) => p - q);
+  const cuts = m.type === 'arc' ? [0, ...ss, span] : (ss.length ? [...ss, ss[0] + 2 * Math.PI] : [0, 2 * Math.PI]);
   const pieces = cuts.slice(1).map((s2, i) => ({ s0: cuts[i], s1: s2, len: r * (s2 - cuts[i]) }));
-  return { type: measure.type, ent, ce, r, base, pieces, marks: ss.map(s => angPoint(ce, r, base + s)) };
+  return { type: m.type, ent, ce, r, base, span, ss, pieces, marks: ss.map(s2 => angPoint(ce, r, base + s2)) };
 }
-function drawMeasure(g) {
-  const M = measureInfo(); if (!M) return;
-  g.save(); g.strokeStyle = C.select; g.lineWidth = 2;
-  const tick = (p, ang) => { const s = toS(p), nx = Math.sin(ang), ny = Math.cos(ang); g.beginPath(); g.moveTo(s.x - nx * 9, s.y - ny * 9); g.lineTo(s.x + nx * 9, s.y + ny * 9); g.stroke(); };
+// active: målet du holder på med (uthevet); ellers et mål som er festet på tegningen
+function drawMeasure(g, m = measure, active = true) {
+  const M = measureInfo(m); if (!M) return;
+  const col = active ? C.select : C.measure, angCol = active ? C.select : C.angle;
+  g.save(); g.strokeStyle = col; g.lineWidth = active ? 2 : 1.5;
+  const tick = (p, ang) => { const s2 = toS(p), nx = Math.sin(ang), ny = Math.cos(ang); g.beginPath(); g.moveTo(s2.x - nx * 9, s2.y - ny * 9); g.lineTo(s2.x + nx * 9, s2.y + ny * 9); g.stroke(); };
   if (M.type === 'line') {
     const a = toS(P(M.l.a)), b = toS(P(M.l.b)), ang = Math.atan2(-(b.y - a.y), b.x - a.x);
-    g.globalAlpha = .3; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; g.lineWidth = 2;
+    if (active) { g.globalAlpha = .3; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; g.lineWidth = 2; }
     for (const c of M.marks) tick(c, ang);
     let rot = Math.atan2(b.y - a.y, b.x - a.x); if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
     const nx = -Math.sin(rot), ny = Math.cos(rot); // motsatt side av vanlig mål
-    for (const pc of M.pieces) {
-      const p = toS(pc.from), q = toS(pc.to), lenPx = Math.hypot(q.x - p.x, q.y - p.y);
-      if (lenPx < 30) continue;
-      drawParts(g, (p.x + q.x) / 2 + nx * 16, (p.y + q.y) / 2 + ny * 16, rot, [{ text: fmtLen(pc.len), color: C.select, outline: true }]);
+    if (M.pieces.length > 1 || active) for (const pc of M.pieces) {
+      const p = toS(pc.from), q = toS(pc.to);
+      if (Math.hypot(q.x - p.x, q.y - p.y) < 30) continue;
+      drawParts(g, (p.x + q.x) / 2 + nx * 16, (p.y + q.y) / 2 + ny * 16, rot, [{ text: fmtLen(pc.len), color: col, outline: true }]);
     }
+    g.strokeStyle = angCol;
     for (const A of M.angles) {
       const c = toS(A), rays = [A.du, A.dw, A.du + Math.PI, A.dw + Math.PI].map(norm2pi).sort((p, q) => p - q);
       for (let i = 0; i < 2; i++) {
-        const s0 = rays[i], s1 = rays[i + 1], deg = (s1 - s0) * DEG, m = (s0 + s1) / 2;
+        const s0 = rays[i], s1 = rays[i + 1], mid = (s0 + s1) / 2;
         g.beginPath(); g.arc(c.x, c.y, i ? 30 : 24, -s0, -s1, true); g.stroke();
-        drawParts(g, c.x + Math.cos(m) * 50, c.y - Math.sin(m) * 50, 0, [{ text: fmtAng(deg), color: C.select, filled: true }]);
+        drawParts(g, c.x + Math.cos(mid) * 50, c.y - Math.sin(mid) * 50, 0, [{ text: fmtAng((s1 - s0) * DEG), color: angCol, filled: active }]);
       }
     }
   } else {
     const c = toS(M.ce), R = M.r * k();
-    g.globalAlpha = .3; g.lineWidth = 9; g.beginPath();
-    if (M.type === 'arc') g.arc(c.x, c.y, R, -M.base, -(M.base + arcGeom(M.ent).span), true); else g.arc(c.x, c.y, R, 0, Math.PI * 2);
-    g.stroke(); g.globalAlpha = 1; g.lineWidth = 2;
-    for (const p of M.marks) { const s = toS(p), ux = (s.x - c.x) / R, uy = (s.y - c.y) / R; g.beginPath(); g.moveTo(s.x - ux * 9, s.y - uy * 9); g.lineTo(s.x + ux * 9, s.y + uy * 9); g.stroke(); }
+    if (active) {
+      g.globalAlpha = .3; g.lineWidth = 9; g.beginPath();
+      if (M.type === 'arc') g.arc(c.x, c.y, R, -M.base, -(M.base + M.span), true); else g.arc(c.x, c.y, R, 0, Math.PI * 2);
+      g.stroke(); g.globalAlpha = 1; g.lineWidth = 2;
+    }
+    for (const p of M.marks) { const s2 = toS(p), ux = (s2.x - c.x) / R, uy = (s2.y - c.y) / R; g.beginPath(); g.moveTo(s2.x - ux * 9, s2.y - uy * 9); g.lineTo(s2.x + ux * 9, s2.y + uy * 9); g.stroke(); }
     for (const pc of M.pieces) {
       if (pc.len * k() < 30) continue;
-      const m = M.base + (pc.s0 + pc.s1) / 2;
-      drawParts(g, c.x + Math.cos(m) * (R - 22), c.y - Math.sin(m) * (R - 22), 0, [{ text: fmtLen(pc.len), color: C.select, outline: true }]);
+      const mid = M.base + (pc.s0 + pc.s1) / 2;
+      drawParts(g, c.x + Math.cos(mid) * (R - 22), c.y - Math.sin(mid) * (R - 22), 0, [{ text: fmtLen(pc.len), color: col, outline: true }]);
     }
   }
   g.restore();
 }
 function measureHTML() {
   const M = measureInfo();
-  if (!M) return `<h3>Linjal</h3><p class="hint">Trykk på en strek, sirkel eller bue. Du får målet på hver bit mellom kryssene, og vinklene der streker krysser. Ingenting endres i tegningen.</p>`;
+  if (!M) return `<h3>Målebånd</h3><p class="hint">Trykk på en strek, sirkel eller bue. Du får målet på hver bit mellom kryssene, og vinklene der streker krysser. Ingenting endres i tegningen før du ber om det.</p>`;
   const name = M.type === 'line' ? M.l.name : M.ent.name;
   const what = M.type === 'line' ? 'Strek' : M.type === 'arc' ? 'Bue' : 'Sirkel';
   const start = M.type === 'line' ? `<p class="hint">Fra ${endLabel(M.l, 'a').toLowerCase()}:</p>` : '';
   const rows = M.pieces.map((pc, i) => `<dt>Bit ${i + 1}</dt><dd>${fmtLen(pc.len)}</dd>`).join('');
   const angs = (M.angles || []).map(A => `<li>Mot ${esc(A.other.name)}: <span class="num">${fmtAng(A.acute)}</span> og <span class="num">${fmtAng(A.obtuse)}</span></li>`).join('');
+  const canSplit = M.type === 'circle' ? M.ss.length >= 2 : M.pieces.length > 1;
+  const pinned = isPinned(measure);
   return `<div class="sel-head"><span class="tag">${esc(name)}</span><span class="title">${what} målt</span></div>
     ${M.pieces.length < 2 ? '<p class="hint">Ingen kryss på denne. Hele lengden:</p>' : start}
     <dl class="facts">${rows}</dl>
-    ${angs ? `<h4>Vinkler der den krysser</h4><ul class="joints">${angs}</ul>` : ''}`;
+    ${angs ? `<h4>Vinkler der den krysser</h4><ul class="joints">${angs}</ul>` : ''}
+    <div class="rules">
+      <button type="button" class="rule" data-act="pin" aria-pressed="${pinned}">${pinned ? 'Festet på tegningen' : 'Fest målene på tegningen'}</button>
+      ${canSplit ? `<button type="button" class="rule" data-act="split">Del opp ved kryssene</button>` : ''}
+    </div>
+    <p class="hint">${pinned ? 'Målene blir stående når du bytter verktøy, og kommer med på utskriften. Trykk igjen for å fjerne dem.' : 'Festede mål blir stående når du bytter verktøy, og kommer med på utskriften.'}</p>`;
 }
 function measureAt(sp) {
   const h = hitLine(sp.x, sp.y) || hitShape(sp.x, sp.y);
   measure = h ? { type: h.type, id: h.id } : null;
   if (measure) setPanel(true);
   requestRender(true);
+}
+function togglePin() {
+  if (!measure) return;
+  const before = snapshot();
+  if (isPinned(measure)) doc.pins = doc.pins.filter(p => !(p.type === measure.type && p.id === measure.id));
+  else doc.pins.push({ type: measure.type, id: measure.id });
+  commit(before);
+}
+// del streken (eller buen/sirkelen) i egne biter der den krysser noe
+function splitMeasured() {
+  const M = measureInfo(); if (!M) return;
+  const before = snapshot();
+  let count = M.pieces.length;
+  if (M.type === 'line') {
+    const l = M.l, endB = l.b, pts = M.marks.map(c => { const pid = pointNear(c); attachTo(pid, c); return pid; });
+    doc.cons = doc.cons.filter(c => !((c.l === l.id || c.l2 === l.id) && ['len', 'eq', 'mid'].includes(c.type)));
+    const dirCons = doc.cons.filter(c => c.l === l.id && ['h', 'v', 'ang'].includes(c.type));
+    l.b = pts[0];
+    for (let i = 0; i < pts.length; i++) {
+      const nl = { id: uid(), a: pts[i], b: pts[i + 1] || endB, name: nextName() };
+      if (l.aux) nl.aux = true;
+      doc.lines.push(nl);
+      for (const c of dirCons) doc.cons.push({ ...c, id: uid(), l: nl.id });
+    }
+  } else if (M.type === 'arc') {
+    const A = M.ent, endB = A.b, pts = M.ss.map(s2 => pointNear(angPoint(M.ce, M.r, M.base + s2)));
+    A.b = pts[0];
+    for (let i = 0; i < pts.length; i++) doc.arcs.push({ id: uid(), c: A.c, a: pts[i], b: pts[i + 1] || endB, name: nextName() });
+  } else {
+    const ci = M.ent, pts = M.ss.map(s2 => pointNear(angPoint(M.ce, M.r, M.base + s2)));
+    doc.circles = doc.circles.filter(x => x.id !== ci.id);
+    pts.forEach((pid, i) => doc.arcs.push({ id: uid(), c: ci.c, a: pid, b: pts[(i + 1) % pts.length], name: i ? nextName() : ci.name }));
+    count = pts.length;
+  }
+  measure = null;
+  cleanup(); commit(before);
+  toast(`Delt i ${count} deler.`);
 }
 
 /* ---------- peker ---------- */
@@ -2071,7 +2122,10 @@ panel.addEventListener('change', e => {
 });
 panel.addEventListener('focusout', () => setTimeout(() => requestRender(true), 0));
 panel.addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b || !sel) return;
+  const b0 = e.target.closest('button');
+  if (b0 && b0.dataset.act === 'pin') { togglePin(); return; }
+  if (b0 && b0.dataset.act === 'split') { splitMeasured(); return; }
+  const b = b0; if (!b || !sel) return;
   e.preventDefault();
   if (b.dataset.act === 'del') deleteSel();
   else if (b.dataset.delCon) removeCon(b.dataset.delCon);
@@ -2176,7 +2230,7 @@ function toggleMenu(btn, menu) {
 }
 $('#docBtn').addEventListener('click', () => toggleMenu($('#docBtn'), $('#docMenu')));
 $('#setBtn').addEventListener('click', () => toggleMenu($('#setBtn'), $('#setMenu')));
-document.addEventListener('pointerdown', e => { if (!e.target.closest('.menu-wrap')) closeMenus(); });
+document.addEventListener('pointerdown', e => { if (!(e.target.closest && e.target.closest('.menu-wrap'))) closeMenus(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenus(); });
 $('#drawList').addEventListener('click', e => {
   const b = e.target.closest('[data-doc]'); if (!b) return;
@@ -2189,7 +2243,7 @@ $('#newDraw').addEventListener('click', () => {
   $('#nameIn').focus(); $('#nameIn').select();
 });
 function openDoc(d) {
-  d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || []; d.labelOffs = d.labelOffs || {};
+  d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || []; d.labelOffs = d.labelOffs || {}; d.pins = d.pins || [];
   doc = d; undoStack = []; redoStack = []; sel = null; action = null;
   if (pick) endPick();
   syncControls();
