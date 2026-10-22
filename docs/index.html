@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "27076a0", "label": "21.10.2026 21:38"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "5df91c9", "label": "22.10.2026 08:03"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -63,15 +63,47 @@ button{cursor:pointer}
 .brand{font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap;display:flex;align-items:center;gap:10px}
 .brand .logo{width:36px;height:36px;flex:none;border-radius:8px;display:block;box-shadow:0 0 0 1px var(--grid-major)}
 .brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted)}
-.bar-scroll{display:flex;align-items:center;gap:8px;overflow-x:auto;min-width:0;flex:1;scrollbar-width:none}
-.bar-scroll::-webkit-scrollbar{display:none}
 .group{display:flex;align-items:center;gap:6px;flex:none}
-.sep{width:1px;height:28px;background:var(--chrome-line);flex:none}
+.spacer{flex:1;min-width:8px}
+.iconbar{display:flex;align-items:center;gap:2px;flex:none}
+.ibtn{width:54px;height:44px;border:0;border-radius:10px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:500;color:var(--chrome-fg)}
+.ibtn svg{width:22px;height:22px}
+.ibtn:hover{background:var(--hover)}
+.ibtn[aria-pressed="true"]{color:var(--select);background:var(--hover)}
+.ibtn[aria-expanded="true"]{background:var(--hover)}
+.menu-wrap{position:relative;flex:none}
+.doc-wrap{min-width:0;flex:0 1 auto}
+.doc-btn{max-width:min(360px,40vw);font-weight:500}
+.doc-btn svg{width:18px;height:18px;flex:none;color:var(--chrome-muted)}
+.doc-btn .chev{width:16px;height:16px}
+.doc-btn span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.menu{position:absolute;z-index:30;top:calc(100% + 8px);left:0;width:300px;max-width:calc(100vw - 32px);max-height:min(70vh,560px);overflow:auto;
+  background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 12px 32px rgb(0 0 0 / .22);padding:8px;display:flex;flex-direction:column;gap:2px}
+.menu.right{left:auto;right:0}
+.menu hr{border:0;border-top:1px solid var(--chrome-line);margin:6px 4px}
+.menu-head{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome-muted);font-weight:600;padding:8px 10px 4px}
+.menu-field{display:flex;flex-direction:column;gap:6px;padding:6px 8px 8px;font-size:12px;color:var(--chrome-muted)}
+.menu-field input{height:40px;border:1px solid var(--chrome-line);border-radius:8px;background:var(--paper);padding:0 10px;font-size:16px;color:var(--chrome-fg);-webkit-user-select:text;user-select:text}
+.menu-list{display:flex;flex-direction:column;gap:2px}
+.menu-item{min-height:42px;border:0;background:transparent;border-radius:8px;padding:6px 10px;text-align:left;font-size:15px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.menu-item small{font-size:12px;color:var(--chrome-muted)}
+.menu-item:hover{background:var(--hover)}
+.menu-item[aria-current="true"]{background:var(--hover);color:var(--select);font-weight:600}
+.menu-item.danger{color:var(--danger)}
+.menu-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 10px;font-size:15px}
+.menu-row select{height:38px;border:1px solid var(--chrome-line);border-radius:8px;background:var(--chrome);padding:0 8px;font-size:15px}
+.menu-toggle{border:0;background:transparent;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:12px;text-align:left}
+.menu-toggle:hover{background:var(--hover)}
+.menu-toggle span{flex:1;display:flex;flex-direction:column;gap:2px;font-size:15px}
+.menu-toggle small{font-size:12px;color:var(--chrome-muted);line-height:1.35}
+.menu-toggle i{flex:none;width:42px;height:26px;border-radius:13px;background:var(--chrome-line);position:relative}
+.menu-toggle i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--chrome);box-shadow:0 1px 3px rgb(0 0 0 / .3)}
+.menu-toggle[aria-pressed="true"] i{background:var(--select)}
+.menu-toggle[aria-pressed="true"] i::after{left:19px}
 .ctl{height:38px;border:1px solid var(--chrome-line);background:var(--chrome);border-radius:8px;padding:0 10px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .ctl:hover{background:var(--hover)}
 .ctl[aria-pressed="true"]{background:var(--hover);border-color:var(--select);color:var(--select)}
 select.ctl{padding-right:6px}
-input.name{width:170px}
 .version-tag{flex:none;font-family:var(--font-num);font-size:11px;line-height:1.3;color:var(--chrome-muted);text-align:right;white-space:nowrap}
 .version-tag b{display:block;font-weight:500;color:var(--chrome-fg)}
 @media (max-width: 760px){ .version-tag{display:none} }
@@ -167,6 +199,9 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 
 @media (max-width: 760px){
   .brand small{display:none}
+  .brand > div{display:none}
+  .ibtn{width:44px}
+  .ibtn span{display:none}
   .panel{left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));width:auto;top:auto;max-height:50%}
   .rail button{width:46px;height:46px}
   .badge{display:none}
@@ -192,33 +227,50 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
       </svg>
       <div>Snekkerblokk<small>Rutepapir med mål</small></div>
     </div>
-    <div class="bar-scroll">
-      <div class="group">
-        <select id="drawSel" class="ctl" aria-label="Velg tegning"></select>
-        <input id="nameIn" class="ctl name" aria-label="Navn på tegningen" spellcheck="false">
-        <button id="delDraw" class="ctl" type="button">Slett</button>
-        <button id="saveFile" class="ctl" type="button" title="Lagre tegningen som fil, for eksempel i Filer eller iCloud">Lagre fil</button>
-        <button id="openFile" class="ctl" type="button" title="Åpne en tegning fra fil">Åpne fil</button>
+    <div class="menu-wrap doc-wrap">
+      <button id="docBtn" class="ctl doc-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Tegninger, navn og filer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg>
+        <span id="docTitle"></span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="menu" id="docMenu" hidden>
+        <label class="menu-field"><span>Navn på tegningen</span><input id="nameIn" spellcheck="false" autocomplete="off"></label>
+        <div class="menu-head">Tegninger</div>
+        <div class="menu-list" id="drawList"></div>
+        <button class="menu-item" type="button" id="newDraw">+ Ny tegning</button>
+        <hr>
+        <button class="menu-item" type="button" id="saveFile">Lagre fil …<small>Til Filer eller iCloud</small></button>
+        <button class="menu-item" type="button" id="openFile">Åpne fil …<small>Hent en lagret tegning</small></button>
         <input type="file" id="fileIn" accept=".json,application/json" hidden>
+        <hr>
+        <button class="menu-item danger" type="button" id="delDraw">Slett tegningen</button>
       </div>
-      <span class="sep"></span>
-      <div class="group">
-        <span class="lbl">1 rute =</span>
-        <select id="ruteSel" class="ctl" aria-label="Størrelse på en rute">
-          <option value="1">1 cm</option><option value="2">2 cm</option><option value="5">5 cm</option>
-          <option value="10">10 cm</option><option value="20">20 cm</option><option value="25">25 cm</option>
-          <option value="50">50 cm</option><option value="100">1 m</option>
-        </select>
-        <button id="snapBtn" class="ctl" type="button" aria-pressed="true">Fest til ruter</button>
-        <button id="autoBtn" class="ctl" type="button" aria-pressed="true" title="Vannrette og loddrette streker får regelen automatisk">Auto-regler</button>
-        <button id="penBtn" class="ctl" type="button" aria-pressed="false" title="Pennen tegner, fingeren flytter. Slås på av seg selv første gang du bruker Apple Pencil.">Penn-modus</button>
-        <select id="unitSel" class="ctl" aria-label="Enhet for mål"><option value="cm">cm</option><option value="mm">mm</option></select>
-      </div>
-      <span class="sep"></span>
-      <div class="group">
-        <button id="fitBtn" class="ctl" type="button">Vis alt</button>
-        <button id="imgBtn" class="ctl" type="button">Utskrift</button>
-        <button id="panelBtn" class="ctl" type="button" aria-pressed="true">Mål</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="iconbar">
+      <button id="snapBtn" class="ibtn" type="button" aria-pressed="true" title="Fest til ruter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9h16M4 15h16M9 4v16M15 4v16" opacity=".55"/><circle cx="15" cy="9" r="2.6" fill="currentColor" stroke="none"/></svg><span>Ruter</span></button>
+      <button id="fitBtn" class="ibtn" type="button" title="Vis hele tegningen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Vis alt</span></button>
+      <button id="imgBtn" class="ibtn" type="button" title="Skriv ut på A4 eller lagre som PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span>Skriv ut</span></button>
+      <button id="panelBtn" class="ibtn" type="button" aria-pressed="true" title="Vis eller skjul panelet med mål og kappliste">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16M17.5 8.5h1M17.5 12h1"/></svg><span>Mål</span></button>
+      <div class="menu-wrap">
+        <button id="setBtn" class="ibtn" type="button" aria-haspopup="true" aria-expanded="false" title="Valg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Valg</span></button>
+        <div class="menu right" id="setMenu" hidden>
+          <label class="menu-row"><span>1 rute er</span>
+            <select id="ruteSel" aria-label="Størrelse på en rute">
+              <option value="1">1 cm</option><option value="2">2 cm</option><option value="5">5 cm</option>
+              <option value="10">10 cm</option><option value="20">20 cm</option><option value="25">25 cm</option>
+              <option value="50">50 cm</option><option value="100">1 m</option>
+            </select></label>
+          <label class="menu-row"><span>Mål i</span><select id="unitSel" aria-label="Enhet for mål"><option value="cm">cm</option><option value="mm">mm</option></select></label>
+          <hr>
+          <button class="menu-toggle" type="button" id="autoBtn" aria-pressed="true"><span><b>Auto-regler</b><small>Vannrette og loddrette streker får regelen selv</small></span><i></i></button>
+          <button class="menu-toggle" type="button" id="penBtn" aria-pressed="false"><span><b>Penn-modus</b><small>Pennen tegner, fingeren flytter. Slås på av seg selv når du bruker Apple Pencil.</small></span><i></i></button>
+        </div>
       </div>
     </div>
     <div class="version-tag" id="versionTag" hidden></div>
@@ -2013,13 +2065,36 @@ function syncControls() {
   $('#penBtn').setAttribute('aria-pressed', String(!!settings.penMode));
   $('#unitSel').value = settings.unit;
   $('#ruteSel').value = String(doc.rute);
-  $('#nameIn').value = doc.name;
-  const ds = $('#drawSel');
+  if (document.activeElement !== $('#nameIn')) $('#nameIn').value = doc.name;
+  $('#docTitle').textContent = doc.name || 'Uten navn';
   const list = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
   if (!store.drawings[doc.id]) list.unshift(doc);
-  ds.innerHTML = list.map(d => `<option value="${esc(d.id)}">${esc(d.name || 'Uten navn')}</option>`).join('') + '<option value="__new">+ Ny tegning</option>';
-  ds.value = doc.id;
+  $('#drawList').innerHTML = list.map(d => `<button class="menu-item" type="button" data-doc="${esc(d.id)}" aria-current="${d.id === doc.id}">${esc(d.name || 'Uten navn')}</button>`).join('');
 }
+/* ---------- menyer i menylinja ---------- */
+function closeMenus(except) {
+  document.querySelectorAll('.menu').forEach(m => { if (m !== except) m.hidden = true; });
+  document.querySelectorAll('[aria-haspopup]').forEach(b => { if (!except || b.parentElement !== except.parentElement) b.setAttribute('aria-expanded', 'false'); });
+}
+function toggleMenu(btn, menu) {
+  const open = menu.hidden;
+  closeMenus(open ? menu : null);
+  menu.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+}
+$('#docBtn').addEventListener('click', () => toggleMenu($('#docBtn'), $('#docMenu')));
+$('#setBtn').addEventListener('click', () => toggleMenu($('#setBtn'), $('#setMenu')));
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.menu-wrap')) closeMenus(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenus(); });
+$('#drawList').addEventListener('click', e => {
+  const b = e.target.closest('[data-doc]'); if (!b) return;
+  if (b.dataset.doc !== doc.id) { flushSave(); openDoc(JSON.parse(JSON.stringify(store.drawings[b.dataset.doc]))); }
+  closeMenus();
+});
+$('#newDraw').addEventListener('click', () => {
+  flushSave(); openDoc(blankDoc()); flushSave(); syncControls();
+  // klar til å gi den nye tegningen et navn
+  $('#nameIn').focus(); $('#nameIn').select();
+});
 function openDoc(d) {
   d.cons = d.cons || []; d.circles = d.circles || []; d.arcs = d.arcs || []; d.strokes = d.strokes || []; d.labelOffs = d.labelOffs || {};
   doc = d; undoStack = []; redoStack = []; sel = null; action = null;
@@ -2027,18 +2102,13 @@ function openDoc(d) {
   syncControls();
   if (d.view) { view = { ...d.view }; requestRender(true); } else fitView();
 }
-$('#drawSel').addEventListener('change', e => {
-  flushSave();
-  if (e.target.value === '__new') { openDoc(blankDoc()); flushSave(); syncControls(); }
-  else openDoc(JSON.parse(JSON.stringify(store.drawings[e.target.value])));
-});
-$('#nameIn').addEventListener('input', e => { doc.name = e.target.value; scheduleSave(); });
+$('#nameIn').addEventListener('input', e => { doc.name = e.target.value; $('#docTitle').textContent = doc.name || 'Uten navn'; scheduleSave(); });
 $('#nameIn').addEventListener('change', () => { flushSave(); syncControls(); });
 let delArm = null;
 $('#delDraw').addEventListener('click', e => {
   const b = e.currentTarget;
-  if (!delArm) { b.textContent = 'Trykk igjen for å slette'; b.style.color = 'var(--danger)'; delArm = setTimeout(() => { delArm = null; b.textContent = 'Slett'; b.style.color = ''; }, 3000); return; }
-  clearTimeout(delArm); delArm = null; b.textContent = 'Slett'; b.style.color = '';
+  if (!delArm) { b.textContent = 'Trykk igjen for å slette «' + (doc.name || 'Uten navn') + '»'; delArm = setTimeout(() => { delArm = null; b.textContent = 'Slett tegningen'; }, 3000); return; }
+  clearTimeout(delArm); delArm = null; b.textContent = 'Slett tegningen'; closeMenus();
   delete store.drawings[doc.id];
   const rest = Object.values(store.drawings).sort((a, b) => (b.updated || 0) - (a.updated || 0));
   openDoc(rest.length ? JSON.parse(JSON.stringify(rest[0])) : blankDoc());
@@ -2072,14 +2142,14 @@ async function saveBlob(name, blob, what) {
   }
 }
 $('#saveFile').addEventListener('click', () => {
-  flushSave();
+  closeMenus(); flushSave();
   const d = JSON.parse(JSON.stringify(doc)); delete d.view;
   const json = JSON.stringify({ app: 'Snekkerblokk', format: 1, saved: new Date().toISOString(), drawing: d });
   saveBlob(safeName(doc.name) + FILE_EXT, new Blob([json], { type: 'application/json' }), 'Tegningen');
 });
 let downloadsApi = null;
 if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloadsApi = d; }).catch(() => {});
-$('#openFile').addEventListener('click', () => $('#fileIn').click());
+$('#openFile').addEventListener('click', () => { closeMenus(); $('#fileIn').click(); });
 $('#fileIn').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';
   if (!f) return;
