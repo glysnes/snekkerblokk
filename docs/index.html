@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>body{margin:0}</style>
-<script>window.SNEKKERBLOKK_VERSION = {"id": "918c059", "label": "24.10.2026 16:53"};</script>
+<script>window.SNEKKERBLOKK_VERSION = {"id": "f21615d", "label": "24.10.2026 17:00"};</script>
 <meta charset="utf-8">
 <title>Snekkerblokk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -366,6 +366,7 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
     <div class="print-opts">
       <label class="menu-field"><span>Title on the sheet</span><input id="printTitle" spellcheck="false" autocomplete="off"></label>
       <div class="rules" id="printScope"><button type="button" class="rule" data-scope="sel">Selection</button><button type="button" class="rule" data-scope="all">Whole drawing</button></div>
+      <button type="button" class="rule" id="printGuides" aria-pressed="true"><b>┄</b>Show guides</button>
     </div>
     <img id="imgOut" alt="Preview of the A4 sheet">
     <div class="row">
@@ -1179,15 +1180,18 @@ function drawDim(g, c) {
   let rot = ang; if (rot > Math.PI / 2) rot -= Math.PI; if (rot <= -Math.PI / 2) rot += Math.PI;
   drawParts(g, (ps.x + qs.x) / 2, (ps.y + qs.y) / 2, rot, [{ text: fmtLen(c.v), color: C.measure, filled: true, hit: { kind: 'dim', con: c.id } }], 'd:' + c.id);
 }
-function labelGeom(l, side) {
+// målet sitter et stykke inn fra den ene enden og merkene mot den andre, så midtpunktet («mid») er fritt;
+// korte streker får målet på midten, siden det ellers ikke er plass
+const labelT = l => (lenOf(l) * k() > 150 ? 0.32 : 0.5);
+function labelGeom(l, side, t = 0.5) {
   const a = toS(P(l.a)), b = toS(P(l.b));
   let ang = Math.atan2(b.y - a.y, b.x - a.x);
   if (ang > Math.PI / 2) ang -= Math.PI; if (ang <= -Math.PI / 2) ang += Math.PI;
   const nx = Math.sin(ang), ny = -Math.cos(ang);
-  return { x: (a.x + b.x) / 2 + nx * 13 * side, y: (a.y + b.y) / 2 + ny * 13 * side, ang, len: Math.hypot(b.x - a.x, b.y - a.y) };
+  return { x: a.x + (b.x - a.x) * t + nx * 13 * side, y: a.y + (b.y - a.y) * t + ny * 13 * side, ang, len: Math.hypot(b.x - a.x, b.y - a.y) };
 }
 function drawLineLabel(g, l) {
-  const G = labelGeom(l, 1), on = sel && sel.type === 'line' && sel.id === l.id;
+  const G = labelGeom(l, 1, labelT(l)), on = sel && sel.type === 'line' && sel.id === l.id;
   if (G.len < 36 && !on) return;
   const t = acuteAng(l);
   const lenLocked = doc.cons.some(c => c.type === 'len' && c.l === l.id);
@@ -1210,7 +1214,7 @@ function drawGlyphs(g, l, pairNo) {
     else if (c.type === 'eq') glyphs.push('=' + pairNo.get(c.id));
   }
   if (!glyphs.length) return;
-  const G = labelGeom(l, -1);
+  const G = labelGeom(l, -1, 1 - labelT(l));
   if (G.len < 50) return;
   drawParts(g, G.x, G.y, G.ang, glyphs.map(t => ({ text: t, color: C['ink-soft'], outline: true })));
 }
@@ -1269,7 +1273,7 @@ function bounds() {
 // hvor en merkelapp hører hjemme (før den er flyttet), i tegningens mål
 function labelAnchor(key) {
   const [t, id] = key.split(':');
-  if (t === 'l') { const l = lineById(id); if (!l) return null; const a = P(l.a), b = P(l.b); return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
+  if (t === 'l') { const l = lineById(id); if (!l) return null; const a = P(l.a), b = P(l.b), u = labelT(l); return { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u }; }
   if (t === 'j') return P(id) || null;
   if (t === 'c') { const c = circById(id); if (!c) return null; const ce = P(c.c); return { x: ce.x, y: ce.y - c.r }; }
   if (t === 'a') { const A = arcById(id); return A ? arcGeom(A).mid : null; }
@@ -2780,9 +2784,16 @@ function drawLogo(g, x, y, s) {
   g.strokeStyle = '#5ddfbd'; g.beginPath(); g.moveTo(...P2(24, 48)); g.lineTo(...P2(50, 24)); g.stroke();
   g.restore();
 }
-function makePrintPage(only = null, sheetTitle = null) {
-  printOnly = only && only.length ? new Set(only.map(m => m.type + ':' + m.id)) : null;
-  printPts = printOnly ? new Set(only.flatMap(entityPoints)) : null;
+function makePrintPage(only = null, sheetTitle = null, guides = true) {
+  let items = only && only.length ? only : null;
+  if (!guides) {
+    // uten hjelpelinjer: alt (eller utvalget) unntatt streker, sirkler og buer som er hjelpelinjer
+    const all = items || [...doc.lines.map(o => ({ type: 'line', id: o.id })), ...doc.circles.map(o => ({ type: 'circle', id: o.id })),
+      ...doc.arcs.map(o => ({ type: 'arc', id: o.id })), ...doc.strokes.map(o => ({ type: 'stroke', id: o.id }))];
+    items = all.filter(m => !(({ line: lineById, circle: circById, arc: arcById })[m.type]?.(m.id) || {}).aux);
+  }
+  printOnly = items ? new Set(items.map(m => m.type + ':' + m.id)) : null;
+  printPts = items ? new Set(items.flatMap(entityPoints)) : null;
   try { return buildPrintPage(sheetTitle); } finally { printOnly = null; printPts = null; }
 }
 function buildPrintPage(sheetTitle) {
@@ -2857,7 +2868,8 @@ function pdfFromJpeg(bytes, iw, ih, landscape) {
 }
 let printPage = null, printSel = [], printScope = 'all', printTimer;
 function refreshPrint() {
-  printPage = makePrintPage(printScope === 'sel' ? printSel : null, $('#printTitle').value);
+  printPage = makePrintPage(printScope === 'sel' ? printSel : null, $('#printTitle').value, settings.printGuides !== false);
+  $('#printGuides').setAttribute('aria-pressed', String(settings.printGuides !== false));
   $('#imgOut').src = printPage.cv.toDataURL('image/jpeg', 0.85);
   document.querySelectorAll('#printScope [data-scope]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scope === printScope)));
 }
@@ -2871,6 +2883,7 @@ $('#imgBtn').addEventListener('click', () => {
   $('#imgOverlay').hidden = false;
   requestRender();
 });
+$('#printGuides').addEventListener('click', () => { settings.printGuides = settings.printGuides === false; scheduleSave(); refreshPrint(); });
 $('#printScope').addEventListener('click', e => { const b = e.target.closest('[data-scope]'); if (!b) return; printScope = b.dataset.scope; refreshPrint(); });
 $('#printTitle').addEventListener('input', () => { clearTimeout(printTimer); printTimer = setTimeout(refreshPrint, 350); });
 $('#savePdf').addEventListener('click', async () => {
