@@ -105,11 +105,20 @@ select.ctl{padding-right:6px}
 
 .panel{position:absolute;z-index:4;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));top:var(--float-top);max-height:calc(100% - var(--float-top) - env(safe-area-inset-bottom,0px) - 12px);
   width:330px;display:flex;flex-direction:column;background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 6px 20px rgb(0 0 0 / .08);overflow:hidden}
+.keypad{position:fixed;z-index:40;display:grid;grid-template-columns:repeat(4,56px);grid-auto-rows:52px;gap:6px;padding:8px;
+  background:var(--chrome);border:1px solid var(--chrome-line);border-radius:14px;box-shadow:0 12px 32px rgb(0 0 0 / .28);touch-action:manipulation}
+.keypad button{border:1px solid var(--chrome-line);background:var(--paper);border-radius:10px;font-family:var(--font-num);font-size:22px;color:var(--chrome-fg);
+  -webkit-user-select:none;user-select:none}
+.keypad button:active{background:var(--hover)}
+.keypad .wide{grid-column:span 2}
+.keypad .ok{grid-row:span 2;background:var(--select);border-color:var(--select);color:var(--chrome);font-family:var(--font-ui);font-weight:700;font-size:18px}
 .panel-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 0 16px}
 .panel-close{width:36px;height:36px;border:0;background:transparent;border-radius:8px;font-size:22px;line-height:1;color:var(--chrome-muted)}
 .panel-close:hover{background:var(--hover);color:var(--chrome-fg)}
 .menu.parts{width:400px;padding:8px 12px 12px}
 .parts-box{padding:0 4px}
+.print-opts{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.print-opts .menu-field{padding:0;flex:1;min-width:200px}
 .help-box{width:min(680px,100%)}
 .help-scroll{overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:4px;-webkit-user-select:text;user-select:text}
 .panel-scroll{overflow-y:auto;padding:6px 16px 18px;display:flex;flex-direction:column;gap:18px;-webkit-user-select:text;user-select:text}
@@ -279,7 +288,6 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 
   <nav class="rail" aria-label="Tools">
     <button type="button" data-tool="line" title="Line (L)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2" fill="currentColor"/><circle cx="19" cy="5" r="2" fill="currentColor"/></svg>Line</button>
-    <button type="button" data-tool="aux" title="Guide line (X)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 3.5"><path d="M5 19 19 5"/></svg>Guide</button>
     <button type="button" data-tool="rect" title="Rectangle (R)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12"/></svg>Rectangle</button>
     <button type="button" data-tool="circle" title="Circle (C)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Circle</button>
     <button type="button" data-tool="arc" title="Arc (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18A9 9 0 0 1 20 18"/><circle cx="4" cy="18" r="2" fill="currentColor"/><circle cx="20" cy="18" r="2" fill="currentColor"/></svg>Arc</button>
@@ -309,13 +317,19 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
   <div class="badge" id="badge"></div>
 </div>
 
+<div class="keypad" id="keypad" hidden aria-label="Number pad">
+  <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button><button type="button" data-k="back" aria-label="Delete">⌫</button>
+  <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button><button type="button" data-k="clear">C</button>
+  <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button><button type="button" data-k="ok" class="ok">OK</button>
+  <button type="button" data-k="0" class="wide">0</button><button type="button" data-k=".">.</button>
+</div>
 <div class="overlay" id="helpOverlay" hidden>
   <div class="box help-box">
     <div class="row"><strong>How to use Snekkerblokk</strong><button class="ctl" type="button" id="helpClose">Close</button></div>
     <div class="help-scroll">
         <p class="hint"><b>Pencil mode:</b> the Pencil draws, your finger moves things. It turns on by itself the first time you use Apple Pencil, and can be turned off under Settings. Your finger drags points, dimensions and the handle on arcs in every tool. On empty paper it moves the sheet, and two fingers zoom. A tap selects. Whole lines and circles are moved with <b>Move</b>.</p>
         <p class="hint"><b>Shapes:</b> Rectangle, Circle and Arc are drawn by dragging with the Pencil. An arc is dragged from end to end and gets a standard curve. Drag the handle in the middle of the arc with Move to adjust it by eye.</p>
-        <p class="hint"><b>Guide lines</b> are dashed and are left out of the parts list. Use them to anchor things, for example the centre of a circle. The Pencil snaps to the middle of a line when you see “mid”. Turn a regular line into a guide line in the panel, or press X.</p>
+        <p class="hint"><b>Guides:</b> any line, circle or arc can be a guide. Select it and tap <b>Guide</b> in the panel, or press X. Guides are dashed and left out of the parts list. Use them to anchor things, for example the centre of a circle. The Pencil snaps to the middle of a line when you see “mid”.</p>
         <p class="hint"><b>Trim:</b> tap the piece that sticks out, and it is trimmed at the nearest crossing with a line, circle or arc. The line gets new end points and correct dimensions. A circle becomes an arc. You can drag the Pencil across several pieces.</p>
         <p class="hint"><b>Tape:</b> tap a line to see how long each piece is between crossings, and the angles where it crosses other lines. Tap a second object (point, line or circle) to measure the distance between them, and lock it as a constraint if you like. In the panel you can pin the dimensions to the drawing, so they stay and are printed, or split the line at the crossings.</p>
         <p class="hint"><b>Select:</b> drag a box around objects, or tap them to add or remove. In the panel you can copy, paste, duplicate, delete, mirror across a line or flip. With Move you drag the whole selection. Keyboard: ⌘C, ⌘V, ⌘D, Delete.</p>
@@ -331,9 +345,13 @@ table.cut tfoot td{border:0;padding-top:10px;color:var(--chrome-muted)}
 <div class="overlay" id="imgOverlay" hidden>
   <div class="box">
     <div class="row"><strong>Print on A4</strong><button class="ctl" type="button" id="imgClose">Close</button></div>
+    <div class="print-opts">
+      <label class="menu-field"><span>Title on the sheet</span><input id="printTitle" spellcheck="false" autocomplete="off"></label>
+      <div class="rules" id="printScope"><button type="button" class="rule" data-scope="sel">Selection</button><button type="button" class="rule" data-scope="all">Whole drawing</button></div>
+    </div>
     <img id="imgOut" alt="Preview of the A4 sheet">
     <div class="row">
-      <p class="hint">On iPad: tap Save PDF and choose Print or Save to Files.</p>
+      <p class="hint">On iPad: tap Save PDF and choose Print or Save to Files. If you selected something with Select first, you can print just that on its own sheet.</p>
       <div class="group"><button class="ctl" type="button" id="savePng">Save image</button><button class="ctl primary" type="button" id="savePdf">Save PDF</button></div>
     </div>
   </div>
@@ -354,6 +372,10 @@ let store = { current: null, drawings: {}, settings: {} };
 let settings = { unit: 'cm', snap: true, auto: true, tool: 'line', panel: true };
 let doc, view = { ox: 0, oy: 0, z: 1 };
 let trimHover = null;
+// ved utskrift av et utvalg: bare disse objektene og punktene deres tegnes
+let printOnly = null, printPts = null;
+const vis = (t, id) => !printOnly || printOnly.has(t + ':' + id);
+const visPt = id => !printPts || printPts.has(id);
 let sel = null, hover = null, action = null, pick = null, editing = null;
 let undoStack = [], redoStack = [];
 let lastPointerType = 'mouse', penSeen = false, spaceDown = false;
@@ -950,6 +972,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.strokeStyle = C['ink-soft']; g.lineWidth = 1.8;
   for (const s of doc.strokes) {
+    if (!vis('stroke', s.id)) continue;
     if (inMulti('stroke', s.id) && !opts.export) { g.strokeStyle = C.select; g.lineWidth = 3.5; drawStroke(g, s.pts); g.strokeStyle = C['ink-soft']; g.lineWidth = 1.8; }
     else drawStroke(g, s.pts);
   }
@@ -957,6 +980,7 @@ function render(target = ctx, W0, H0, opts = {}) {
   const pickSrc = pick && pick.l;
   const dofInfo = (doc.lines.length || doc.arcs.length || doc.circles.length) && !opts.export ? computeDof() : null;
   for (const l of doc.lines) {
+    if (!vis('line', l.id)) continue;
     const a = toS(P(l.a)), b = toS(P(l.b)), on = !opts.export && ((sel && sel.type === 'line' && sel.id === l.id) || pickSrc === l.id || inMulti('line', l.id));
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; line(g, a, b); g.globalAlpha = 1; }
     const free = dofInfo && !(dofInfo.det.has(l.a) && dofInfo.det.has(l.b));
@@ -967,30 +991,34 @@ function render(target = ctx, W0, H0, opts = {}) {
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; line(g, a, b);
   }
   for (const c of doc.circles) {
+    if (!vis('circle', c.id)) continue;
     const ce = toS(P(c.c)), on = !opts.export && ((sel && sel.type === 'circle' && sel.id === c.id) || inMulti('circle', c.id));
     const free = dofInfo && !dofInfo.det.has(c.c);
     g.beginPath(); g.arc(ce.x, ce.y, c.r * k(), 0, Math.PI * 2);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
+    if (c.aux) { g.setLineDash([8, 6]); g.strokeStyle = on ? C.select : C['ink-soft']; g.lineWidth = on ? 2.4 : 1.6; g.stroke(); g.setLineDash([]); continue; }
     g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
   }
   for (const A of doc.arcs) {
+    if (!vis('arc', A.id)) continue;
     const G = arcGeom(A), ce = toS(G.c), on = !opts.export && ((sel && sel.type === 'arc' && sel.id === A.id) || inMulti('arc', A.id));
     const free = dofInfo && ![A.a, A.b, A.c].every(id => dofInfo.det.has(id));
     g.beginPath(); g.arc(ce.x, ce.y, G.r * k(), -G.t0, -(G.t0 + G.span), true);
     if (on) { g.strokeStyle = C.select; g.globalAlpha = .25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 1; }
-    g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke();
+    if (A.aux) { g.setLineDash([8, 6]); g.strokeStyle = on ? C.select : C['ink-soft']; g.lineWidth = on ? 2.4 : 1.6; g.stroke(); g.setLineDash([]); }
+    else { g.strokeStyle = on ? C.select : free ? C.free : C.ink; g.lineWidth = on ? 3 : 2.2; g.stroke(); }
     if (!opts.export && (on || settings.tool === 'move' || settings.penMode)) {
       const m = toS(G.mid);
       g.setLineDash([3, 4]); g.strokeStyle = C['ink-soft']; g.lineWidth = 1; line(g, ce, m); g.setLineDash([]);
       if (!opts.export) { g.beginPath(); g.arc(m.x, m.y, 6, 0, Math.PI * 2); g.fillStyle = C.paper; g.fill(); g.strokeStyle = on ? C.select : C.ink; g.lineWidth = 2; g.stroke(); }
     }
   }
-  for (const id in doc.points) drawJoint(g, id);
+  for (const id in doc.points) if (visPt(id)) drawJoint(g, id);
   const pairNo = new Map(); let pn = 0;
   for (const c of doc.cons) if (c.type === 'par' || c.type === 'perp' || c.type === 'eq') pairNo.set(c.id, ++pn);
-  for (const l of doc.lines) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
-  for (const c of doc.cons) if (c.type === 'pdist' || c.type === 'ppdist') drawDim(g, c);
-  for (const p of doc.pins) if (!(settings.tool === 'measure' && measure && p.type === measure.type && p.id === measure.id && !opts.export)) drawMeasure(g, p, false);
+  for (const l of doc.lines) if (vis('line', l.id)) { drawLineLabel(g, l); drawGlyphs(g, l, pairNo); }
+  for (const c of doc.cons) if ((c.type === 'pdist' || c.type === 'ppdist') && labelVisible('d:' + c.id)) drawDim(g, c);
+  for (const p of doc.pins) if (vis(p.type, p.id) && !(settings.tool === 'measure' && measure && p.type === measure.type && p.id === measure.id && !opts.export)) drawMeasure(g, p, false);
   if (settings.tool === 'measure' && !opts.export) { if (measure2) drawMeasureDistance(g); else if (measure && measure.type === 'point') glowEnt(g, measure); else drawMeasure(g); }
   if (action && action.type === 'marquee') {
     const a = toS(action.w0), b = toS(action.w1);
@@ -1000,16 +1028,18 @@ function render(target = ctx, W0, H0, opts = {}) {
   }
   for (const c of doc.circles) {
     const ce = toS(P(c.c)), rr = c.r * k();
-    if (rr < 12) continue;
+    if (rr < 12 || !vis('circle', c.id) || (c.aux && !(sel && sel.id === c.id))) continue;
     drawParts(g, ce.x, ce.y - rr - 13, 0, [{ text: c.name, color: C['ink-soft'] }, { text: 'Ø ' + fmtLen(2 * c.r), color: C.measure, hit: { kind: 'dia', circle: c.id } }], 'c:' + c.id);
   }
   for (const A of doc.arcs) {
+    if (!vis('arc', A.id) || (A.aux && !(sel && sel.id === A.id))) continue;
     const G = arcGeom(A), m = toS(G.mid), locked = doc.cons.some(c => c.type === 'rad' && c.arc === A.id);
     drawParts(g, m.x + Math.cos(G.tm) * 24, m.y - Math.sin(G.tm) * 24, 0, [{ text: A.name, color: C['ink-soft'] }, { text: 'R ' + fmtLen(G.r), color: C.measure, filled: locked, hit: { kind: 'rad', arc: A.id } }], 'a:' + A.id);
   }
   const big = settings.tool === 'move' && !opts.export;
   const fx = fixedPts();
   for (const id in doc.points) {
+    if (!visPt(id)) continue;
     const s = toS(P(id)), on = sel && sel.type === 'point' && sel.id === id;
     if (fx.has(id)) {
       g.strokeStyle = C.ink; g.lineWidth = 1.4; g.beginPath();
@@ -1170,6 +1200,7 @@ function drawJoint(g, pid) {
   const gs = gaps(pid); if (!gs.length) return;
   const c = toS(P(pid));
   for (const j of gs) {
+    if (!vis('line', j.u.line.id) || !vis('line', j.v.line.id)) continue;
     if (Math.abs(j.deg - 90) < 0.05 && !j.locked) {
       const s = 10, u = { x: Math.cos(j.u.ang), y: -Math.sin(j.u.ang) }, v = { x: Math.cos(j.v.ang), y: -Math.sin(j.v.ang) };
       g.beginPath(); g.moveTo(c.x + u.x * s, c.y + u.y * s); g.lineTo(c.x + (u.x + v.x) * s, c.y + (u.y + v.y) * s); g.lineTo(c.x + v.x * s, c.y + v.y * s);
@@ -1208,6 +1239,7 @@ function freeArea() {
   return { left, top, right, bottom };
 }
 function bounds() {
+  if (printOnly) return selectionBox([...printOnly].map(key => { const [type, id] = key.split(':'); return { type, id }; }));
   const xs = [], ys = [];
   for (const id in doc.points) { xs.push(P(id).x); ys.push(P(id).y); }
   doc.strokes.forEach(s => s.pts.forEach(p => { xs.push(p.x); ys.push(p.y); }));
@@ -1233,11 +1265,21 @@ function labelAnchor(key) {
   }
   return null;
 }
+function labelVisible(key) {
+  const [t, id, l1, l2] = key.split(':');
+  if (t === 'l') return vis('line', id);
+  if (t === 'c') return vis('circle', id);
+  if (t === 'a') return vis('arc', id);
+  if (t === 'j') return visPt(id) && vis('line', l1) && vis('line', l2);
+  if (t === 'd') { const c = doc.cons.find(x => x.id === id); return !!c && visPt(c.p) && (c.type === 'pdist' ? vis('line', c.l) : visPt(c.p2)); }
+  return true;
+}
 // tegningens ytterkanter, med plass til mål og vinkler som er dratt utenfor
 function boundsWithLabels(z) {
   const B = bounds(); if (!B) return null;
   const mx = 55 / (PX_PER_CM * z), my = 16 / (PX_PER_CM * z);
   for (const key in doc.labelOffs) {
+    if (printOnly && !labelVisible(key)) continue;
     const a = labelAnchor(key); if (!a) continue;
     const o = doc.labelOffs[key], x = a.x + o.x, y = a.y + o.y;
     B.x0 = Math.min(B.x0, x - mx); B.x1 = Math.max(B.x1, x + mx); B.y0 = Math.min(B.y0, y - my); B.y1 = Math.max(B.y1, y + my);
@@ -1917,6 +1959,7 @@ function multiHTML() {
       <button type="button" class="rule" data-act="paste"${clip}>Paste</button>
       <button type="button" class="rule" data-act="dup">Duplicate</button>
       <button type="button" class="rule" data-act="mclear">Clear selection</button>
+      ${multi.some(m => m.type !== 'stroke') ? `<button type="button" class="rule" data-act="guide" aria-pressed="${guideTargets().length > 0 && guideTargets().every(o => o.aux)}"><b>┄</b>Guide</button>` : ''}
     </div>
     <h4>Mirror</h4>
     <div class="rules">
@@ -1927,6 +1970,41 @@ function multiHTML() {
     <p class="hint">Mirror makes a mirrored copy on the other side of a line you pick, for example a guide line down the middle. Points on that line are shared, so the two halves stay joined. Flip turns the selection over where it is.</p>
     <p class="hint">With Move, drag one of the selected objects to move them all.</p>`;
 }
+
+/* ---------- talltastatur på skjermen (iPad med penn får ellers håndskrift i stedet for tastatur) ---------- */
+const touchDevice = navigator.maxTouchPoints > 0;
+const keypad = $('#keypad');
+let kpInput = null, kpFresh = false;
+function prepNumInputs(root) {
+  if (!touchDevice) return;
+  root.querySelectorAll('input[inputmode="decimal"], input[data-num]').forEach(i => { i.setAttribute('inputmode', 'none'); i.dataset.num = '1'; });
+}
+function openKeypad(inp) {
+  kpInput = inp; kpFresh = true;
+  keypad.hidden = false;
+  const r = inp.getBoundingClientRect(), kw = keypad.offsetWidth, kh = keypad.offsetHeight, W = innerWidth, H = innerHeight;
+  let x = Math.min(Math.max(8, r.right - kw), W - kw - 8), y = r.bottom + 8;
+  if (y + kh > H - 8) y = Math.max(8, r.top - kh - 8);
+  if (x < r.right && x + kw > r.left && y < r.bottom && y + kh > r.top) x = Math.max(8, r.left - kw - 8); // ikke oppå feltet
+  keypad.style.left = x + 'px'; keypad.style.top = y + 'px';
+  try { inp.select(); } catch (e) {}
+}
+function closeKeypad() { keypad.hidden = true; kpInput = null; }
+document.addEventListener('focusin', e => { if (touchDevice && e.target.matches && e.target.matches('input[data-num]')) openKeypad(e.target); });
+document.addEventListener('focusout', e => { if (e.target === kpInput) setTimeout(() => { if (document.activeElement !== kpInput) closeKeypad(); }, 0); });
+keypad.addEventListener('pointerdown', e => {
+  e.preventDefault(); // feltet beholder fokus
+  const b = e.target.closest('[data-k]'), i = kpInput; if (!b || !i) return;
+  const key = b.dataset.k;
+  if (key === 'ok') { i.dispatchEvent(new Event('change', { bubbles: true })); i.blur(); closeKeypad(); return; }
+  if (key === 'clear') { i.value = ''; kpFresh = false; return; }
+  if (key === 'back') { i.value = kpFresh ? '' : i.value.slice(0, -1); kpFresh = false; return; }
+  const cur = kpFresh ? '' : i.value;
+  if (key === '.') { if (!/[.,]/.test(cur)) i.value = (cur || '0') + '.'; }
+  else i.value = cur + key;
+  kpFresh = false;
+});
+prepNumInputs(document);
 
 /* ---------- peker ---------- */
 const touches = new Map();
@@ -2278,8 +2356,8 @@ document.addEventListener('keydown', e => {
   if (mod && e.key.toLowerCase() === 'd' && multi.length) { e.preventDefault(); duplicateSelection(); return; }
   if (mod && e.key.toLowerCase() === 'a' && settings.tool === 'select') { e.preventDefault(); selectAll(); return; }
   if (mod) return;
-  if (e.key.toLowerCase() === 'x' && sel && sel.type === 'line') { toggleAux(lineById(sel.id)); return; }
-  const tools = { l: 'line', x: 'aux', r: 'rect', c: 'circle', a: 'arc', t: 'trim', m: 'measure', s: 'select', v: 'move', f: 'free', e: 'erase' };
+  if (e.key.toLowerCase() === 'x') { toggleGuide(); return; }
+  const tools = { l: 'line', r: 'rect', c: 'circle', a: 'arc', t: 'trim', m: 'measure', s: 'select', v: 'move', f: 'free', e: 'erase' };
   if (tools[e.key.toLowerCase()]) setTool(tools[e.key.toLowerCase()]);
   else if (e.key === 'Escape') { if (pick) endPick(); sel = null; multi = []; if (action) cancelAction(); requestRender(true); }
   else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); if (multi.length) deleteMulti(); else deleteSel(); }
@@ -2378,7 +2456,7 @@ function selHTML() {
   }
   if (sel.type === 'arc') {
     const A = arcById(sel.id), G = arcGeom(A), locked = doc.cons.find(c => c.type === 'rad' && c.arc === A.id);
-    return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">Arc</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
+    return `<div class="sel-head"><span class="tag">${esc(A.name)}</span><span class="title">${A.aux ? 'Guide arc' : 'Arc'}</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
       <label class="field"><span>Radius</span><span class="inbox"><input id="inRad" inputmode="decimal" value="${inputLen(G.r)}"><em>${unitName()}</em></span>
         <button type="button" class="lock" data-lock-rad="1" aria-pressed="${!!locked}" aria-label="Lock radius">${LOCK_SVG}</button></label>
       <dl class="facts">
@@ -2387,16 +2465,17 @@ function selHTML() {
         <dt>Arc length</dt><dd>${fmtLen(G.len)}</dd>
         <dt>Angle</dt><dd>${fmtAng(G.span * DEG)}</dd>
       </dl>
+      <div class="rules"><button type="button" class="rule" data-act="guide" aria-pressed="${!!A.aux}"><b>┄</b>Guide</button></div>
       <p class="hint">With Move you can drag the round handle in the middle of the arc to make it flatter or rounder. The end points stay put.</p>
       <p class="hint">To mark it out: put a nail at the centre and use a string or batten of ${fmtLen(G.r)}.</p>`;
   }
   if (sel.type === 'circle') {
     const c = circById(sel.id);
-    return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">Circle</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
+    return `<div class="sel-head"><span class="tag">${esc(c.name)}</span><span class="title">${c.aux ? 'Guide circle' : 'Circle'}</span><button class="btn-danger" type="button" data-act="del">Delete</button></div>
       <label class="field"><span>Diameter</span><span class="inbox"><input id="inDia" inputmode="decimal" value="${inputLen(2 * c.r)}"><em>${unitName()}</em></span><span></span></label>
       <dl class="facts"><dt>Radius</dt><dd>${fmtLen(c.r)}</dd><dt>Circumference</dt><dd>${fmtLen(2 * Math.PI * c.r)}</dd></dl>
       <h4>Constraints</h4>
-      <div class="rules">${ruleBtn('pdist', 'Distance from centre to line …', false, '↔')}${ruleBtn('ppdist', 'Distance to point …', false, '↔')}${ruleBtn('tan', 'Touches line …')}${ruleBtn('fix', 'Lock centre', isFixed(c.c))}</div>
+      <div class="rules">${ruleBtn('pdist', 'Distance from centre to line …', false, '↔')}${ruleBtn('ppdist', 'Distance to point …', false, '↔')}${ruleBtn('tan', 'Touches line …')}${ruleBtn('fix', 'Lock centre', isFixed(c.c))}<button type="button" class="rule" data-act="guide" aria-pressed="${!!c.aux}"><b>┄</b>Guide</button></div>
       ${rulesList(doc.cons.filter(x => x.circle === c.id || x.p === c.c || x.p2 === c.c))}
       <p class="hint">With Move: drag the edge to resize, or the cross in the middle to move the circle.</p>`;
   }
@@ -2413,13 +2492,13 @@ function selHTML() {
     ${rulesList(pc)}`;
 }
 function shapesHTML() {
-  const rows = doc.arcs.map(A => { const G = arcGeom(A); return `<tr><td class="n">${esc(A.name)}</td><td>Arc</td><td class="l">R ${fmtLen(G.r)}</td><td class="l">span ${fmtLen(G.chord)}<br>rise ${fmtLen(G.sag)}</td></tr>`; })
-    .concat(doc.circles.map(c => `<tr><td class="n">${esc(c.name)}</td><td>Circle</td><td class="l">Ø ${fmtLen(2 * c.r)}</td><td></td></tr>`));
+  const rows = doc.arcs.filter(A => !A.aux).map(A => { const G = arcGeom(A); return `<tr><td class="n">${esc(A.name)}</td><td>Arc</td><td class="l">R ${fmtLen(G.r)}</td><td class="l">span ${fmtLen(G.chord)}<br>rise ${fmtLen(G.sag)}</td></tr>`; })
+    .concat(doc.circles.filter(c => !c.aux).map(c => `<tr><td class="n">${esc(c.name)}</td><td>Circle</td><td class="l">Ø ${fmtLen(2 * c.r)}</td><td></td></tr>`));
   return rows.length ? `<table class="cut" style="margin-top:12px"><thead><tr><th></th><th>Shape</th><th>Size</th><th></th></tr></thead><tbody>${rows.join('')}</tbody></table>` : '';
 }
 function cutHTML() {
   const lines = doc.lines.filter(l => !l.aux);
-  if (!lines.length) return (doc.arcs.length || doc.circles.length) ? shapesHTML() : '<p class="hint">Draw lines with the Pencil and their lengths show up here.</p>';
+  if (!lines.length) return (doc.arcs.some(A => !A.aux) || doc.circles.some(c => !c.aux)) ? shapesHTML() : '<p class="hint">Draw lines with the Pencil and their lengths show up here.</p>';
   const groups = new Map();
   let total = 0;
   for (const l of lines) {
@@ -2437,7 +2516,7 @@ function updatePanel() {
   const ae = document.activeElement;
   if (ae && ae.tagName === 'INPUT' && panel.contains(ae)) return;
   panelDirty = false;
-  if (!panel.hidden) { statusBox.innerHTML = statusHTML(); selBox.innerHTML = selHTML(); }
+  if (!panel.hidden) { statusBox.innerHTML = statusHTML(); selBox.innerHTML = selHTML(); prepNumInputs(selBox); }
   if (!$('#partsMenu').hidden) cutBox.innerHTML = statusHTML() + cutHTML();
 }
 panel.addEventListener('change', e => {
@@ -2456,7 +2535,7 @@ panel.addEventListener('click', e => {
   const b0 = e.target.closest('button');
   if (b0 && b0.dataset.act === 'pin') { togglePin(); return; }
   if (b0 && b0.dataset.act === 'split') { splitMeasured(); return; }
-  const MA = { lockdist: lockMeasuredDistance, copy: copySelection, paste: pasteClipboard, dup: duplicateSelection, mdel: deleteMulti, selall: selectAll,
+  const MA = { guide: toggleGuide, lockdist: lockMeasuredDistance, copy: copySelection, paste: pasteClipboard, dup: duplicateSelection, mdel: deleteMulti, selall: selectAll,
     mclear: () => { multi = []; requestRender(true); }, fliph: () => flipSelection(true), flipv: () => flipSelection(false),
     mirror: () => { pick = { type: 'mirror' }; $('#pickText').textContent = PICK_TEXT.mirror(); $('#pickbar').hidden = false; requestRender(); } };
   if (b0 && MA[b0.dataset.act]) { e.preventDefault(); MA[b0.dataset.act](); requestRender(true); return; }
@@ -2485,11 +2564,25 @@ panel.addEventListener('click', e => {
     else { const j = gaps(p).find(j => j.u.line.id === l1 && j.v.line.id === l2); if (j) addConstraint({ type: 'angle2', p, l: l1, l2, v: j.deg }); }
   } else if (b.dataset.rule) ruleClick(b.dataset.rule);
 });
-function toggleAux(l) {
+function toggleAux(l) { setGuide([l], !l.aux); }
+// hjelpelinje av eller på for streker, sirkler og buer (ett objekt eller et helt utvalg)
+function setGuide(ents, on) {
+  if (!ents.length) return;
   const before = snapshot();
-  if (l.aux) delete l.aux; else l.aux = true;
+  for (const o of ents) { if (on) o.aux = true; else delete o.aux; }
   commit(before);
-  toast(l.aux ? `${l.name} is now a guide line. It is left out of the parts list.` : `${l.name} is now a regular line.`);
+  toast(on ? (ents.length === 1 ? `${ents[0].name} is now a guide. It is left out of the parts list.` : 'Made into guides. They are left out of the parts list.')
+           : (ents.length === 1 ? `${ents[0].name} is now solid.` : 'Made solid again.'));
+}
+function guideTargets() {
+  const get = m => ({ line: lineById, circle: circById, arc: arcById })[m.type]?.(m.id);
+  if (multi.length) return multi.map(get).filter(Boolean);
+  if (sel && sel.type !== 'point') { const o = get(sel); return o ? [o] : []; }
+  return [];
+}
+function toggleGuide() {
+  const ents = guideTargets(); if (!ents.length) return;
+  setGuide(ents, !ents.every(o => o.aux));
 }
 function ruleClick(rule) {
   if (sel.type === 'circle') {
@@ -2669,7 +2762,12 @@ function drawLogo(g, x, y, s) {
   g.strokeStyle = '#5ddfbd'; g.beginPath(); g.moveTo(...P2(24, 48)); g.lineTo(...P2(50, 24)); g.stroke();
   g.restore();
 }
-function makePrintPage() {
+function makePrintPage(only = null, sheetTitle = null) {
+  printOnly = only && only.length ? new Set(only.map(m => m.type + ':' + m.id)) : null;
+  printPts = printOnly ? new Set(only.flatMap(entityPoints)) : null;
+  try { return buildPrintPage(sheetTitle); } finally { printOnly = null; printPts = null; }
+}
+function buildPrintPage(sheetTitle) {
   const B0 = bounds(), Bl = B0 && boundsWithLabels(1), landscape = !Bl || (Bl.x1 - Bl.x0) >= (Bl.y1 - Bl.y0);
   const mm = 200 / 25.4, PW = Math.round((landscape ? 297 : 210) * mm), PH = Math.round((landscape ? 210 : 297) * mm);
   const cv = document.createElement('canvas'); cv.width = PW; cv.height = PH;
@@ -2685,10 +2783,11 @@ function makePrintPage() {
   g.fillStyle = C['ink-soft']; g.font = `600 ${3 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
   g.fillText('SNEKKERBLOKK', tx, M + 4 * mm);
   g.fillStyle = C.ink; g.font = `700 ${7 * mm}px "IBM Plex Sans Condensed", "Arial Narrow", sans-serif`;
-  let title = doc.name || 'Untitled';
+  const fullTitle = (sheetTitle != null ? sheetTitle : doc.name) || 'Untitled';
+  let title = fullTitle;
   const maxW = PW - tx - M - 60 * mm;
   while (g.measureText(title).width > maxW && title.length > 4) title = title.slice(0, -2);
-  if (title !== (doc.name || 'Untitled')) title += '…';
+  if (title !== fullTitle) title += '…';
   g.fillText(title, tx, M + 11.5 * mm);
   // innhold i rammen
   const fx = M, fy = M + headH, fw = PW - 2 * M, fh = PH - M - fy, rad = 5 * mm, S = 2.4;
@@ -2738,24 +2837,34 @@ function pdfFromJpeg(bytes, iw, ih, landscape) {
   for (const p of parts) { out.set(p, o); o += p.length; }
   return out;
 }
-let printPage = null;
-$('#imgBtn').addEventListener('click', () => {
-  flushSave();
-  printPage = makePrintPage();
+let printPage = null, printSel = [], printScope = 'all', printTimer;
+function refreshPrint() {
+  printPage = makePrintPage(printScope === 'sel' ? printSel : null, $('#printTitle').value);
   $('#imgOut').src = printPage.cv.toDataURL('image/jpeg', 0.85);
+  document.querySelectorAll('#printScope [data-scope]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scope === printScope)));
+}
+$('#imgBtn').addEventListener('click', () => {
+  flushSave(); closeMenus();
+  printSel = multi.slice();
+  printScope = printSel.length ? 'sel' : 'all';
+  $('#printScope').hidden = !printSel.length;
+  $('#printTitle').value = doc.name || '';
+  refreshPrint();
   $('#imgOverlay').hidden = false;
   requestRender();
 });
+$('#printScope').addEventListener('click', e => { const b = e.target.closest('[data-scope]'); if (!b) return; printScope = b.dataset.scope; refreshPrint(); });
+$('#printTitle').addEventListener('input', () => { clearTimeout(printTimer); printTimer = setTimeout(refreshPrint, 350); });
 $('#savePdf').addEventListener('click', async () => {
   if (!printPage) return;
   const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/jpeg', 0.92));
   const pdf = pdfFromJpeg(new Uint8Array(await blob.arrayBuffer()), printPage.cv.width, printPage.cv.height, printPage.landscape);
-  saveBlob(safeName(doc.name) + '.pdf', new Blob([pdf], { type: 'application/pdf' }), 'The print');
+  saveBlob(safeName($('#printTitle').value || doc.name) + '.pdf', new Blob([pdf], { type: 'application/pdf' }), 'The print');
 });
 $('#savePng').addEventListener('click', async () => {
   if (!printPage) return;
   const blob = await new Promise(r => printPage.cv.toBlob(r, 'image/png'));
-  saveBlob(safeName(doc.name) + '.png', blob, 'The image');
+  saveBlob(safeName($('#printTitle').value || doc.name) + '.png', blob, 'The image');
 });
 $('#imgClose').addEventListener('click', () => { $('#imgOverlay').hidden = true; });
 
@@ -2797,6 +2906,7 @@ if (APP_VERSION) {
 }
 
 /* ---------- oppstart ---------- */
+if (settings.tool === 'aux') settings.tool = 'line';
 if (navigator.standalone) document.documentElement.classList.add('standalone');
 loadStore();
 const startDoc = store.current && store.drawings[store.current] ? JSON.parse(JSON.stringify(store.drawings[store.current])) : sampleDoc();
